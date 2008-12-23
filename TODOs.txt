@@ -1,0 +1,21 @@
+* Limit requests/threads per minute
+* More daemon like run mode
+* HttpClient: http://hc.apache.org/httpclient-3.x/
+  - Setting Browser information
+  - Muli threaded mode: http://hc.apache.org/httpclient-3.x/threading.html
+* Check mime type for html or txt
+* Unit tests
+* Maven plugins: http://maven.apache.org/plugins/
+  - site: Page generating
+  - Building easy to run assemblies: http://maven.apache.org/plugins/maven-assembly-plugin/
+  - pmd http://maven.apache.org/plugins/maven-pmd-plugin/
+  - scm
+  - jdepend: http://mojo.codehaus.org/jdepend-maven-plugin/
+  - taglist: http://mojo.codehaus.org/taglist-maven-plugin/
+  - licence: http://code.google.com/p/maven-license-plugin/wiki/Configuration
+  - buildnumber: http://commons.ucalgary.ca/projects/maven-buildnumber-plugin/howto.html
+* URL normalization: http://en.wikipedia.org/wiki/URL_normalization
+* Support for more performant data bases:
+  - db4o: http://de.wikipedia.org/wiki/Db4o
+  - hibernate
+  - h2: http://www.h2database.com/html/main.html
