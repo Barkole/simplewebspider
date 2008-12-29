@@ -28,10 +28,11 @@ import simplespider.simplespider.enity.Link;
  * Hello world!
  */
 public class Main {
-	private static final int		MAX_CURRENT_THREADS	= 4;
-	private static final Log		LOG					= LogFactory.getLog(Main.class);
+	private static final int		MAX_CURRENT_THREADS		= 4;
+	private static final int		MAX_THREADS_PER_MINUTE	= 2;
+	private static final Log		LOG						= LogFactory.getLog(Main.class);
 
-	private volatile boolean		cancled				= false;
+	private volatile boolean		cancled					= false;
 	private final DbHelperFactory	dbHelperFactory;
 	final HttpClientFactory			httpClientFactory;
 
@@ -68,11 +69,15 @@ public class Main {
 		final LinkDao linkDao = db.getLinkDao();
 
 		final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_CURRENT_THREADS);
+		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 
 		while (!this.cancled) {
+			// Block while to much threads were working in last minute
+			limitThroughPut.next();
+
 			final Link next = linkDao.getNext();
 			if (next == null) {
-				LOG.info("No more links available...");
+				LOG.warn("No more links available...");
 				break;
 			}
 
@@ -81,7 +86,7 @@ public class Main {
 			db.commitTransaction();
 
 			final String baseUrl = next.getUrl();
-			LOG.debug("Start crawling URL: \"" + baseUrl + "\"");
+			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
 
 			final LinkExtractor extractor = new LinkExtractorImpl();
 			final Crawler crawler = new CrawlerImpl(this.dbHelperFactory, extractor, this.httpClientFactory);
