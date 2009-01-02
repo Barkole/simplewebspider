@@ -69,14 +69,29 @@ public class LinkExtractorImpl implements LinkExtractor {
 		final SimpleUrl url = SimpleUrl.newURL(baseUrl, null);
 
 		final ArrayList<String> links = new ArrayList<String>();
-		links.addAll(getLinksBySimpleTag(url, tagNode, "a", "href"));
-		links.addAll(getLinksBySimpleTag(url, tagNode, "frame", "src"));
-		links.addAll(getLinksBySimpleTag(url, tagNode, "iframe", "src"));
-		links.addAll(getLinksBySimpleTag(url, tagNode, "ilayer", "src"));
+		// html
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "a", "href"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "frame", "src"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "iframe", "src"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "ilayer", "src"));
+
+		// rss & rdf
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "atom:link", "href"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "category", "domain"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "source", "url"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "comments"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "link"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "guid"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "wfw:commentRss"));
+
+		// atom
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "link", "href"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "id"));
+
 		return links;
 	}
 
-	private List<String> getLinksBySimpleTag(final SimpleUrl baseUrl, final TagNode tagNode, final String tagName, final String attributeName) {
+	private List<String> getLinksBySimpleTagAttribute(final SimpleUrl baseUrl, final TagNode tagNode, final String tagName, final String attributeName) {
 		ValidityHelper.checkNotNull("baseUrl", baseUrl);
 		ValidityHelper.checkNotNull("tagNode", tagNode);
 		ValidityHelper.checkNotEmpty("tagName", tagName);
@@ -91,6 +106,35 @@ public class LinkExtractorImpl implements LinkExtractor {
 			if (!ValidityHelper.isEmpty(reference)) {
 				try {
 					final SimpleUrl newUrl = SimpleUrl.newURL(baseUrl, reference);
+					if (newUrl == null) {
+						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
+					} else {
+						links.add(newUrl.toString());
+					}
+				} catch (final Exception e) {
+					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
+				}
+			}
+		}
+
+		return links;
+	}
+
+	// FIXME Most the same like getLinksBySimpleTagAttribute -> Refactoring
+	private List<String> getLinksBySimpleTagContent(final SimpleUrl baseUrl, final TagNode tagNode, final String tagName) {
+		ValidityHelper.checkNotNull("baseUrl", baseUrl);
+		ValidityHelper.checkNotNull("tagNode", tagNode);
+		ValidityHelper.checkNotEmpty("tagName", tagName);
+
+		final List<String> links = new ArrayList<String>();
+
+		final TagNode[] frames = getTagByName(tagNode, tagName);
+		for (final TagNode frame : frames) {
+			final StringBuffer reference = frame.getText();
+			// Ignoring tags with empty attributes
+			if (!ValidityHelper.isEmpty(reference)) {
+				try {
+					final SimpleUrl newUrl = SimpleUrl.newURL(baseUrl, reference.toString());
 					if (newUrl == null) {
 						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
 					} else {
