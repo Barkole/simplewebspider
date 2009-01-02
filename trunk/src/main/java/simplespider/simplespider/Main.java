@@ -29,7 +29,7 @@ import simplespider.simplespider.enity.Link;
  */
 public class Main {
 	private static final int		MAX_CURRENT_THREADS		= 4;
-	private static final int		MAX_THREADS_PER_MINUTE	= 2;
+	private static final int		MAX_THREADS_PER_MINUTE	= 10;
 	private static final Log		LOG						= LogFactory.getLog(Main.class);
 
 	private volatile boolean		cancled					= false;
