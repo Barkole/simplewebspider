@@ -1,10 +1,16 @@
 * Check mime type for html or txt
 * Improve performance getting new links:
-  - Don't use xml normalizing and parsing at all, but splitting by "=" 
-* URL normalization: http://en.wikipedia.org/wiki/URL_normalization
+  - Don't use xml normalizing and parsing at all, but splitting by "="
+* Building new links
+  - Use own logic to concat links
+  - URL normalization: http://en.wikipedia.org/wiki/URL_normalization
 * HttpClient: http://hc.apache.org/httpclient-3.x/
   - Setting Browser information
   - Muli threaded mode: http://hc.apache.org/httpclient-3.x/threading.html
+* Configuration
+  - Provide default settings
+  - allow set configuration by command -> http://commons.apache.org/cli/
+  - allow set configuration by file
 * More daemon like run mode
 * Unit tests
 * Maven plugins: http://maven.apache.org/plugins/
@@ -20,3 +26,4 @@
   - db4o: http://de.wikipedia.org/wiki/Db4o
   - hibernate
   - h2: http://www.h2database.com/html/main.html
+  - Derby/JavaDB
