@@ -185,6 +185,8 @@ public class CrawlerImpl implements Crawler {
 				|| "text/html".equalsIgnoreCase(mimeType) //
 				|| "text/xml".equalsIgnoreCase(mimeType) //
 				|| "application/atom+xml".equalsIgnoreCase(mimeType) //
+				|| "application/atomcoll+xml".equalsIgnoreCase(mimeType) //
+				|| "application/atomserv+xml".equalsIgnoreCase(mimeType) //
 				|| "application/html+xml".equalsIgnoreCase(mimeType) //
 				|| "application/rdf+xml".equalsIgnoreCase(mimeType) //
 				|| "application/rss+xml".equalsIgnoreCase(mimeType) //
