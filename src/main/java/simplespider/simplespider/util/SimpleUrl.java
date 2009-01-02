@@ -500,10 +500,18 @@ public class SimpleUrl {
 		// this is the path plus quest plus ref
 		// if there is no quest and no ref the result is identical to getPath
 		// this is defined according to http://java.sun.com/j2se/1.4.2/docs/api/java/net/URL.html#getFile()
-		if (this.quest != null) {
-			return ((includeReference) && (this.ref != null)) ? this.path + "?" + this.quest + "#" + this.ref : this.path + "?" + this.quest;
+		final StringBuilder sb = new StringBuilder();
+		sb.append(this.path);
+
+		if (!ValidityHelper.isEmpty(this.quest)) {
+			sb.append('?').append(this.quest);
 		}
-		return ((includeReference) && (this.ref != null)) ? this.path + "#" + this.ref : this.path;
+
+		if (includeReference && !ValidityHelper.isEmpty(this.ref)) {
+			sb.append('#').append(this.ref);
+		}
+
+		return sb.toString();
 	}
 
 	public String getFileName() {
@@ -614,7 +622,7 @@ public class SimpleUrl {
 	}
 
 	public boolean isPOST() {
-		return (this.quest != null) && (this.quest.length() > 0);
+		return !ValidityHelper.isEmpty(this.quest);
 	}
 
 	// language calculation
@@ -727,7 +735,7 @@ public class SimpleUrl {
 		return myPath.equals("") ? "/" : myPath;
 	}
 
-	private String toNormalform(final boolean includeReference) {
+	public String toNormalform(final boolean includeReference) {
 		// generates a normal form of the URL
 		boolean defaultPort = false;
 		if (this.protocol.equals("mailto")) {
@@ -754,7 +762,7 @@ public class SimpleUrl {
 				+ ((defaultPort) ? ("") : (":" + this.port)) + resolvedPath;
 	}
 
-	private String toNormalform(final boolean stripReference, final boolean stripAmp) {
+	public String toNormalform(final boolean stripReference, final boolean stripAmp) {
 		String result = toNormalform(!stripReference);
 		if (stripAmp) {
 			result = result.replaceAll("&amp;", "&");
