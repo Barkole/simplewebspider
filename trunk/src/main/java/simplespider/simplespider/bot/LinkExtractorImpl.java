@@ -95,6 +95,13 @@ public class LinkExtractorImpl implements LinkExtractor {
 		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "member", "hrefreadonly"));
 		links.addAll(getLinksBySimpleTagContent(url, tagNode, "id"));
 
+		// opml
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "outline", "htmlUrl"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "outline", "url"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "outline", "xmlUrl"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "docs"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "ownerId"));
+
 		return links;
 	}
 
