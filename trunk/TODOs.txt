@@ -9,6 +9,8 @@
   - Provide default settings
   - allow set configuration by command -> http://commons.apache.org/cli/
   - allow set configuration by file
+* Bootstrap phase:
+  - Load all xx first items sequential at first, than do random get next
 * More daemon like run mode
 * Unit tests
 * Maven plugins: http://maven.apache.org/plugins/
@@ -27,17 +29,6 @@
   - Derby/JavaDB
   
 Known bugs:
-* Failed to handle mailto link: (low - causes no failure)
-	INFO: Ignoring malformed URL "mailto:info@xxx.com.ni"
-	java.lang.NullPointerException
-		at simplespider.simplespider.util.SimpleUrl.<init>(SimpleUrl.java:73)
-		at simplespider.simplespider.util.SimpleUrl.newURL(SimpleUrl.java:255)
-		at simplespider.simplespider.bot.CrawlerImpl.saveLinks(CrawlerImpl.java:114)
-		at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:91)
-		at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:20)
-		at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:885)
-		at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:907)
-		at java.lang.Thread.run(Thread.java:619)
 * Unique constrain failures: (low - causes no failure)
 	WARNING: Failed to crawl
 	java.lang.RuntimeException: Failed to save link Link [id:null,url:"http://www.xxx.de/xxx/xxx/",done:false]
