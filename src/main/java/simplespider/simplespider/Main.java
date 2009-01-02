@@ -118,5 +118,6 @@ public class Main {
 		final Main main = new Main(dbHelperFactory, httpClientFactory);
 		main.startCancleListener();
 		main.runCrawler();
+		System.exit(0);
 	}
 }
