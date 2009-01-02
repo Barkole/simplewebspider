@@ -99,18 +99,17 @@ public class SimpleUrl {
 		escape();
 	}
 
-	private SimpleUrl(final String url) throws MalformedURLException {
-		if (url == null) {
-			throw new MalformedURLException("url string is null");
-		}
+	public SimpleUrl(final String url) throws MalformedURLException {
+		checkNotEmpty("url", url);
 
 		parseURLString(url);
 	}
 
-	private SimpleUrl(final String protocol, final String host, final int port, final String path) throws MalformedURLException {
-		if (protocol == null) {
-			throw new MalformedURLException("protocol is null");
-		}
+	public SimpleUrl(final String protocol, final String host, final int port, final String path) throws MalformedURLException {
+		checkNotEmpty("protocol", protocol);
+		checkNotEmpty("host", host);
+		checkNotLowerThan("port", port, 0);
+
 		this.protocol = protocol;
 		this.host = host;
 		this.port = port;
@@ -118,6 +117,45 @@ public class SimpleUrl {
 		identRef();
 		identQuest();
 		escape();
+	}
+
+	private static void checkNotLowerThan(final String name, final long value, final long limit) throws MalformedURLException {
+		ValidityHelper.checkNotEmpty("name", name);
+
+		if (value < limit) {
+			throw new MalformedURLException(name + " is lower than " + limit + ": " + value);
+		}
+	}
+
+	private static void checkNotEmpty(final String name, final CharSequence value) throws MalformedURLException {
+		ValidityHelper.checkNotEmpty("name", name);
+
+		if (value == null) {
+			throw new MalformedURLException(name + " is null");
+		}
+		if (ValidityHelper.isEmpty(value)) {
+			throw new MalformedURLException(name + " is empty");
+		}
+	}
+
+	/**
+	 * Copy constructor
+	 * 
+	 * @param baseURL
+	 *            must not be <code>null</code>
+	 * @throws NullPointerException
+	 *             if <code>baseUrl</code> is <code>null</code>
+	 */
+	public SimpleUrl(final SimpleUrl baseURL) {
+		ValidityHelper.checkNotNull("baseURL", baseURL);
+
+		this.host = baseURL.host;
+		this.path = baseURL.path;
+		this.port = baseURL.port;
+		this.protocol = baseURL.protocol;
+		this.quest = baseURL.quest;
+		this.ref = baseURL.ref;
+		this.userInfo = baseURL.userInfo;
 	}
 
 	/**
@@ -243,7 +281,12 @@ public class SimpleUrl {
 				|| isAbsolute(relPath)) {
 			return new SimpleUrl(relPath);
 		}
-		return new SimpleUrl(baseURL, relPath == null ? "" : relPath);
+
+		if (ValidityHelper.isEmpty(relPath)) {
+			return new SimpleUrl(baseURL);
+		}
+
+		return new SimpleUrl(baseURL, relPath);
 	}
 
 	// TODO Replace this logic by public constructor
@@ -252,7 +295,12 @@ public class SimpleUrl {
 				|| isAbsolute(relPath)) {
 			return new SimpleUrl(relPath);
 		}
-		return new SimpleUrl(new SimpleUrl(baseURL), relPath == null ? "" : relPath);
+
+		if (ValidityHelper.isEmpty(relPath)) {
+			return new SimpleUrl(baseURL);
+		}
+
+		return new SimpleUrl(new SimpleUrl(baseURL), relPath);
 	}
 
 	private static boolean isAbsolute(final String path) {

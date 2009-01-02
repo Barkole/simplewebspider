@@ -111,7 +111,7 @@ public class CrawlerImpl implements Crawler {
 			for (final String url : urls) {
 				SimpleUrl simpleUrl;
 				try {
-					simpleUrl = SimpleUrl.newURL(url, null);
+					simpleUrl = new SimpleUrl(url);
 				} catch (final Exception e) {
 					LOG.info("Ignoring malformed URL \"" + url + "\"", e);
 					continue;
@@ -156,8 +156,8 @@ public class CrawlerImpl implements Crawler {
 			return null;
 		}
 
-		final String cleanedBasedUrl = SimpleUrl.newURL(baseUrl, null).toString();
-		final String cleanedRealBaseUrl = SimpleUrl.newURL(realBaseUrl, null).toString();
+		final String cleanedBasedUrl = new SimpleUrl(baseUrl).toString();
+		final String cleanedRealBaseUrl = new SimpleUrl(realBaseUrl).toString();
 
 		if (isRedirectDouble(cleanedBasedUrl, cleanedRealBaseUrl)) {
 			// Was redirected to a URL, thats already available, so nothing is to do
