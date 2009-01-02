@@ -123,7 +123,7 @@ public class CrawlerImpl implements Crawler {
 					continue;
 				}
 
-				final String cleanedUrl = simpleUrl.toString();
+				final String cleanedUrl = simpleUrl.toNormalform(false);
 				if (linkDao.isAvailable(cleanedUrl)) {
 					LOG.debug("URL is already available: \"" + url + "\"");
 					continue;
@@ -156,8 +156,8 @@ public class CrawlerImpl implements Crawler {
 			return null;
 		}
 
-		final String cleanedBasedUrl = new SimpleUrl(baseUrl).toString();
-		final String cleanedRealBaseUrl = new SimpleUrl(realBaseUrl).toString();
+		final String cleanedBasedUrl = new SimpleUrl(baseUrl).toNormalform(false);
+		final String cleanedRealBaseUrl = new SimpleUrl(realBaseUrl).toNormalform(false);
 
 		if (isRedirectDouble(cleanedBasedUrl, cleanedRealBaseUrl)) {
 			// Was redirected to a URL, thats already available, so nothing is to do
