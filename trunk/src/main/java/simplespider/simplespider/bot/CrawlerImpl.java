@@ -170,11 +170,21 @@ public class CrawlerImpl implements Crawler {
 			return null;
 		}
 
-		try {
-			return this.linkExtractor.getUrls(bodyAsStream, cleanedRealBaseUrl);
-		} catch (final IOException e) {
-			LOG.warn("Failed to extract links from body for url \"" + cleanedRealBaseUrl + "\"", e);
-			return null;
+		final String mimeType = httpClient.getMimeType();
+		// Only supporting HTTP and mime type plain and html
+		// If not mime type is defined, so hope it will be plain or html ;-)
+		if (ValidityHelper.isEmpty(mimeType) //
+				|| "text/plain".equalsIgnoreCase(mimeType) //
+				|| "text/html".equalsIgnoreCase(mimeType)) {
+			try {
+				return this.linkExtractor.getUrls(bodyAsStream, cleanedRealBaseUrl);
+			} catch (final IOException e) {
+				LOG.warn("Failed to extract links from body for url \"" + cleanedRealBaseUrl + "\"", e);
+				return null;
+			}
+		} else {
+			LOG.info("Not supporting mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+			return new ArrayList<String>(0);
 		}
 	}
 

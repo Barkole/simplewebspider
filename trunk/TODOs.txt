@@ -1,4 +1,3 @@
-* Check mime type for html or txt
 * Improve performance getting new links:
   - Don't use xml normalizing and parsing at all, but splitting by "="
 * Building new links

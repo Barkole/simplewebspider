@@ -3,6 +3,7 @@ package simplespider.simplespider.bot.http.apache;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpException;
 import org.apache.commons.httpclient.HttpMethod;
 import org.apache.commons.httpclient.StatusLine;
@@ -49,9 +50,7 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#getStatusCode()
 	 */
 	public int getStatusCode() {
-		if (this.method == null) {
-			throw new IllegalStateException("There is no open connection");
-		}
+		checkForOpenConnection();
 		return this.method.getStatusCode();
 	}
 
@@ -60,9 +59,7 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#getStatusLine()
 	 */
 	public StatusLine getStatusLine() {
-		if (this.method == null) {
-			throw new IllegalStateException("There is no open connection");
-		}
+		checkForOpenConnection();
 		return this.method.getStatusLine();
 	}
 
@@ -71,9 +68,7 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#getStatusText()
 	 */
 	public String getStatusText() {
-		if (this.method == null) {
-			throw new IllegalStateException("There is no open connection");
-		}
+		checkForOpenConnection();
 		return this.method.getStatusText();
 	}
 
@@ -82,6 +77,7 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#getRedirectedUrl()
 	 */
 	public String getRedirectedUrl() throws URIException {
+		checkForOpenConnection();
 		final URI uri = this.method.getURI();
 		final String realBaseUrl = uri.getURI();
 		return realBaseUrl;
@@ -92,6 +88,7 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#getResponseBodyAsStream()
 	 */
 	public InputStream getResponseBodyAsStream() throws IOException {
+		checkForOpenConnection();
 		return this.method.getResponseBodyAsStream();
 	}
 
@@ -100,11 +97,32 @@ public class ApacheHttpClient implements HttpClient {
 	 * @see simplespider.simplespider_core.http.HttpClient#releaseConnection()
 	 */
 	public void releaseConnection() {
+		checkForOpenConnection();
+		this.method.releaseConnection();
+		this.method = null;
+	}
+
+	private void checkForOpenConnection() {
 		if (this.method == null) {
 			throw new IllegalStateException("There is no open connection");
 		}
-		this.method.releaseConnection();
-		this.method = null;
+	}
+
+	public String getMimeType() {
+		checkForOpenConnection();
+		final Header contentTypeHeader = this.method.getResponseHeader("Content-Type");
+		if (contentTypeHeader == null) {
+			return null;
+		}
+
+		final String contentTypeValue = contentTypeHeader.getValue();
+		if (contentTypeValue == null) {
+			return null;
+		}
+
+		// Only the first part is the mime type: e.g. "text/html; charset=UTF-8"
+		final String[] split = contentTypeValue.split(";", -1);
+		return split[0];
 	}
 
 }

@@ -23,4 +23,6 @@ public interface HttpClient {
 
 	public abstract void releaseConnection();
 
+	public abstract String getMimeType();
+
 }
