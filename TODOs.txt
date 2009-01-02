@@ -28,7 +28,7 @@
   
 Known bugs:
 * Failed to handle mailto link: (low - causes no failure)
-	INFO: Ignoring malformed URL "mailto:info@elnuevodiario.com.ni"
+	INFO: Ignoring malformed URL "mailto:info@xxx.com.ni"
 	java.lang.NullPointerException
 		at simplespider.simplespider.util.SimpleUrl.<init>(SimpleUrl.java:73)
 		at simplespider.simplespider.util.SimpleUrl.newURL(SimpleUrl.java:255)
@@ -40,7 +40,7 @@ Known bugs:
 		at java.lang.Thread.run(Thread.java:619)
 * Unique constrain failures: (low - causes no failure)
 	WARNING: Failed to crawl
-	java.lang.RuntimeException: Failed to save link Link [id:null,url:"http://www.allegebraucht.de/Buch/Cartoons%20und%20Comics/",done:false]
+	java.lang.RuntimeException: Failed to save link Link [id:null,url:"http://www.xxx.de/xxx/xxx/",done:false]
 		at simplespider.simplespider.dao.jdbc.JdbcLinkDao.save(JdbcLinkDao.java:167)
 		at simplespider.simplespider.bot.CrawlerImpl.saveLinks(CrawlerImpl.java:133)
 		at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:91)
@@ -53,3 +53,7 @@ Known bugs:
 		at org.hsqldb.jdbc.jdbcPreparedStatement.executeUpdate(Unknown Source)
 		at simplespider.simplespider.dao.jdbc.JdbcLinkDao.save(JdbcLinkDao.java:145)
 		... 6 more
+* Program quits, if to less links available (low - restarting causes rerun)
+	The problem is, that main thread not wait for running thread. The could insert more new links
+	-> Solution: try it after quitting of a running thread again, until no thread are running,
+	   if there is no link, too, so no link will be inserted and program can quit
