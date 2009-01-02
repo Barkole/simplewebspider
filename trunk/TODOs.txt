@@ -1,5 +1,6 @@
 * Improve performance getting new links:
   - Don't use xml normalizing and parsing at all, but splitting by "="
+  - Detect binary content and skip that URL
 * Building new links
   - URL normalization: http://en.wikipedia.org/wiki/URL_normalization
 * HttpClient: http://hc.apache.org/httpclient-3.x/
