@@ -182,7 +182,13 @@ public class CrawlerImpl implements Crawler {
 		// If not mime type is defined, so hope it will be plain or html ;-)
 		if (ValidityHelper.isEmpty(mimeType) //
 				|| "text/plain".equalsIgnoreCase(mimeType) //
-				|| "text/html".equalsIgnoreCase(mimeType)) {
+				|| "text/html".equalsIgnoreCase(mimeType) //
+				|| "text/xml".equalsIgnoreCase(mimeType) //
+				|| "application/atom+xml".equalsIgnoreCase(mimeType) //
+				|| "application/html+xml".equalsIgnoreCase(mimeType) //
+				|| "application/rdf+xml".equalsIgnoreCase(mimeType) //
+				|| "application/xml".equalsIgnoreCase(mimeType) //
+		) {
 			try {
 				return this.linkExtractor.getUrls(bodyAsStream, cleanedRealBaseUrl);
 			} catch (final IOException e) {
