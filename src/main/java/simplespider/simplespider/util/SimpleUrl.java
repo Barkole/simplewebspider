@@ -308,17 +308,11 @@ public class SimpleUrl {
 			return false;
 		}
 
-		// TODO An RegExpression would be better
-		final String pathLowerCase = path.toLowerCase();
-		return pathLowerCase.startsWith("http://") //
-				|| pathLowerCase.startsWith("https://") //
-				|| pathLowerCase.startsWith("ftp://") //
-				|| pathLowerCase.startsWith("file://") //
-				|| pathLowerCase.startsWith("smb://") //
-				|| pathLowerCase.startsWith("about:") //
-				|| pathLowerCase.startsWith("news:") //
-				|| pathLowerCase.startsWith("mailto:") //
-				|| pathLowerCase.startsWith("javascript:");
+		// Use only find, so we have no need to define the whole complex URI RegExp
+		final Pattern protocalPattern = Pattern.compile("[a-zA-Z]+:");
+		final Matcher protocolMatcher = protocalPattern.matcher(path);
+		// If the expression is found AND is found at the beginning of given string, so we assume that is an absolute URI according to URI definition
+		return protocolMatcher.find() && protocolMatcher.start() == 0;
 	}
 
 	// from: http://www.w3.org/International/unescape.java
