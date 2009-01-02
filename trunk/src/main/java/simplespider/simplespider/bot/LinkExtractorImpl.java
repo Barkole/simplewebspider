@@ -66,7 +66,7 @@ public class LinkExtractorImpl implements LinkExtractor {
 			throw new RuntimeException("Failed to load url \"" + baseUrl + "\"", e);
 		}
 
-		final SimpleUrl url = SimpleUrl.newURL(baseUrl, null);
+		final SimpleUrl url = new SimpleUrl(baseUrl);
 
 		final ArrayList<String> links = new ArrayList<String>();
 		// html
