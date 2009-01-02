@@ -1,7 +1,6 @@
 * Improve performance getting new links:
   - Don't use xml normalizing and parsing at all, but splitting by "="
 * Building new links
-  - Use own logic to concat links
   - URL normalization: http://en.wikipedia.org/wiki/URL_normalization
 * HttpClient: http://hc.apache.org/httpclient-3.x/
   - Setting Browser information
@@ -26,3 +25,31 @@
   - hibernate
   - h2: http://www.h2database.com/html/main.html
   - Derby/JavaDB
+  
+Known bugs:
+* Failed to handle mailto link: (low - causes no failure)
+	INFO: Ignoring malformed URL "mailto:info@elnuevodiario.com.ni"
+	java.lang.NullPointerException
+		at simplespider.simplespider.util.SimpleUrl.<init>(SimpleUrl.java:73)
+		at simplespider.simplespider.util.SimpleUrl.newURL(SimpleUrl.java:255)
+		at simplespider.simplespider.bot.CrawlerImpl.saveLinks(CrawlerImpl.java:114)
+		at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:91)
+		at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:20)
+		at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:885)
+		at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:907)
+		at java.lang.Thread.run(Thread.java:619)
+* Unique constrain failures: (low - causes no failure)
+	WARNING: Failed to crawl
+	java.lang.RuntimeException: Failed to save link Link [id:null,url:"http://www.allegebraucht.de/Buch/Cartoons%20und%20Comics/",done:false]
+		at simplespider.simplespider.dao.jdbc.JdbcLinkDao.save(JdbcLinkDao.java:167)
+		at simplespider.simplespider.bot.CrawlerImpl.saveLinks(CrawlerImpl.java:133)
+		at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:91)
+		at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:20)
+		at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:885)
+		at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:907)
+		at java.lang.Thread.run(Thread.java:619)
+	Caused by: java.sql.SQLException: Unique constraint violation: LINK_URL_UNIQUE in statement [INSERT INTO link (url, done, errors) VALUES (?, ?, ?)]
+		at org.hsqldb.jdbc.Util.throwError(Unknown Source)
+		at org.hsqldb.jdbc.jdbcPreparedStatement.executeUpdate(Unknown Source)
+		at simplespider.simplespider.dao.jdbc.JdbcLinkDao.save(JdbcLinkDao.java:145)
+		... 6 more

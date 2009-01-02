@@ -2,6 +2,7 @@ package simplespider.simplespider.bot;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +18,7 @@ import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.enity.Link;
-import simplespider.simplespider.util.UrlUtil;
+import simplespider.simplespider.util.SimpleUrl;
 import simplespider.simplespider.util.ValidityHelper;
 
 public class CrawlerImpl implements Crawler {
@@ -108,23 +109,21 @@ public class CrawlerImpl implements Crawler {
 			final LinkDao linkDao = dbHelper.getLinkDao();
 
 			for (final String url : urls) {
-				String cleanedUrl = UrlUtil.cleanUrl(url);
-				if (ValidityHelper.isEmpty(cleanedUrl)) {
-					LOG.info("Ignoring URL \"" + url + "\"");
-					continue;
-				}
-
+				SimpleUrl simpleUrl;
 				try {
-					cleanedUrl = UrlUtil.setRootPath(cleanedUrl);
-				} catch (final IllegalArgumentException e) {
-					LOG.info("Ignoring URL \"" + url + "\"", e);
-					continue;
-				}
-				if (ValidityHelper.isEmpty(cleanedUrl)) {
-					LOG.info("Ignoring URL \"" + url + "\"");
+					simpleUrl = SimpleUrl.newURL(url, null);
+				} catch (final Exception e) {
+					LOG.info("Ignoring malformed URL \"" + url + "\"", e);
 					continue;
 				}
 
+				final String protocol = simpleUrl.getProtocol();
+				if (!isSupportedProtocol(protocol)) {
+					LOG.info("Ignoring URL without supported protocol: \"" + url + "\"");
+					continue;
+				}
+
+				final String cleanedUrl = simpleUrl.toString();
 				if (linkDao.isAvailable(cleanedUrl)) {
 					LOG.debug("URL is already available: \"" + url + "\"");
 					continue;
@@ -140,7 +139,15 @@ public class CrawlerImpl implements Crawler {
 		}
 	}
 
-	private List<String> getLinks(final String baseUrl, final HttpClient httpClient) throws SQLException {
+	private boolean isSupportedProtocol(final String protocol) {
+		ValidityHelper.checkNotEmpty("protocol", protocol);
+
+		return "http".equals(protocol) //
+				|| "https".equals(protocol) //
+				|| "ftp".equals(protocol);
+	}
+
+	private List<String> getLinks(final String baseUrl, final HttpClient httpClient) throws SQLException, MalformedURLException {
 		final String realBaseUrl;
 		try {
 			realBaseUrl = httpClient.getRedirectedUrl();
@@ -149,8 +156,8 @@ public class CrawlerImpl implements Crawler {
 			return null;
 		}
 
-		final String cleanedBasedUrl = UrlUtil.setRootPath(UrlUtil.cleanUrl(baseUrl));
-		final String cleanedRealBaseUrl = UrlUtil.setRootPath(UrlUtil.cleanUrl(realBaseUrl));
+		final String cleanedBasedUrl = SimpleUrl.newURL(baseUrl, null).toString();
+		final String cleanedRealBaseUrl = SimpleUrl.newURL(realBaseUrl, null).toString();
 
 		if (isRedirectDouble(cleanedBasedUrl, cleanedRealBaseUrl)) {
 			// Was redirected to a URL, thats already available, so nothing is to do

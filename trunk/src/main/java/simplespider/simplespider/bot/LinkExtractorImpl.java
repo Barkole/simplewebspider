@@ -15,7 +15,7 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 
-import simplespider.simplespider.util.UrlUtil;
+import simplespider.simplespider.util.SimpleUrl;
 import simplespider.simplespider.util.ValidityHelper;
 
 public class LinkExtractorImpl implements LinkExtractor {
@@ -66,16 +66,18 @@ public class LinkExtractorImpl implements LinkExtractor {
 			throw new RuntimeException("Failed to load url \"" + baseUrl + "\"", e);
 		}
 
+		final SimpleUrl url = SimpleUrl.newURL(baseUrl, null);
+
 		final ArrayList<String> links = new ArrayList<String>();
-		links.addAll(getLinksBySimpleTag(baseUrl, tagNode, "a", "href"));
-		links.addAll(getLinksBySimpleTag(baseUrl, tagNode, "frame", "src"));
-		links.addAll(getLinksBySimpleTag(baseUrl, tagNode, "iframe", "src"));
-		links.addAll(getLinksBySimpleTag(baseUrl, tagNode, "ilayer", "src"));
+		links.addAll(getLinksBySimpleTag(url, tagNode, "a", "href"));
+		links.addAll(getLinksBySimpleTag(url, tagNode, "frame", "src"));
+		links.addAll(getLinksBySimpleTag(url, tagNode, "iframe", "src"));
+		links.addAll(getLinksBySimpleTag(url, tagNode, "ilayer", "src"));
 		return links;
 	}
 
-	private List<String> getLinksBySimpleTag(final String baseUrl, final TagNode tagNode, final String tagName, final String attributeName) {
-		ValidityHelper.checkNotEmpty("baseUrl", baseUrl);
+	private List<String> getLinksBySimpleTag(final SimpleUrl baseUrl, final TagNode tagNode, final String tagName, final String attributeName) {
+		ValidityHelper.checkNotNull("baseUrl", baseUrl);
 		ValidityHelper.checkNotNull("tagNode", tagNode);
 		ValidityHelper.checkNotEmpty("tagName", tagName);
 		ValidityHelper.checkNotEmpty("attributeName", attributeName);
@@ -88,11 +90,11 @@ public class LinkExtractorImpl implements LinkExtractor {
 			// Ignoring tags with empty attributes
 			if (!ValidityHelper.isEmpty(reference)) {
 				try {
-					final String newUrl = UrlUtil.concatUrls(baseUrl, reference);
-					if (ValidityHelper.isEmpty(newUrl)) {
+					final SimpleUrl newUrl = SimpleUrl.newURL(baseUrl, reference);
+					if (newUrl == null) {
 						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
 					} else {
-						links.add(newUrl);
+						links.add(newUrl.toString());
 					}
 				} catch (final Exception e) {
 					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
