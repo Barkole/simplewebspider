@@ -78,14 +78,21 @@ public class LinkExtractorImpl implements LinkExtractor {
 		// rss & rdf
 		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "atom:link", "href"));
 		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "category", "domain"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "item", "rdf:about"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "rdf:li", "rdf:resource"));
 		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "source", "url"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "textinput", "rdf:resource"));
 		links.addAll(getLinksBySimpleTagContent(url, tagNode, "comments"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "docs"));
 		links.addAll(getLinksBySimpleTagContent(url, tagNode, "link"));
-		links.addAll(getLinksBySimpleTagContent(url, tagNode, "guid"));
+		links.addAll(getLinksBySimpleTagContent(url, tagNode, "url"));
 		links.addAll(getLinksBySimpleTagContent(url, tagNode, "wfw:commentRss"));
 
 		// atom
 		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "link", "href"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "collection", "href"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "member", "href"));
+		links.addAll(getLinksBySimpleTagAttribute(url, tagNode, "member", "hrefreadonly"));
 		links.addAll(getLinksBySimpleTagContent(url, tagNode, "id"));
 
 		return links;
