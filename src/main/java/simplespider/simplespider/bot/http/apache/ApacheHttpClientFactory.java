@@ -49,7 +49,7 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 
 		// RFC 2101 cookie management spec is used per default
 		// to parse, validate, format & match cookies
-		httpClient.getParams().setCookiePolicy(CookiePolicy.RFC_2109);
+		httpClient.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
 		// A different cookie management spec can be selected
 		// when desired
 
