@@ -716,6 +716,6 @@ public class SimpleUrl {
 
 	@Override
 	public String toString() {
-		return toNormalform(false, true);
+		return toNormalform(false, false);
 	}
 }
