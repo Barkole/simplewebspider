@@ -77,7 +77,7 @@ public class Main {
 
 			final Link next = linkDao.getNext();
 			if (next == null) {
-				LOG.warn("No more links available...");
+				LOG.fatal("No more links available...");
 				break;
 			}
 
@@ -86,7 +86,7 @@ public class Main {
 			db.commitTransaction();
 
 			final String baseUrl = next.getUrl();
-			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
+			LOG.debug("Start crawling URL: \"" + baseUrl + "\"");
 
 			final LinkExtractor extractor = new LinkExtractorImpl();
 			final Crawler crawler = new CrawlerImpl(this.dbHelperFactory, extractor, this.httpClientFactory);
