@@ -1,3 +1,15 @@
+********************
+** Hurting Bugs:
+********************
+* URLs are always escaped:
+  - Instead of
+      http://ga.wikipedia.org/w/index.php?title=Speisialta:RecentChanges&feed=rss
+    there is
+      http://ga.wikipedia.org/w/index.php?title=Speisialta:RecentChanges&amp;feed=rss
+
+********************
+** Feature Requests:
+********************
 * Logging:
   - Use log file
   - use log configuration
@@ -44,7 +56,9 @@
   - h2: http://www.h2database.com/html/main.html
   - Derby/JavaDB
   
-Known bugs:
+********************
+** Minor Bugs:
+********************
 * Unique constrain failures: (low - causes no failure)
 	WARNING: Failed to crawl
 	java.lang.RuntimeException: Failed to save link Link [id:null,url:"http://www.xxx.de/xxx/xxx/",done:false]
