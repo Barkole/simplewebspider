@@ -1,11 +1,10 @@
+* Logging:
+  - Use log file
+  - use log configuration
 * Improve performance getting new links:
   - Don't use xml normalizing and parsing at all, but splitting by "="
+  - Use streaming not load whole document into memory
   - Detect binary content and skip that URL
-* Better http error handling:
-  - Simple one: After xxx faults do not use this link again
-  - Perhaps more intelligent:
-     ~ Permanent errors (e.g. 403, 404) -> disable link
-     ~ Temporary errors (e.g. 500) -> try it later
 * Building new links
   - URL normalization: http://en.wikipedia.org/wiki/URL_normalization
 * HttpClient: http://hc.apache.org/httpclient-3.x/
@@ -18,6 +17,17 @@
 * Bootstrap phase:
   - Load all xx first items sequential at first, than do random get next
 * More daemon like run mode
+* Better http error handling:
+  - Simple one: After xxx faults do not use this link again
+  - Perhaps more intelligent:
+     -> But this could causes errors if using a proxy, because program cannot know, if error is caused
+        by destination server or by proxy
+     ~ Permanent errors (e.g. 403, 404) -> disable link
+     ~ Temporary errors (e.g. 500) -> try it later
+  - Slowing down, if too many errors happens.
+    -> Use an error hook so bot can call there was an error
+    -> Perhaps it would be a better way to throw exceptions (different for different failures) an bot
+       runner will call hook? 
 * Unit tests
 * Maven plugins: http://maven.apache.org/plugins/
   - site: Page generating
