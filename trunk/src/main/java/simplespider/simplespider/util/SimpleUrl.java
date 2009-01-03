@@ -45,7 +45,7 @@ public class SimpleUrl {
 			"%DE", "%DF", "%E0", "%E1", "%E2", "%E3", "%E4", "%E5", "%E6", "%E7", "%E8", "%E9", "%EA", "%EB", "%EC", "%ED", "%EE", "%EF", "%F0",
 			"%F1", "%F2", "%F3", "%F4", "%F5", "%F6", "%F7", "%F8", "%F9", "%FA", "%FB", "%FC", "%FD", "%FE", "%FF" };
 
-	private SimpleUrl(final SimpleUrl baseURL, String relPath) throws MalformedURLException {
+	public SimpleUrl(final SimpleUrl baseURL, String relPath) throws MalformedURLException {
 		if (baseURL == null) {
 			throw new MalformedURLException("base URL is null");
 		}
@@ -96,7 +96,7 @@ public class SimpleUrl {
 		this.path = resolveBackpath(this.path);
 		identRef();
 		identQuest();
-		escape();
+		// escape();
 	}
 
 	public SimpleUrl(final String url) throws MalformedURLException {
@@ -108,7 +108,6 @@ public class SimpleUrl {
 	public SimpleUrl(final String protocol, final String host, final int port, final String path) throws MalformedURLException {
 		checkNotEmpty("protocol", protocol);
 		checkNotEmpty("host", host);
-		checkNotLowerThan("port", port, 0);
 
 		this.protocol = protocol;
 		this.host = host;
@@ -116,15 +115,7 @@ public class SimpleUrl {
 		this.path = path;
 		identRef();
 		identQuest();
-		escape();
-	}
-
-	private static void checkNotLowerThan(final String name, final long value, final long limit) throws MalformedURLException {
-		ValidityHelper.checkNotEmpty("name", name);
-
-		if (value < limit) {
-			throw new MalformedURLException(name + " is lower than " + limit + ": " + value);
-		}
+		// escape();
 	}
 
 	private static void checkNotEmpty(final String name, final CharSequence value) throws MalformedURLException {
@@ -260,8 +251,8 @@ public class SimpleUrl {
 			// check stability: the normalform of the normalform must be equal to the normalform
 			if (aURL != null) {
 				try {
-					aURL1 = new SimpleUrl(aURL.toNormalform(false, true));
-					if (!(aURL1.toNormalform(false, true).equals(aURL.toNormalform(false, true)))) {
+					aURL1 = new SimpleUrl(aURL.toNormalform(true));
+					if (!(aURL1.toNormalform(true).equals(aURL.toNormalform(true)))) {
 						System.out.println("no stability for url:");
 						System.out.println("aURL0=" + aURL.toString());
 						System.out.println("aURL1=" + aURL1.toString());
@@ -443,45 +434,43 @@ public class SimpleUrl {
 	 * <li>quest: same as above without the ampersand ("&amp;") and the equals symbol</li>
 	 * </ul>
 	 */
-	private void escape() {
-		if (this.path != null && this.path.indexOf('%') == -1) {
-			escapePath();
-		}
-		if (this.quest != null && this.quest.indexOf('%') == -1) {
-			escapeQuest();
-		}
-		if (this.ref != null && this.ref.indexOf('%') == -1) {
-			escapeRef();
-		}
-	}
-
-	private void escapePath() {
-		final String[] pathp = this.path.split("/", -1);
-		String ptmp = "";
-		for (int i = 0; i < pathp.length; i++) {
-			ptmp += "/" + escape(pathp[i]);
-		}
-		this.path = ptmp.substring((ptmp.length() > 0) ? 1 : 0);
-	}
-
-	private void escapeQuest() {
-		final String[] questp = this.quest.split("&", -1);
-		String qtmp = "";
-		for (int i = 0; i < questp.length; i++) {
-			if (questp[i].indexOf('=') != -1) {
-				qtmp += "&" + escape(questp[i].substring(0, questp[i].indexOf('=')));
-				qtmp += "=" + escape(questp[i].substring(questp[i].indexOf('=') + 1));
-			} else {
-				qtmp += "&" + escape(questp[i]);
-			}
-		}
-		this.quest = qtmp.substring((qtmp.length() > 0) ? 1 : 0);
-	}
-
-	private void escapeRef() {
-		this.ref = escape(this.ref);
-	}
-
+	// private void escape() {
+	// if (this.path != null && this.path.indexOf('%') == -1) {
+	// escapePath();
+	// }
+	// if (this.quest != null && this.quest.indexOf('%') == -1) {
+	// escapeQuest();
+	// }
+	// if (this.ref != null && this.ref.indexOf('%') == -1) {
+	// escapeRef();
+	// }
+	// }
+	// private void escapePath() {
+	// final String[] pathp = this.path.split("/", -1);
+	// String ptmp = "";
+	// for (int i = 0; i < pathp.length; i++) {
+	// ptmp += "/" + escape(pathp[i]);
+	// }
+	// this.path = ptmp.substring((ptmp.length() > 0) ? 1 : 0);
+	// }
+	//
+	// private void escapeQuest() {
+	// final String[] questp = this.quest.split("&", -1);
+	// String qtmp = "";
+	// for (int i = 0; i < questp.length; i++) {
+	// if (questp[i].indexOf('=') != -1) {
+	// qtmp += "&" + escape(questp[i].substring(0, questp[i].indexOf('=')));
+	// qtmp += "=" + escape(questp[i].substring(questp[i].indexOf('=') + 1));
+	// } else {
+	// qtmp += "&" + escape(questp[i]);
+	// }
+	// }
+	// this.quest = qtmp.substring((qtmp.length() > 0) ? 1 : 0);
+	// }
+	//
+	// private void escapeRef() {
+	// this.ref = escape(this.ref);
+	// }
 	public String getAuthority() {
 		return ((this.port >= 0) && (this.host != null)) ? this.host + ":" + this.port : ((this.host != null) ? this.host : "");
 	}
@@ -674,7 +663,7 @@ public class SimpleUrl {
 			identPort(url, (this.protocol.equals("http") ? 80 : ((this.protocol.equals("https")) ? 443 : ((this.protocol.equals("ftp")) ? 21 : -1))));
 			identRef();
 			identQuest();
-			escape();
+			// escape();
 		} else {
 			// this is not a http or ftp url
 			if (this.protocol.equals("mailto")) {
@@ -756,16 +745,8 @@ public class SimpleUrl {
 				+ ((defaultPort) ? ("") : (":" + this.port)) + resolvedPath;
 	}
 
-	public String toNormalform(final boolean stripReference, final boolean stripAmp) {
-		String result = toNormalform(!stripReference);
-		if (stripAmp) {
-			result = result.replaceAll("&amp;", "&");
-		}
-		return result;
-	}
-
 	@Override
 	public String toString() {
-		return toNormalform(false, false);
+		return toNormalform(true);
 	}
 }

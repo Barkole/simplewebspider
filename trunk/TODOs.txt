@@ -1,13 +1,4 @@
 ********************
-** Hurting Bugs:
-********************
-* URLs are always escaped:
-  - Instead of
-      http://ga.wikipedia.org/w/index.php?title=Speisialta:RecentChanges&feed=rss
-    there is
-      http://ga.wikipedia.org/w/index.php?title=Speisialta:RecentChanges&amp;feed=rss
-
-********************
 ** Feature Requests:
 ********************
 * Logging:
