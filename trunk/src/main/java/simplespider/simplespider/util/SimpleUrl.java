@@ -720,29 +720,24 @@ public class SimpleUrl {
 
 	public String toNormalform(final boolean includeReference) {
 		// generates a normal form of the URL
-		boolean defaultPort = false;
 		if (this.protocol.equals("mailto")) {
 			return this.protocol + ":" + this.userInfo + "@" + this.host;
-		} else if (this.protocol.equals("http")) {
-			if (this.port < 0 || this.port == 80) {
-				defaultPort = true;
-			}
-		} else if (this.protocol.equals("ftp")) {
-			if (this.port < 0 || this.port == 21) {
-				defaultPort = true;
-			}
-		} else if (this.protocol.equals("https")) {
-			if (this.port < 0 || this.port == 443) {
-				defaultPort = true;
-			}
 		}
+
 		final String resolvedPath = resolveBackpath(this.getFile(includeReference));
 
-		if (defaultPort) {
-			return this.protocol + "://" + ((this.userInfo != null) ? (this.userInfo + "@") : ("")) + getHost().toLowerCase() + resolvedPath;
-		}
-		return this.protocol + "://" + ((this.userInfo != null) ? (this.userInfo + "@") : ("")) + getHost().toLowerCase()
-				+ ((defaultPort) ? ("") : (":" + this.port)) + resolvedPath;
+		return this.protocol + "://" //
+				+ ((this.userInfo != null) ? (this.userInfo + "@") : ("")) //
+				+ getHost().toLowerCase() //
+				+ (hasDefaultPort() ? "" : ":" + this.port) //
+				+ resolvedPath;
+	}
+
+	private boolean hasDefaultPort() {
+		return this.port < 0 //
+				|| (this.port == 21 && this.protocol.equals("ftp")) //
+				|| (this.port == 80 && this.protocol.equals("http")) //
+				|| (this.port == 443 && this.protocol.equals("https"));
 	}
 
 	@Override
