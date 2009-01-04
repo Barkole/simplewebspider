@@ -251,8 +251,8 @@ public class SimpleUrl {
 			// check stability: the normalform of the normalform must be equal to the normalform
 			if (aURL != null) {
 				try {
-					aURL1 = new SimpleUrl(aURL.toNormalform(true));
-					if (!(aURL1.toNormalform(true).equals(aURL.toNormalform(true)))) {
+					aURL1 = new SimpleUrl(aURL.toNormalform(true, true));
+					if (!(aURL1.toNormalform(true, true).equals(aURL.toNormalform(true, true)))) {
 						System.out.println("no stability for url:");
 						System.out.println("aURL0=" + aURL.toString());
 						System.out.println("aURL1=" + aURL1.toString());
@@ -733,6 +733,14 @@ public class SimpleUrl {
 				+ resolvedPath;
 	}
 
+	public String toNormalform(final boolean includeReference, final boolean stripAmp) {
+		String result = toNormalform(includeReference);
+		if (stripAmp) {
+			result = result.replaceAll("&amp;", "&");
+		}
+		return result;
+	}
+
 	private boolean hasDefaultPort() {
 		return this.port < 0 //
 				|| (this.port == 21 && this.protocol.equals("ftp")) //
@@ -742,6 +750,6 @@ public class SimpleUrl {
 
 	@Override
 	public String toString() {
-		return toNormalform(true);
+		return toNormalform(true, false);
 	}
 }

@@ -123,7 +123,8 @@ public class LinkExtractorImpl implements LinkExtractor {
 					if (newUrl == null) {
 						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
 					} else {
-						links.add(newUrl.toNormalform(false));
+						final String normalformedUrl = newUrl.toNormalform(false, true);
+						links.add(normalformedUrl);
 					}
 				} catch (final Exception e) {
 					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
@@ -152,7 +153,8 @@ public class LinkExtractorImpl implements LinkExtractor {
 					if (newUrl == null) {
 						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
 					} else {
-						links.add(newUrl.toNormalform(false));
+						final String normalformedUrl = newUrl.toNormalform(false, true);
+						links.add(normalformedUrl);
 					}
 				} catch (final Exception e) {
 					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
