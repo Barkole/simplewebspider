@@ -12,7 +12,7 @@
   - URL normalization: http://en.wikipedia.org/wiki/URL_normalization
 * HttpClient: http://hc.apache.org/httpclient-3.x/
   - Setting Browser information
-  - Muli threaded mode: http://hc.apache.org/httpclient-3.x/threading.html
+  - Multi threaded mode: http://hc.apache.org/httpclient-3.x/threading.html
 * Configuration
   - Provide default settings
   - allow set configuration by command -> http://commons.apache.org/cli/
