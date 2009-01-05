@@ -4,7 +4,7 @@
 	<groupId>simplespider</groupId>
 	<artifactId>simplespider-core</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<name>simplespider-core</name>
 	<developers>
 	</developers>
