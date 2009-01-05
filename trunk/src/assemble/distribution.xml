@@ -13,6 +13,11 @@
 			<fileMode>0600</fileMode>
 		</file>
 		<file>
+			<source>target/${project.build.finalName}-sources.jar</source>
+			<outputDirectory>/src</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
 			<source>testdb.properties</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0600</fileMode>
