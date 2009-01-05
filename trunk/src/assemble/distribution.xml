@@ -1,0 +1,55 @@
+<assembly>
+	<id>distribution</id>
+	<formats>
+		<format>zip</format>
+		<format>tar.gz</format>
+		<format>tar.bz2</format>
+		<format>dir</format>
+	</formats>
+	<files>
+		<file>
+			<source>target/${project.build.finalName}.jar</source>
+			<outputDirectory>/lib</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
+			<source>testdb.properties</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
+			<source>testdb.script</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
+			<source>src/assemble/resources/simple-web-spider.properties</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
+			<source>src/assemble/resources/simple-web-spider.sh</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0700</fileMode>
+		</file>
+<!--
+		<file>
+			<source>src/assemble/resources/simple-web-spider.bat</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+-->
+	</files>
+	<dependencySets>
+		<dependencySet>
+			<scope>provided</scope>
+			<includes />
+			<excludes>
+				<exclude>junit:junit</exclude>
+			</excludes>
+			<outputDirectory>/lib</outputDirectory>
+			<fileMode>0600</fileMode>
+			<directoryMode>0700</directoryMode>
+		</dependencySet>
+	</dependencySets>
+</assembly>

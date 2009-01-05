@@ -4,7 +4,7 @@
 	<groupId>simplespider</groupId>
 	<artifactId>simplespider-core</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<name>simplespider-core</name>
 	<developers>
 	</developers>
@@ -18,7 +18,12 @@
 				<dependency>
 					<groupId>commons-httpclient</groupId>
 					<artifactId>commons-httpclient</artifactId>
-					<version>[3.0,4.0)</version>
+					<version>3.0.1</version>
+					<!--
+						Assembly plugin forced us to set a fixed version:
+						http://jira.codehaus.org/browse/MASSEMBLY-248 
+						[3.0,4.0)
+					-->
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
@@ -32,7 +37,12 @@
 				<dependency>
 					<groupId>hsqldb</groupId>
 					<artifactId>hsqldb</artifactId>
-					<version>[1.8.0.0,2.0)</version>
+					<version>1.8.0.1</version>
+					<!--
+						Assembly plugin forced us to set a fixed version:
+						http://jira.codehaus.org/browse/MASSEMBLY-248 
+						[1.8.0.0,2.0)
+					-->
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
@@ -108,7 +118,12 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>[3.0,4.0)</version>
+			<version>3.8.1</version>
+			<!--
+				Assembly plugin forced us to set a fixed version:
+				http://jira.codehaus.org/browse/MASSEMBLY-248 
+				[4.0,5.0)
+			-->
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -118,15 +133,14 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>commons-logging</groupId>
-			<artifactId>commons-logging</artifactId>
-			<version>[1.1.0,2.0)</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
-			<version>[1.5.0,2.0)</version>
+			<version>1.5.6</version>
+			<!--
+				Assembly plugin forced us to set a fixed version:
+				http://jira.codehaus.org/browse/MASSEMBLY-248 
+				[1.5.0,2.0)
+			-->
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -196,10 +210,31 @@
 				-->
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
+					<!--
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
+					-->
+					<descriptors>
+						<descriptor>src/assemble/distribution.xml</descriptor>
+					</descriptors>
+					<archive>
+						<manifest>
+							<mainClass>simplespider.simplespider.Main</mainClass>
+						</manifest>
+					</archive>
 				</configuration>
+<!--
+				<executions>
+					<execution>
+						<id>make-assembly</id> < ! - - this is used for inheritance merges - - >
+						<phase>package</phase> < ! - - append to the packaging phase. - - >
+						<goals>
+							<goal>attached</goal> < ! - - goals == mojos - - >
+						</goals>
+					</execution>
+				</executions>
+-->
 			</plugin>
 		</plugins>
 	</build>
