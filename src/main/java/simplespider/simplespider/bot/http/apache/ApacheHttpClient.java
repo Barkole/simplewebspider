@@ -36,13 +36,7 @@ public class ApacheHttpClient implements HttpClient {
 		this.method = new GetMethod(url);
 		this.method.setFollowRedirects(true);
 
-		try {
-			this.httpClient.executeMethod(this.method);
-		} catch (final HttpException e) {
-			throw new HttpException("Failed to connect to url \"" + url + "\": " + e, e);
-		} catch (final IOException e) {
-			throw new IOException("Failed to connect to url \"" + url + "\": " + e, e);
-		}
+		this.httpClient.executeMethod(this.method);
 	}
 
 	/*
