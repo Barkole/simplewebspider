@@ -3,11 +3,13 @@ package simplespider.simplespider.bot;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.httpclient.CircularRedirectException;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +46,13 @@ public class CrawlerImpl implements Crawler {
 		try {
 			httpClient.createConnection(baseUrl);
 		} catch (final Exception e) {
-			LOG.info("Failed to load URL: \"" + baseUrl, e);
+			if (e instanceof SocketTimeoutException) {
+				LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+			} else if (e instanceof CircularRedirectException) {
+				LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+			} else {
+				LOG.info("Failed to load URL \"" + baseUrl + "\"", e);
+			}
 			return null;
 		}
 
