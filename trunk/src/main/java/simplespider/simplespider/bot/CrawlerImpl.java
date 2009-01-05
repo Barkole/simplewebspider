@@ -23,6 +23,7 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class CrawlerImpl implements Crawler {
 
+	// TODO Sleeping on error should be solved not here
 	private static final int		SLEEP_SECONDS_ON_ERROR	= 10;
 
 	private static final Log		LOG						= LogFactory.getLog(CrawlerImpl.class);
