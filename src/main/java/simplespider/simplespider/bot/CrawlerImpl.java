@@ -100,7 +100,7 @@ public class CrawlerImpl implements Crawler {
 				saveLinks(urls);
 			}
 		} catch (final Exception e) {
-			LOG.warn("Failed to crawl", e);
+			LOG.warn("Failed to crawl URL \"" + baseUrl + "\"", e);
 		}
 	}
 
