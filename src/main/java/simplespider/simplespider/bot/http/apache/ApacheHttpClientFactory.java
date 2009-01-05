@@ -12,7 +12,7 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class ApacheHttpClientFactory implements HttpClientFactory {
 
-	private static final int	CONNTECTION_TIMEOUT_MILLISECONDS	= 30000;
+	private static final int	CONNECTION_TIMEOUT_MILLISECONDS	= 30000;
 	private final ProxyHost		proxyHost;
 
 	public ApacheHttpClientFactory() {
@@ -41,7 +41,7 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 			httpClient.getHostConfiguration().setProxyHost(this.proxyHost);
 		}
 
-		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(CONNTECTION_TIMEOUT_MILLISECONDS);
+		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
 
 		// Get initial state object
 		final HttpState initialState = new HttpState();
