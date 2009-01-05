@@ -75,3 +75,6 @@
 	        at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:885)
 	        at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:907)
 	        at java.lang.Thread.run(Thread.java:619)
+	Or:
+	Failed to load URL: "http://www.google.com/Top/World/Deutsch/Regional/Europa/Österreich/Gesundheit/ <java.lang.IllegalArgumentException: Invalid uri 'http://www.google.com/Top/World/Deutsch/Regional/Europa/Österreich/Gesundheit/': escaped absolute path not valid>java.lang.IllegalArgumentException: Invalid uri 'http://www.google.com/Top/World/Deutsch/Regional/Europa/Österreich/Gesundheit/': escaped absolute path not valid
+	
