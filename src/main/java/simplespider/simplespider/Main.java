@@ -28,6 +28,7 @@ import simplespider.simplespider.enity.Link;
  * Hello world!
  */
 public class Main {
+	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
 	private static final int		MAX_CURRENT_THREADS		= 4;
 	private static final int		MAX_THREADS_PER_MINUTE	= 10;
 	private static final Log		LOG						= LogFactory.getLog(Main.class);
@@ -96,7 +97,7 @@ public class Main {
 		LOG.info("Invoke shutting down threads...");
 		threadPool.shutdown();
 		try {
-			threadPool.awaitTermination(1, TimeUnit.MINUTES);
+			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
 		} catch (final InterruptedException e) {
 			LOG.warn("failed to wait for ending of al threads", e);
 		}
