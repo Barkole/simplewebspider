@@ -28,12 +28,12 @@ import simplespider.simplespider.enity.Link;
  * Hello world!
  */
 public class Main {
-	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
-	private static final int		MAX_CURRENT_THREADS		= 4;
-	private static final int		MAX_THREADS_PER_MINUTE	= 10;
-	private static final Log		LOG						= LogFactory.getLog(Main.class);
+	private static final int		WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
+	private static final int		MAX_CURRENT_THREADS			= 4;
+	private static final int		MAX_THREADS_PER_MINUTE		= 10;
+	private static final Log		LOG							= LogFactory.getLog(Main.class);
 
-	private volatile boolean		cancled					= false;
+	private volatile boolean		cancled						= false;
 	private final DbHelperFactory	dbHelperFactory;
 	final HttpClientFactory			httpClientFactory;
 
@@ -46,6 +46,7 @@ public class Main {
 		final Thread listener = new Thread() {
 			@Override
 			public void run() {
+				System.out.println("Stop crawler with ENTER...");
 				LOG.info("Stop crawler with ENTER...");
 
 				try {
@@ -55,7 +56,8 @@ public class Main {
 				}
 				Main.this.cancled = true;
 
-				LOG.info("Invoke stopping crawler...");
+				System.out.println("Invoke stopping crawler...");
+				LOG.warn("Invoke stopping crawler...");
 			}
 
 		};
@@ -87,14 +89,14 @@ public class Main {
 			db.commitTransaction();
 
 			final String baseUrl = next.getUrl();
-			LOG.debug("Start crawling URL: \"" + baseUrl + "\"");
+			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
 
 			final LinkExtractor extractor = new LinkExtractorImpl();
 			final Crawler crawler = new CrawlerImpl(this.dbHelperFactory, extractor, this.httpClientFactory);
 			threadPool.execute(new CrawlerRunner(crawler, baseUrl));
 		}
 
-		LOG.info("Invoke shutting down threads...");
+		LOG.warn("Invoke shutting down threads...");
 		threadPool.shutdown();
 		try {
 			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
