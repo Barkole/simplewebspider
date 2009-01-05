@@ -2,6 +2,8 @@
 JAVA="`which java`"
 CONFIGFILE="simple-web-spider.properties"
 JAVANMAIN="simplespider.simplespider.Main"
+LOGFILE="simple-web-spider.log"
+PIDFILE="simple-web-spider.pid"
 OS="`uname`"
 
 #check if OS is Sun Solaris or one of the OpenSolaris distributions and use different version of id if necessary
@@ -32,15 +34,29 @@ usage() {
 startscript for simple web spider on UNIX-like systems
 Options
   -h, --help		show this help
-  -p, --print-only	only print the command, which would be executed to start Simple Web Spider
+  -t, --tail-log	show the output of "tail -f ${LOGFILE}" after starting (enables "-l")
+  -l, --logging		save the output to ${LOGFILE}
+  -d, --debug		show the output on the console
+  -p, --print-out	only print the command, which would be executed to start
   -- HOST PORT		set proxy host and port 
 USAGE
 }
 
+check_already_runnning () {
+	pid=`cat ${PIDFILE} 2>/dev/null` || true
+	if [ -f ${PIDFILE} -a -n "${pid}" ]; then
+		if kill -0 ${pid} 2>/dev/null; then
+			echo "Alread running (there is ${PIDFILE} - PID ${pid})."
+			exit 1
+		fi
+    fi
+}
+
+
 #startup simple web spider directory
 cd "`dirname $0`"
 
-options="`getopt -u -n SimpleWebSpider -o -h,-p -l help,print-only -- $@`"
+options="`getopt -u -n SimpleWebSpider -o -h,-d,-l,-p,-t -l help,debug,logging,print-out,tail-log -- $@`"
 if [ $? -ne 0 ];then
 	usage
 	exit 1
@@ -60,14 +76,39 @@ for option in ${options};do
 				usage
 				exit 3
 				;;
+			-l|--logging) 
+				LOGGING=1
+				if [ ${DEBUG} -eq 1 ];then
+					echo "can not combine -l and -d"
+					usage
+					exit 1;
+				fi
+				;;
+			-d|--debug)
+				DEBUG=1
+				if [ ${LOGGING} -eq 1 ];then
+					echo "can not combine -l and -d"
+					usage
+					exit 1;
+				fi
+				;;
 			-p|--print-out)
 				PRINTONLY=1
+				;;
+			-t|--tail-log)
+				LOGGING=1
+				TAILLOG=1
+				if [ ${DEBUG} -eq 1 ];then
+					echo "can not combine -t and -d"
+					usage
+					exit 1;
+				fi
 				;;
 			--)
 				isparameter=1;
 				;;
 			*)
-				echo "Invalid paramater ${option}"
+				echo "Invalid parameter ${option}"
 				usage
 				exit 1
 				;;
@@ -134,13 +175,30 @@ CLASSPATH=""
 for i in lib/*.jar; do CLASSPATH="${CLASSPATH}$i:"; done
 
 cmdline="${JAVA} ${JAVA_ARGS} -classpath ${CLASSPATH} ${JAVANMAIN} ${PARAMETER}";
+
+if [ ${DEBUG} -eq 1 ] #debug
+then
+	cmdline=${cmdline}
+elif [ $LOGGING -eq 1 ];then #logging
+	cmdline="${cmdline} >> ${LOGFILE} 2>>${LOGFILE} & echo \$! > ${PIDFILE}"
+else
+	cmdline="$cmdline >/dev/null 2>/dev/null & echo \$! > ${PIDFILE}"
+fi
+
 if [ ${PRINTONLY} -eq 1 ];then
-	echo ${cmdline}
+	echo "${cmdline}"
 else
 	echo "****************** Simple Web Spider **********************************"
 	echo "**** (C) by Michael Decker, usage granted under the GPL Version 3  ****"
 	echo "****   USE AT YOUR OWN RISK! Project home and releases:            ****"
 	echo "****   simplewebspider.sf.net                                      ****"
-	echo "************************************************************************"
-	eval ${cmdline}
+	echo "***********************************************************************"
+	
+	check_already_runnning
+	
+	eval "${cmdline}"
+	if [ ${TAILLOG} -eq 1 ];then
+		sleep 1
+		tail -f "${LOGFILE}"
+	fi
 fi

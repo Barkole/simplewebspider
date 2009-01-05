@@ -1,8 +1,6 @@
 package simplespider.simplespider;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -28,12 +26,20 @@ import simplespider.simplespider.enity.Link;
  * Hello world!
  */
 public class Main {
-	private static final int		WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
-	private static final int		MAX_CURRENT_THREADS			= 4;
-	private static final int		MAX_THREADS_PER_MINUTE		= 10;
-	private static final Log		LOG							= LogFactory.getLog(Main.class);
+	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
+	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
+	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
+	private static final int	MAX_CURRENT_THREADS			= 4;
+	private static final int	MAX_THREADS_PER_MINUTE		= 10;
+	private static final Log	LOG							= LogFactory.getLog(Main.class);
 
-	private volatile boolean		cancled						= false;
+	private static Thread		mainThread;
+
+	private static Thread getMainDaemonThread() {
+		return mainThread;
+	}
+
+	private volatile boolean		cancled	= false;
 	private final DbHelperFactory	dbHelperFactory;
 	final HttpClientFactory			httpClientFactory;
 
@@ -42,28 +48,35 @@ public class Main {
 		this.httpClientFactory = httpClientFactory;
 	}
 
+	static private void daemonize() {
+		mainThread = Thread.currentThread();
+		getPidFile().deleteOnExit();
+	}
+
+	private static File getPidFile() {
+		return new File(System.getProperty(PID_FILENAME_KEY, PID_FILENAME_DEFAULT));
+	}
+
 	private void startCancleListener() {
 		final Thread listener = new Thread() {
 			@Override
 			public void run() {
-				System.out.println("Stop crawler with ENTER...");
-				LOG.info("Stop crawler with ENTER...");
-
-				try {
-					new BufferedReader(new InputStreamReader(System.in)).readLine();
-				} catch (final IOException e) {
-					LOG.fatal("Failed to listen to input stream", e);
-				}
+				LOG.warn("Invoke stopping crawler...");
 				Main.this.cancled = true;
 
-				System.out.println("Invoke stopping crawler...");
-				LOG.warn("Invoke stopping crawler...");
+				try {
+					getMainDaemonThread().join();
+				} catch (final InterruptedException e) {
+					LOG.error("Interrupted which waiting on main daemon thread to complete.");
+				}
+
 			}
 
 		};
 
-		listener.setDaemon(true); // Ensure, that this thread will be terminated, if main is not running
-		listener.start();
+		listener.setDaemon(true);
+
+		Runtime.getRuntime().addShutdownHook(listener);
 	}
 
 	private void runCrawler() throws SQLException {
@@ -109,6 +122,13 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
+		try {
+			// do sanity checks and startup actions
+			daemonize();
+		} catch (final Throwable e) {
+			LOG.fatal("Startup failed", e);
+		}
+
 		final DbHelperFactory dbHelperFactory = new JdbcDbHelperFactory();
 
 		final HttpClientFactory httpClientFactory;
@@ -121,6 +141,5 @@ public class Main {
 		final Main main = new Main(dbHelperFactory, httpClientFactory);
 		main.startCancleListener();
 		main.runCrawler();
-		System.exit(0);
 	}
 }

@@ -1,9 +1,6 @@
 ********************
 ** Feature Requests:
 ********************
-* Logging:
-  - Use log file
-  - use log configuration
 * Improve performance getting new links:
   - Don't use xml normalizing and parsing at all, but splitting by "="
   - Use streaming not load whole document into memory
@@ -19,7 +16,6 @@
   - allow set configuration by file
 * Bootstrap phase:
   - Load all xx first items sequential at first, than do random get next
-* More daemon like run mode
 * Better http error handling:
   - Simple one: After xxx faults do not use this link again
   - Perhaps more intelligent:
