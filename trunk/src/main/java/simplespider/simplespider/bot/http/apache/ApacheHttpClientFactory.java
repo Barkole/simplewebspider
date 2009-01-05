@@ -5,6 +5,7 @@ import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
+import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
@@ -15,6 +16,7 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class ApacheHttpClientFactory implements HttpClientFactory {
 
+	private static final String	USER_AGENT						= "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 6.0)";
 	private static final int	CONNECTION_TIMEOUT_MILLISECONDS	= 30000;
 	private final ProxyHost		proxyHost;
 
@@ -46,21 +48,23 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		}
 
 		final HttpConnectionManager httpConnectionManager = httpClient.getHttpConnectionManager();
-		final HttpConnectionManagerParams params = httpConnectionManager.getParams();
-		params.setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
-		params.setSoTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		final HttpConnectionManagerParams httpConnectionManagerParams = httpConnectionManager.getParams();
+		httpConnectionManagerParams.setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
 
 		// Get initial state object
 		final HttpState initialState = new HttpState();
 		httpClient.setState(initialState);
 
-		// RFC 2101 cookie management spec is used per default
-		// to parse, validate, format & match cookies
-		httpClient.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
-		// A different cookie management spec can be selected
-		// when desired
+		final HttpClientParams clientParams = httpClient.getParams();
+		// More browser like behavior
+		clientParams.setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+		// More browser like behavior
+		clientParams.makeLenient();
+		// Setting client global socket timeout
+		clientParams.setSoTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		// Setting user agent
+		clientParams.setParameter("http.useragent", USER_AGENT);
 
 		return new ApacheHttpClient(httpClient);
 	}
-
 }
