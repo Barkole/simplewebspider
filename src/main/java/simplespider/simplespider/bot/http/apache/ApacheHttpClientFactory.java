@@ -1,8 +1,11 @@
 package simplespider.simplespider.bot.http.apache;
 
+import org.apache.commons.httpclient.HostConfiguration;
+import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpState;
 import org.apache.commons.httpclient.ProxyHost;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
+import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.protocol.Protocol;
 
 import simplespider.simplespider.bot.http.HttpClient;
@@ -38,10 +41,14 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		final org.apache.commons.httpclient.HttpClient httpClient = new org.apache.commons.httpclient.HttpClient();
 
 		if (this.proxyHost != null) {
-			httpClient.getHostConfiguration().setProxyHost(this.proxyHost);
+			final HostConfiguration hostConfiguration = httpClient.getHostConfiguration();
+			hostConfiguration.setProxyHost(this.proxyHost);
 		}
 
-		httpClient.getHttpConnectionManager().getParams().setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		final HttpConnectionManager httpConnectionManager = httpClient.getHttpConnectionManager();
+		final HttpConnectionManagerParams params = httpConnectionManager.getParams();
+		params.setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		params.setSoTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
 
 		// Get initial state object
 		final HttpState initialState = new HttpState();
