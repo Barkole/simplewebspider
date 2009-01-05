@@ -34,7 +34,6 @@
 * Unit tests
 * Maven plugins: http://maven.apache.org/plugins/
   - site: Page generating
-  - Building easy to run assemblies: http://maven.apache.org/plugins/maven-assembly-plugin/
   - pmd http://maven.apache.org/plugins/maven-pmd-plugin/
   - scm
   - jdepend: http://mojo.codehaus.org/jdepend-maven-plugin/
