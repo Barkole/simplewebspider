@@ -14,6 +14,14 @@
 			<item name="Download"
 				href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586" />
 		</links>
+		<!--
+			Information about apt, fml and xdoc:
+			http://maven.apache.org/doxia/references/apt-format.html
+		-->
+		<menu name="Main">
+			<item name="Introduction" href="/introduction.html" />
+			<item name="FAQs" href="/faqs.html" />
+		</menu>
 		<menu name="Community">
 			<item name="SourceForge Home" href="https://sourceforge.net/projects/simplewebspider/" />
 			<item name="Forums" href="https://sourceforge.net/forum/?group_id=248602" />
