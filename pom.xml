@@ -289,6 +289,44 @@
 	<reporting>
 		<plugins>
 			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jxr-maven-plugin</artifactId>
+			</plugin>  
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<artifactId>maven-clover-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>taglist-maven-plugin</artifactId>
+				<configuration>
+					<tags>
+						<tag>TODO</tag>
+			            <tag>FIXME</tag>
+			          </tags>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<configuration>
+					<targetjdk>1.5</targetjdk>
+					<rulesets>
+						<ruleset>/rulesets/basic.xml</ruleset>
+						<ruleset>/rulesets/controversial.xml</ruleset>
+					</rulesets>
+					<format>xml</format>
+					<linkXref>true</linkXref>
+					<sourceEncoding>utf-8</sourceEncoding>
+					<minimumTokens>100</minimumTokens>
+				</configuration>
+			</plugin>
+   			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-project-info-reports-plugin</artifactId>
 				<reportSets>
@@ -301,9 +339,9 @@
 							<report>project-team</report>
 							<report>scm</report>
 							<report>summary</report>
+							<report>license</report>
 <!--
 							<report>cim</report>
-							<report>license</report>
 							<report>mailing-list</report>
 -->
 						</reports>
@@ -312,10 +350,19 @@
 			</plugin>
 		</plugins>
 	</reporting>
+	<licenses>
+		<license>
+			<name>GPL 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+			<distribution>manual</distribution>
+			<comments />
+		</license>
+	</licenses>
 	<distributionManagement>
 		<site>
 			<!-- http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services -->
 			<id>simplewebspider.sourceforge.net</id>
+			<name>simplewebspider.sourceforge.net</name>
 			<url>sftp://USERNAME,simplewebspider@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
 	</distributionManagement>
