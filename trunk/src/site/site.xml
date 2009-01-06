@@ -4,6 +4,8 @@
           img="http://maven.apache.org/images/logos/maven-feather.png"/>
     <logo name="SourceForge" href="https://sourceforge.net/projects/simplewebspider/"
           img="http://sflogo.sourceforge.net/sflogo.php?group_id=248602&amp;type=2"/>
+    <logo name="GPL 3.0" href="http://www.gnu.org/licenses/gpl-3.0.html"
+          img="http://www.gnu.org/graphics/gplv3-88x31.png"/>
   </poweredBy>
 
   <body>
