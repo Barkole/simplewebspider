@@ -54,9 +54,7 @@
 		<dependencySet>
 			<scope>provided</scope>
 			<includes />
-			<excludes>
-				<exclude>junit:junit</exclude>
-			</excludes>
+			<excludes />
 			<outputDirectory>/lib</outputDirectory>
 			<fileMode>0600</fileMode>
 			<directoryMode>0700</directoryMode>
