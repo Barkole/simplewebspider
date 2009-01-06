@@ -1,10 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<!-- More repositories: http://www.mvnbrowser.com/repositories.html -->
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>simplespider</groupId>
 	<artifactId>simplespider-core</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.6-SNAPSHOT</version>
+	<version>0.0.7-SNAPSHOT</version>
 	<name>simplespider-core</name>
 	<description>Other spiders has a limited link depth, follows links not randomized or are combined with heavy indexing machines. This spider will has not link depth limits, randomize next url, that will be checked for new urls.</description>
 	<url>http://simplewebspider.sourceforge.net/</url>
@@ -29,11 +30,23 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<repositories>
+				<repository>
+					<id>apache</id>
+					<url>http://people.apache.org/repo/m1-ibiblio-rsync-repository/commons-httpclient/</url>
+					<releases>
+						<enabled>true</enabled>
+					</releases>
+					<snapshots>
+						<enabled>true</enabled>
+					</snapshots>
+				</repository>
+			</repositories>
 			<dependencies>
 				<dependency>
 					<groupId>commons-httpclient</groupId>
 					<artifactId>commons-httpclient</artifactId>
-					<version>3.0.1</version>
+					<version>3.1</version>
 					<!--
 						Assembly plugin forced us to set a fixed version:
 						http://jira.codehaus.org/browse/MASSEMBLY-248 
@@ -52,7 +65,7 @@
 				<dependency>
 					<groupId>hsqldb</groupId>
 					<artifactId>hsqldb</artifactId>
-					<version>1.8.0.1</version>
+					<version>1.8.0.7</version>
 					<!--
 						Assembly plugin forced us to set a fixed version:
 						http://jira.codehaus.org/browse/MASSEMBLY-248 
