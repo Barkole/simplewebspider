@@ -294,22 +294,18 @@
 				<reportSets>
 					<reportSet>
 						<reports>
-							<report>about</report>
-							<report>index</report>
-							<report>integration</report>
 							<report>dependencies</report>
-							<report>plugins</report>
-							<report>project-plugins</report>
+							<report>index</report>
 							<report>issue-tracking</report>
-							<report>mailing-list</report>
-							<report>mailing-lists</report>
-							<report>license</report>
-							<report>project-summary</report>
+							<report>plugins</report>
 							<report>project-team</report>
-							<report>team-list</report>
 							<report>scm</report>
-							<report>source-repository</report>
+							<report>summary</report>
+<!--
 							<report>cim</report>
+							<report>license</report>
+							<report>mailing-list</report>
+-->
 						</reports>
 					</reportSet>
 				</reportSets>
