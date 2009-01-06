@@ -1,30 +1,31 @@
 <project name="Simple Web Spider">
- <poweredBy>
-    <logo name="Maven" href="http://maven.apache.org/"
-          img="http://maven.apache.org/images/logos/maven-feather.png"/>
-    <logo name="SourceForge" href="https://sourceforge.net/projects/simplewebspider/"
-          img="http://sflogo.sourceforge.net/sflogo.php?group_id=248602&amp;type=2"/>
-    <logo name="GPL 3.0" href="http://www.gnu.org/licenses/gpl-3.0.html"
-          img="http://www.gnu.org/graphics/gplv3-88x31.png"/>
-  </poweredBy>
+	<poweredBy>
+		<logo name="Maven" href="http://maven.apache.org/"
+			img="http://maven.apache.org/images/logos/maven-feather.png" />
+		<logo name="SourceForge" href="https://sourceforge.net/projects/simplewebspider/"
+			img="http://sflogo.sourceforge.net/sflogo.php?group_id=248602&amp;type=2" />
+		<logo name="GPL 3.0" href="http://www.gnu.org/licenses/gpl-3.0.html"
+			img="http://www.gnu.org/graphics/gplv3-88x31.png" />
+	</poweredBy>
 
-  <body>
-	<links>
-		<item
-			name="Project Page"
-			href="https://sourceforge.net/projects/simplewebspider/"/>
-		<item
-			name="Download"
-			href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586"/>
-	</links>
-	 <menu name="Community">
-            <item name="SourceForge Home" href="https://sourceforge.net/projects/simplewebspider/"/>
-            <item name="Forums" href="https://sourceforge.net/forum/?group_id=248602"/>
-            <item name="Bugs" href="https://sourceforge.net/pm/task.php?group_project_id=58091&amp;group_id=248602&amp;func=browse"/>
-            <item name="Feature Requests" href="https://sourceforge.net/pm/task.php?group_project_id=58092&amp;group_id=248602&amp;func=browse"/>
-            <item name="Improvements" href="https://sourceforge.net/pm/task.php?group_project_id=58093&amp;group_id=248602&amp;func=browse"/>
-            <item name="Download" href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586"/>
-    </menu>
-	<menu ref="reports"/>      
-  </body>
+	<body>
+		<links>
+			<item name="Project Page" href="https://sourceforge.net/projects/simplewebspider/" />
+			<item name="Download"
+				href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586" />
+		</links>
+		<menu name="Community">
+			<item name="SourceForge Home" href="https://sourceforge.net/projects/simplewebspider/" />
+			<item name="Forums" href="https://sourceforge.net/forum/?group_id=248602" />
+			<item name="Bugs"
+				href="https://sourceforge.net/pm/task.php?group_project_id=58091&amp;group_id=248602&amp;func=browse" />
+			<item name="Feature Requests"
+				href="https://sourceforge.net/pm/task.php?group_project_id=58092&amp;group_id=248602&amp;func=browse" />
+			<item name="Improvements"
+				href="https://sourceforge.net/pm/task.php?group_project_id=58093&amp;group_id=248602&amp;func=browse" />
+			<item name="Download"
+				href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586" />
+		</menu>
+		<menu ref="reports" />
+	</body>
 </project>
