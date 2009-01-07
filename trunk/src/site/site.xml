@@ -19,7 +19,7 @@
 			http://maven.apache.org/doxia/references/apt-format.html
 		-->
 		<menu name="Main">
-			<item name="Introduction" href="/introduction.html" />
+			<item name="Introduction" href="/index.html" />
 			<item name="FAQs" href="/faqs.html" />
 		</menu>
 		<menu name="Community">
