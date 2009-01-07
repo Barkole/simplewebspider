@@ -297,10 +297,20 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.1</version>
+			</plugin>
 		</plugins>
 	</build>
 	<reporting>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-changes-plugin</artifactId>
+				<version>2.1</version>
+			</plugin>
 			<plugin>
 				<artifactId>maven-javadoc-plugin</artifactId>
 			</plugin>
@@ -353,6 +363,7 @@
 							<report>scm</report>
 							<report>summary</report>
 							<report>license</report>
+							<report>changes-report</report>
 <!--
 							<report>cim</report>
 							<report>mailing-list</report>
