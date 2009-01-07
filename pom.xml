@@ -356,7 +356,6 @@
 					<reportSet>
 						<reports>
 							<report>dependencies</report>
-							<report>index</report>
 							<report>issue-tracking</report>
 							<report>plugins</report>
 							<report>project-team</report>
@@ -365,6 +364,7 @@
 							<report>license</report>
 							<report>changes-report</report>
 <!--
+							<report>index</report>
 							<report>cim</report>
 							<report>mailing-list</report>
 -->
