@@ -5,25 +5,47 @@
   <part id="general">
     <title>General</title>
 
-    <faq id="whats-foo">
+    <faq id="whats-simplewebspider">
       <question>
-        What is Foo?
+        What is SimpleWebSpider?
       </question>
       <answer>
-        <p>some markup goes here</p>
-
-        <source>some source code</source>
-
-        <p>some markup goes here</p>
+      	<p>It's a simple Java based application, running an all system, that can run java virtual machine (javavm).</p>
+      	<p>This program will start with some web pages, scan for new links to other pages and than visit them.</p>
       </answer>
     </faq>
 
-    <faq id="whats-bar">
+    <faq id="Do-I-get-anonymity-with-SimpleWebSpider">
       <question>
-        What is Bar?
+        Do I get anonymity with SimpleWebSpider?
       </question>
       <answer>
-        <p>some markup goes here</p>
+        <p>No. You are not getting anonymity. But it should be harder to track your normal page visits</p>
+        <p>You can try <a href="http://www.torproject.org/">Tor</a> to get some anonymity.</p>
+      </answer>
+    </faq>
+
+    <faq id="Why-I-should-use-SimpleWebSpider">
+      <question>
+        Why I should use SimpleWebSpider?
+      </question>
+      <answer>
+        <p>Their can be some reasons:</p>
+        <ul>
+        	<li>You use some indexer like <a href="http://yacy.net/">YaCy</a> and you will give this tools some web pages to index.</li>
+        	<li>You are curious, which pages that tool will visit.</li>
+        	<li>You want to try to obfuscate you web page visits.</li>
+        </ul>
+      </answer>
+    </faq>
+
+    <faq id="Is-it-illegal-to-use-SimpleWebSpider">
+      <question>
+        Is it illegal to use SimpleWebSpider
+      </question>
+      <answer>
+      	<p>At first you're using this tool on your own risk. But why should it be illegal to use another program as your browser to visit web pages?</p>
+      	<p>But it could be, that this tool will visit some pages, which you would never visit. And if some one (e.g. your country, your ISP or the web hoster) will track this access, he could blame you for this and you could get into trouble.</p>
       </answer>
     </faq>
   </part>
@@ -32,15 +54,85 @@
 
     <title>Installation</title>
 
-    <faq id="how-install">
+    <faq id="Where-can-I-download-current-version-of-SimpleWebSpider">
       <question>
-        How do I install Foo?
+        Where can I download current version of SimpleWebSpider?
       </question>
       <answer>
-        <p>some markup goes here</p>
+      	<p>You get all available version on <a href="http://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586">Sourceforge</a>.</p>
+      </answer>
+    </faq>
+
+    <faq id="Which-file-is-the-correct-file-for-me">
+      <question>
+        Which file is the correct file for me?
+      </question>
+      <answer>
+      	<p>There are some available:</p>
+      	<ul>
+      		<li><tt>.zip:</tt> Windows user</li>
+      		<li><tt>.tar.gz:</tt> Linux/*nix user</li>
+      		<li><tt>.jar:</tt> this contains only the class files for main program, not usable alone.</li>
+      		<li><tt>-sources.jar:</tt> this contains the sources of this program, but not the whole project. If you'r curious, what code is running.</li>
+      	</ul>
+      </answer>
+    </faq>
+
+    <faq id="How-can-I-install-SimpleWebSpider">
+      <question>
+        How can I install SimpleWebSpider?
+      </question>
+      <answer>
+      	<p>You only need to uncompress the file and save the directory where ever you want to.</p>
+      </answer>
+    </faq>
+
+    <faq id="Which-java-version-do-I-need">
+      <question>
+        Which java version do I need?
+      </question>
+      <answer>
+      	<p>You need 1.5 or higher.</p>
+      </answer>
+    </faq>
+
+    <faq id="How-can-I-run-SimpleWebSpider">
+      <question>
+        How can I run SimpleWebSpider?
+      </question>
+      <answer>
+      	<p>For some operations systems, there are helper scripts:</p>
+      	<ul>
+      		<li>Linux/*nix: Use <tt>start-sws.sh</tt></li>
+      		<li>Mac OS X: Use also <tt>start-sws.sh</tt> it should work</li>
+      		<li>M$ Windows: Not today, but there is an open taks: <a href="http://sourceforge.net/pm/task.php?func=detailtask&amp;project_task_id=152920&amp;group_id=248602&amp;group_project_id=58092">Script for start under windows</a></li>
+      	</ul>
       </answer>
     </faq>
 
   </part>
 
+  <part id="troubleshooting">
+
+    <title>Troubleshooting</title>
+    
+    <faq id="Where-can-I-can-get-help">
+    	<question>
+    		Where can I can get help?
+    	</question>
+    	<answer>
+    		Please use the <a href="http://sourceforge.net/forum/?group_id=248602">forums</a>.
+    	</answer>
+    </faq>
+
+    <faq id="I-ve-some-but-feature-or-improvement-request-where-can-I-ask-for-implementation">
+    	<question>
+    		I've some but, feature or improvement request, where can I ask for implementation?
+    	</question>
+    	<answer>
+    		Please use the <a href="http://sourceforge.net/forum/?group_id=248602">forums</a>. And after this describe your request as some <a href="http://sourceforge.net/pm/?group_id=248602">task</a>. 
+    	</answer>
+    </faq>
+
+  </part>
 </faqs>
