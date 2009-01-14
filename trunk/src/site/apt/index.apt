@@ -1,107 +1,31 @@
                                     ------
-                                    Title
+                                    SimpleWebSpider Project Home
                                     ------
-                                    Author
-                                    ------
-                                     Date
 
-Other spiders has a limited link depth, follows links not randomized or are combined with heavy indexing machines. This spider will has not link depth limits, randomize next url, that will be checked for new urls.
+Main feature
 
-  Paragraph 1, line 1.
-  Paragraph 1, line 2.
+  Other spiders has a limited link depth, follows links not randomized or are combined with
+  heavy indexing machines. This spider will has not link depth limits, randomize next url, that will
+  be checked for new urls.
+  
+Motivation
 
-  Paragraph 2, line 1.
-  Paragraph 2, line 2.
+  Some countries are collecting communication data from their citizens. So they are able to track
+  every call, e-mail transmitting or web page visit. Or some internet service providers (ISP) track
+  their customers and display personalized advertise.
+  
+Other pages
 
-Section title
+* Information
 
-* Sub-section title
+  * {{{http://en.wikipedia.org/wiki/Telecommunications_data_retention}Wikipedia - telecommunications data retention}}.
 
-** Sub-sub-section title
+* Other projects
 
-*** Sub-sub-sub-section title
+  * {{{http://www.torproject.org/}Tor: anonymity online}}
 
-**** Sub-sub-sub-sub-section title
+* News
 
-      * List item 1.
+  * {{{http://blog.wired.com/27bstroke6/2008/06/isp-spying-made.html}Leaked Report: ISP Secretly Added Spy Code To Web Sessions, Crashing Browsers}}
 
-      * List item 2.
-
-        Paragraph contained in list item 2.
-
-            * Sub-list item 1.
-
-            * Sub-list item 2.
-
-      * List item 3.
-        Force end of list:
-
-      []
-
-+------------------------------------------+
-Verbatim text not contained in list item 3
-+------------------------------------------+
-
-      [[1]] Numbered item 1.
-
-                [[A]] Numbered item A.
-
-                [[B]] Numbered item B.
-
-      [[2]] Numbered item 2.
-
-  List numbering schemes: [[1]], [[a]], [[A]], [[i]], [[I]].
-
-      [Defined term 1] of definition list.
-
-      [Defined term 2] of definition list.
-
-+-------------------------------+
-Verbatim text
-                        in a box        
-+-------------------------------+
-
-  --- instead of +-- suppresses the box around verbatim text.
-
-[Figure name] Figure caption
-
-*----------*--------------+----------------:
-| Centered | Left-aligned | Right-aligned  |
-| cell 1,1 | cell 1,2     | cell 1,3       |
-*----------*--------------+----------------:
-| cell 2,1 | cell 2,2     | cell 2,3       |
-*----------*--------------+----------------:
-Table caption
-
-  No grid, no caption:
-
-*-----*------*
- cell | cell
-*-----*------*
- cell | cell
-*-----*------*
-
-  Horizontal line:
-
-=======================================================================
-
-^L
-  New page.
-
-  <Italic> font. <<Bold>> font. <<<Monospaced>>> font.
-
-  {Anchor}. Link to {{anchor}}. Link to {{http://www.pixware.fr}}. 
-  Link to {{{anchor}showing alternate text}}.
-  Link to {{{http://www.pixware.fr}Pixware home page}}.
-
-  Force line\
-  break.
-
-  Non\ breaking\ space.
-
-  Escaped special characters: \~, \=, \-, \+, \*, \[, \], \<, \>, \{, \}, \\.
-
-  Copyright symbol: \251, \xA9, \u00a9.
-
-~~Commented out.
-
+  * {{{http://www.dailymail.co.uk/news/article-556068/We-spied-36-000-customers-using-internet-admits-BT.html}We spied on 36,000 customers using the internet, admits BT}}
