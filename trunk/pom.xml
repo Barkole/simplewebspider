@@ -19,6 +19,7 @@
 			<name>berendona</name>
 			<email>berendona@users.sourceforge.net</email>
 			<url>https://sourceforge.net/users/berendona/</url>
+			<timezone>+1</timezone>
 			<roles>
 				<role>Developer</role>
 			</roles>
