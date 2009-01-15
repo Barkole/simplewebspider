@@ -307,6 +307,7 @@
 					<tagBase>https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tagBase>
 					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
 					<releaseProfiles>releases</releaseProfiles>
+					<goals>assembly:assembly</goals>
 				</configuration>
 			</plugin>
 		</plugins>
