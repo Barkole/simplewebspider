@@ -401,11 +401,26 @@
 		</license>
 	</licenses>
 	<distributionManagement>
+		<downloadUrl>http://simplewebspider.sourceforge.net/repository/main</downloadUrl>
 		<site>
 			<!-- http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services -->
 			<id>simplewebspider.sourceforge.net</id>
 			<name>simplewebspider.sourceforge.net</name>
 			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
+		<repository>
+			<id>simplewebspider.sourceforge.net.main</id>
+			<name>Simple Web Spider Repository</name>
+			<uniqueVersion>true</uniqueVersion>
+			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/main</url>
+			<layout>default</layout>
+		</repository>
+		<snapshotRepository>
+			<id>simplewebspider.sourceforge.net.snapshot</id>
+			<name>Simple Web Spider Snapshot Repository</name>
+			<uniqueVersion>true</uniqueVersion>
+			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/snapshot</url>
+			<layout>default</layout>
+		</snapshotRepository>
 	</distributionManagement>
 </project>
