@@ -198,7 +198,7 @@
 		</contributor>
 	</contributors>
 	<scm>
-		<connection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<connection>scm:svn:${sfUsername}:${sfPassword}@https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
 		<developerConnection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
 		<tag>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tag>
 		<url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url>
@@ -405,7 +405,7 @@
 			<!-- http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services -->
 			<id>simplewebspider.sourceforge.net</id>
 			<name>simplewebspider.sourceforge.net</name>
-			<url>sftp://USERNAME,simplewebspider@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
+			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
 	</distributionManagement>
 </project>
