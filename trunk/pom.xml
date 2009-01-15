@@ -198,9 +198,9 @@
 		</contributor>
 	</contributors>
 	<scm>
-		<connection>scm:svn:${sfUsername}:${sfPassword}@https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
-		<developerConnection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
-		<tag>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tag>
+		<connection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<developerConnection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
+		<tag>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tag>
 		<url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url>
 	</scm>
 	<build>
