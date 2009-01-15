@@ -398,17 +398,17 @@
 			<url>scp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
 		<repository>
-			<id>simplewebspider.sourceforge.net.main</id>
+			<id>releases</id>
 			<name>Simple Web Spider Repository</name>
 			<uniqueVersion>true</uniqueVersion>
-			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/main</url>
+			<url>scp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/main</url>
 			<layout>default</layout>
 		</repository>
 		<snapshotRepository>
-			<id>simplewebspider.sourceforge.net.snapshot</id>
+			<id>snapshots</id>
 			<name>Simple Web Spider Snapshot Repository</name>
 			<uniqueVersion>true</uniqueVersion>
-			<url>sftp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/snapshot</url>
+			<url>scp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs/repository/snapshot</url>
 			<layout>default</layout>
 		</snapshotRepository>
 	</distributionManagement>
