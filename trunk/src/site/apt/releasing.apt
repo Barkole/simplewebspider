@@ -1,0 +1,78 @@
+                                    ------
+                                    Releasing
+                                    ------
+
+Requirements
+
+	You need a sourceforge account and must be related to this project.
+	
+	Than you have to set up your <<<~/.m2/settings.xml>>> or
+	<<<C:\Document and Settings\YOUR USERNAME\.m2\settings.xml>>> like this:
+
++------------------------------
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+  http://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <profiles>
+    <profile>
+      <!-- It's your choice, must must be unique -->
+      <id>simplespider-core</id>
+      <activation>
+        <!-- That should only used, if you want to activated this by default -->
+        <activeByDefault>true</activeByDefault> 
+      </activation>
+      <properties>
+         <sfUsername>YOUR SOURCEFORGE NAME</sfUsername>
+         <sfPassword>YOUR SOURCEFORGE PASSWORD</sfPassword>
+      </properties>
+    </profile>
+  </profiles>
+</settings>
++------------------------------
+
+Perform release
+
+	How to create a release.
+
+* Prepare
+
+	At first you prepare the release. So you can define the created version number and the next one.
+	Maven will also create a tag for this release:
+
++--------------------------------------------
+$ mvn clean release:clean release:prepare
++--------------------------------------------
+	
+* Perform
+
+	After preparing you can perform building release. So the assemblies will be built and uploaded to
+	{{sftp://frs.sourceforge.net}} and page will be updated, too:
+
++--------------------------------------------
+$ mvn release:perform 
++--------------------------------------------
+
+* Cleanup
+
+	Sometime something happens, so we need to clean up. At first please delete created tag and than call
+	also: 
+
++--------------------------------------------
+$ mvn release:rollback 
++--------------------------------------------
+
+* Simplified
+
+	You can perform preparing and performing in one step, too:
+
++--------------------------------------------
+$ mvn clean release:clean release:prepare release:perform
++--------------------------------------------
+
+	
+Additional links
+
+	* {{{http://maven.apache.org/guides/mini/guide-releasing.html}Releasing Guide}} by Maven
+
+	* {{{http://maven.apache.org/plugins/maven-release-plugin/}Maven Release Plugin}}

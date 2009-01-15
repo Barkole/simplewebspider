@@ -5,31 +5,38 @@
 	-->
 	<properties>
 		<title>Changes</title>
-		<author email="berendona@users.sourceforge.net">Johnny R. Ruiz III</author>
+		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
-		<release version="1.1" date="2005-03-01" description="Subsequent release">
-			<action dev="jruiz" type="add">
-				Added additional documentation on how
-				to configure the plugin.
-      </action>
-			<action dev="aramirez" type="fix" issue="MPJIRA-11">
-				Enable retrieving
-				component-specific issues.
-      </action>
-			<action dev="jruiz" type="remove" due-to="Allan Ramirez"
-				due-to-email="aramirez@exist.com">
-				The element type " link " must be terminated by the
-				matching end-tag.
-				Deleted the erroneous code.
-      </action>
+
+		<release version="0.0.8" date="2009-01-XX" description="Project management only">
+			<action dev="berendona" type="add" issue="153246">Release management by maven with site and
+				assemblies auto	upload</action>
+			<action dev="berendona" type="add" issue="152921">Generating home page by maven</action>
+			<action dev="berendona" type="add" issue="152923">Site report: collect TODOs and
+				FIXMEs</action>
+			<action dev="berendona" type="add" issue="152924">Site report: use PMD for code
+				checks</action>
 		</release>
 
-		<release version="1.0" date="2005-01-01" description="First release">
-			<action dev="jruiz" type="update">
-				Uploaded documentation on how to use
-				the plugin.
-      </action>
+		<release version="0.0.7" date="2009-01-05" description="Features and fixes">
+			<action dev="berendona" type="fix">Improve logging messages on some exception: spare some
+				stacktrace without positive effects</action>
+			<action dev="berendona" type="fix">some other bug fixes</action>
+			<action dev="berendona" type="update">Updating required libraries: commons-httpclient and
+				hsqldb</action>
+			<action dev="berendona" type="remove">Do not provide tar.bz2 anymore</action>
+		</release>
+
+		<release version="0.0.3" date="2009-01-05" description="Feature release">
+			<action dev="berendona" type="add">allowing deamon mode under linux</action>
+		</release>
+
+		<release version="0.0.2" date="2009-01-05" description="First release">
+			<action dev="berendona" type="add">first runable demonstation</action>
+			<action dev="berendona" type="add">linux shell script for simplified start</action>
+			<action dev="berendona" type="add">providing zip, tar.gz and tar.bz2 with all dependencies and source code</action>
+			<action dev="berendona" type="add">providing jar with only compiled classes and jar with only source code</action>
 		</release>
 	</body>
 </document>
