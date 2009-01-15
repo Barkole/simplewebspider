@@ -12,6 +12,7 @@
 		<release version="0.0.8" date="2009-01-XX" description="Project management only">
 			<action dev="berendona" type="add" issue="153246">Release management by maven with site and
 				assemblies auto	upload</action>
+			<action dev="berendona" type="add" issue="152918">Add maven SCM (SVN) support</action>
 			<action dev="berendona" type="add" issue="152921">Generating home page by maven</action>
 			<action dev="berendona" type="add" issue="152923">Site report: collect TODOs and
 				FIXMEs</action>
