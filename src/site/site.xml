@@ -18,8 +18,9 @@
 			Information about apt, fml and xdoc:
 			http://maven.apache.org/doxia/references/apt-format.html
 		-->
-		<menu name="Main">
+		<menu name="Overview">
 			<item name="Introduction" href="/index.html" />
+			<item name="Change reports" href="/changes-report.html"/>
 			<item name="FAQs" href="/faqs.html" />
 		</menu>
 		<menu name="Community">
@@ -33,6 +34,9 @@
 				href="https://sourceforge.net/pm/task.php?group_project_id=58093&amp;group_id=248602&amp;func=browse" />
 			<item name="Download"
 				href="https://sourceforge.net/project/showfiles.php?group_id=248602&amp;package_id=303586" />
+		</menu>
+		<menu name="Developers">
+			<item name="Releasing" href="/releasing.html" />
 		</menu>
 		<menu ref="reports" />
 	</body>
