@@ -328,7 +328,28 @@
 					<targetJdk>${javaVersion}</targetJdk>
 					<rulesets>
 						<ruleset>/rulesets/basic.xml</ruleset>
+						<ruleset>/rulesets/braces.xml</ruleset>
+						<ruleset>/rulesets/clone.xml</ruleset>
+						<ruleset>/rulesets/codesize.xml</ruleset>
+<!--
 						<ruleset>/rulesets/controversial.xml</ruleset>
+-->
+						<ruleset>src/pmd/rulesets/controversial-modified.xml</ruleset>
+						<ruleset>/rulesets/coupling.xml</ruleset>
+						<ruleset>/rulesets/design.xml</ruleset>
+						<ruleset>/rulesets/finalizers.xml</ruleset>
+						<ruleset>/rulesets/imports.xml</ruleset>
+						<ruleset>/rulesets/junit.xml</ruleset>
+						<ruleset>/rulesets/logging-jakarta-commons.xml</ruleset>
+<!--
+						<ruleset>/rulesets/naming.xml</ruleset>
+						<ruleset>/rulesets/optimization.xml</ruleset>
+						<ruleset>/rulesets/strictexception.xml</ruleset>
+-->
+						<ruleset>/rulesets/strings.xml</ruleset>
+						<ruleset>/rulesets/sunsecure.xml</ruleset>
+						<ruleset>/rulesets/typeresolution.xml</ruleset>
+						<ruleset>/rulesets/unusedcode.xml</ruleset>
 					</rulesets>
 					<format>xml</format>
 					<linkXref>true</linkXref>
@@ -377,7 +398,28 @@
 					<targetJdk>${javaVersion}</targetJdk>
 					<rulesets>
 						<ruleset>/rulesets/basic.xml</ruleset>
+						<ruleset>/rulesets/braces.xml</ruleset>
+						<ruleset>/rulesets/clone.xml</ruleset>
+						<ruleset>/rulesets/codesize.xml</ruleset>
+<!--
 						<ruleset>/rulesets/controversial.xml</ruleset>
+-->
+						<ruleset>src/pmd/rulesets/controversial-modified.xml</ruleset>
+						<ruleset>/rulesets/coupling.xml</ruleset>
+						<ruleset>/rulesets/design.xml</ruleset>
+						<ruleset>/rulesets/finalizers.xml</ruleset>
+						<ruleset>/rulesets/imports.xml</ruleset>
+						<ruleset>/rulesets/junit.xml</ruleset>
+						<ruleset>/rulesets/logging-jakarta-commons.xml</ruleset>
+<!--
+						<ruleset>/rulesets/naming.xml</ruleset>
+						<ruleset>/rulesets/optimization.xml</ruleset>
+						<ruleset>/rulesets/strictexception.xml</ruleset>
+-->
+						<ruleset>/rulesets/strings.xml</ruleset>
+						<ruleset>/rulesets/sunsecure.xml</ruleset>
+						<ruleset>/rulesets/typeresolution.xml</ruleset>
+						<ruleset>/rulesets/unusedcode.xml</ruleset>
 					</rulesets>
 					<format>xml</format>
 					<linkXref>true</linkXref>
