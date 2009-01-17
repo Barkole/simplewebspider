@@ -217,9 +217,9 @@
 				<executions>
 					<execution>
 						<id>upload-to-sourceforge-releasing</id>
-						<phase>release</phase>
+						<phase>release:perform</phase>
 						<goals>
-							<goal>perform</goal>
+							<goal>upload</goal>
 						</goals>
 						<configuration>
 							<fromDir>target/</fromDir>
