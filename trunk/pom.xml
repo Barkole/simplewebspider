@@ -198,6 +198,9 @@
 		</contributor>
 	</contributors>
 	<scm>
+		<connection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<developerConnection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
+	    <url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url> 	 
 	</scm>
 	<build>
 		<resources>
@@ -206,7 +209,37 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh</artifactId>
+				<version>1.0-beta-4</version>
+			</extension>
+		</extensions>
 		<plugins>
+<!--
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>wagon-maven-plugin</artifactId>
+				<version>1.0-beta-1</version>
+				<executions>
+					<execution>
+						<id>upload-to-sourceforge-releasing</id>
+						<phase>deploy</phase>
+						<goals>
+							<goal>upload</goal>
+						</goals>
+						<configuration>
+							<fromDir>target/</fromDir>
+							<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
+							<! - - <excludes>pom.xml</excludes> - ->
+							<url>scp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
+							<toDir>uploads/</toDir>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
