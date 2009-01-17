@@ -210,7 +210,6 @@
 				<filtering>true</filtering>
 			</resource>
 		</resources>
-<!--
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
@@ -218,9 +217,7 @@
 				<version>1.0-beta-4</version>
 			</extension>
 		</extensions>
--->
 		<plugins>
-<!--
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>
@@ -235,14 +232,13 @@
 						<configuration>
 							<fromDir>target/</fromDir>
 							<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
-							<! - - <excludes>pom.xml</excludes> - ->
-							<url>scp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
+							<!-- <excludes>pom.xml</excludes> -->
+							<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
 							<toDir>uploads/</toDir>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
--->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
