@@ -217,7 +217,7 @@
 				<executions>
 					<execution>
 						<id>upload-to-sourceforge-releasing</id>
-						<phase>release:perform</phase>
+						<phase>deploy</phase>
 						<goals>
 							<goal>upload</goal>
 						</goals>
