@@ -18,6 +18,8 @@
 				FIXMEs</action>
 			<action dev="berendona" type="add" issue="152924">Site report: use PMD for code
 				checks</action>
+			<action dev="berendona" type="add" issue="152922">Site report: use jdepend for code
+				checks</action>
 		</release>
 
 		<release version="0.0.7" date="2009-01-05" description="Features and fixes">
