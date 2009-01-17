@@ -206,6 +206,10 @@
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
+				<filtering>false</filtering>
+			</resource>
+			<resource>
+				<directory>src/main/filter</directory>
 				<filtering>true</filtering>
 			</resource>
 		</resources>
@@ -291,7 +295,7 @@
 					</descriptorRefs>
 					-->
 					<descriptors>
-						<descriptor>src/assemble/distribution.xml</descriptor>
+						<descriptor>src/main/assembly/distribution.xml</descriptor>
 					</descriptors>
 					<archive>
 						<manifest>
