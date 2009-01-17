@@ -217,9 +217,9 @@
 				<executions>
 					<execution>
 						<id>upload-to-sourceforge-releasing</id>
-						<phase>deploy</phase>
+						<phase>release</phase>
 						<goals>
-							<goal>upload</goal>
+							<goal>perform</goal>
 						</goals>
 						<configuration>
 							<fromDir>target/</fromDir>
@@ -326,7 +326,7 @@
 				<configuration>
 					<tagBase>https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tagBase>
 					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-					<goals>assembly:assembly site-deploy deploy:upload</goals>
+					<goals>assembly:assembly site-deploy</goals>
 				</configuration>
 			</plugin>
 			<plugin>
