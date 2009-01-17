@@ -27,23 +27,23 @@
 			<fileMode>0600</fileMode>
 		</file>
 		<file>
-			<source>src/assemble/resources/simple-web-spider.properties</source>
+			<source>src/main/assembly/resources/simple-web-spider.properties</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0600</fileMode>
 		</file>
 		<file>
-			<source>src/assemble/resources/start-sws.sh</source>
+			<source>src/main/assembly/resources/start-sws.sh</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0700</fileMode>
 		</file>
 		<file>
-			<source>src/assemble/resources/stop-sws.sh</source>
+			<source>src/main/assembly/resources/stop-sws.sh</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0700</fileMode>
 		</file>
 <!--
 		<file>
-			<source>src/assemble/resources/simple-web-spider.bat</source>
+			<source>src/main/assembly/resources/simple-web-spider.bat</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0600</fileMode>
 		</file>
