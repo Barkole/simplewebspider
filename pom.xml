@@ -197,8 +197,8 @@
 		</contributor>
 	</contributors>
 	<scm>
-		<connection>scm:svn:https://berendona:gTa9sW2@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
-		<developerConnection>scm:svn:https://berendona:gTa9sW2@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
+		<connection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<developerConnection>scm:svn:https://${sfUsername}:${sfPassword}@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
 		<url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url>
 	</scm>
 	<build>
