@@ -221,7 +221,7 @@
 				<executions>
 					<execution>
 						<id>upload-to-sourceforge-releasing</id>
-						<phase>deploy</phase>
+						<phase>install</phase>
 						<goals>
 							<goal>upload</goal>
 						</goals>
