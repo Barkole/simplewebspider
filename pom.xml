@@ -326,7 +326,7 @@
 				<configuration>
 					<tagBase>https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tagBase>
 					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
-					<goals>assembly:assembly site-deploy</goals>
+					<goals>assembly:assembly site-deploy deploy:upload</goals>
 				</configuration>
 			</plugin>
 			<plugin>
