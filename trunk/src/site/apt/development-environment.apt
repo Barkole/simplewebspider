@@ -1,0 +1,31 @@
+                                    ------
+                                    Development environment
+                                    ------
+
+Requirement
+
+  * Java 1.5 (Sun): {{http://java.sun.com}}
+
+  * SVN command line version
+
+    * Windows: (Some suggestions)
+
+      * {{{http://www.collab.net/downloads/subversion/}CollabNet Subversion}}
+
+      * {{{http://www.sliksvn.com/en/download}Silk SVN}}
+
+      * {{{http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=8100}Windows Apache 2.2.x}}
+
+      * {{{http://subversion.tigris.org/servlets/ProjectDocumentList?folderID=91}Windows Apache 2.0.x}}
+
+  * Maven 2: {{http://maven.apache.org/}}
+
+  * Eclipse 3.4: {{http://www.eclipse.org/}}
+
+    * Plugins:
+
+      * SVN
+
+      * Maven: {{http://maven.apache.org/eclipse-plugin.html}}
+
+      * (ExploreFS: {{http://www.junginger.biz/eclipse/}}
