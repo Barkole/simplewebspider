@@ -223,7 +223,7 @@
 					<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
 					<!-- <excludes>pom.xml</excludes> -->
 					<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
-					<toDir>uploads/</toDir>
+					<toDir>${sfFrsPath}</toDir>
 				</configuration>
 			</plugin>
 			<plugin>
