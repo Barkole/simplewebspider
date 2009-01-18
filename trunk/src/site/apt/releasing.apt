@@ -25,6 +25,7 @@ Requirements
       <properties>
          <sfUsername>YOUR SOURCEFORGE NAME</sfUsername>
          <sfPassword>YOUR SOURCEFORGE PASSWORD</sfPassword>
+         <sfFrsPath>YOUR SFTP://FRS.SOURCEFORGE.NET PATH LIKE: home/users/b/be/berendona/uploads</sfFrsPath>
       </properties>
     </profile>
   </profiles>
@@ -46,8 +47,15 @@ $ mvn clean release:clean release:prepare
 	
 * Perform
 
-	After preparing you can perform building release. So the assemblies will be built and uploaded to
-	{{sftp://frs.sourceforge.net}} and page will be updated, too:
+	After preparing you can perform building release. For uploading project website, you need to create
+	a shell on sourceforge. If you don't do this performing release will fail:
+
++--------------------------------------------
+$ ssh -t YOUR_SOURCEFORGE_ACCOUNT,simplewebspider@shell.sourceforge.net create 
++--------------------------------------------
+	
+	So the assemblies will be built and uploaded to	{{sftp://frs.sourceforge.net}} and page will be
+	updated, too:
 
 +--------------------------------------------
 $ mvn release:perform 
