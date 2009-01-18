@@ -228,7 +228,7 @@
 				<artifactId>wagon-maven-plugin</artifactId>
 				<version>1.0-beta-1</version>
 				<configuration>
-					<fromDir>target/</fromDir>
+					<fromDir>target/checkout/target/</fromDir>
 					<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
 					<!-- <excludes>pom.xml</excludes> -->
 					<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
@@ -397,7 +397,27 @@
 				<version>2.1</version>
 			</plugin>
 			<plugin>
+				<!-- http://maven.apache.org/plugins/maven-javadoc-plugin/ -->
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<excludePackageNames>org.codehaus.mevenide.idea.config.*:org.apache.maven
+		          </excludePackageNames>
+					<links>
+						<link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+						<link>http://jakarta.apache.org/commons/logging/apidocs/</link>
+						<link>http://www.junit.org/junit/javadoc/</link>
+						<link>http://logging.apache.org/log4j/docs/api/</link>
+						<link>http://hc.apache.org/httpclient-3.x/apidocs/</link>
+						<link>http://htmlcleaner.sourceforge.net/doc/</link>
+					</links>
+				</configuration>
+				<!--
+					<version>2.0-beta-3-SNAPSHOT</version> <configuration>
+					<minmemory>128m</minmemory> <maxmemory>512m</maxmemory>
+					<quit>true</quit> </configuration>
+				-->
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
