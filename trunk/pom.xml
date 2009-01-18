@@ -85,64 +85,6 @@
 				</dependency>
 			</dependencies>
 		</profile>
-		<profile>
-			<id>database-hibernate</id>
-			<repositories>
-				<repository>
-					<id>jboss</id>
-					<url>http://repository.jboss.com/maven2</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</repository>
-				<repository>
-					<id>jboss-snapshot</id>
-					<url>http://snapshots.jboss.org/maven2</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</repository>
-			</repositories>
-			<pluginRepositories>
-				<pluginRepository>
-					<id>jboss-plugins</id>
-					<url>http://repository.jboss.com/maven2</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>false</enabled>
-					</snapshots>
-				</pluginRepository>
-				<pluginRepository>
-					<id>jboss-snapshot-plugins</id>
-					<url>http://snapshots.jboss.org/maven2</url>
-					<releases>
-						<enabled>true</enabled>
-					</releases>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-				</pluginRepository>
-				<!-- 20080306 added by emmanuel to make things work -->
-				<pluginRepository>
-					<id>codehaus-plugins-snapshots</id>
-					<url>http://snapshots.repository.codehaus.org/</url>
-					<snapshots>
-						<enabled>true</enabled>
-					</snapshots>
-					<releases>
-						<enabled>false</enabled>
-					</releases>
-				</pluginRepository>
-			</pluginRepositories>
-		</profile>
 	</profiles>
 	<repositories>
 		<repository>
