@@ -200,7 +200,7 @@
 	<scm>
 		<connection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
 		<developerConnection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
-	    <url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url> 	 
+	    <url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url>
 	</scm>
 	<build>
 		<resources>
@@ -214,6 +214,15 @@
 			</resource>
 		</resources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.1</version>
+				<configuration>
+					<username>${sfUsername}</username>
+					<password>${sfPassword}</password>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>
