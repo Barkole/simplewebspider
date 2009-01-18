@@ -37,6 +37,7 @@
 		</menu>
 		<menu name="Developers">
 			<item name="Releasing" href="/releasing.html" />
+			<item name="Environment" href="/development-environment.html" />
 		</menu>
 		<menu ref="reports" />
 	</body>
