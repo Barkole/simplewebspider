@@ -5,7 +5,7 @@
 	<groupId>simplespider</groupId>
 	<artifactId>simplespider-core</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.8</version>
+	<version>0.0.9-SNAPSHOT</version>
 	<name>simplespider-core</name>
 	<description>Other spiders has a limited link depth, follows links not randomized or are combined with heavy indexing machines. This spider will has not link depth limits, randomize next url, that will be checked for new urls.</description>
 	<url>http://simplewebspider.sourceforge.net/</url>
@@ -198,9 +198,9 @@
 		</contributor>
 	</contributors>
 	<scm>
-		<connection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags/simplespider-core-0.0.8</connection>
-		<developerConnection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags/simplespider-core-0.0.8</developerConnection>
-	    <url>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags/simplespider-core-0.0.8</url> 	 
+		<connection>scm:svn:https://berendona:o1AkAYHa5Qf5XDt1h80XFsN3x@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<developerConnection>scm:svn:https://berendona:o1AkAYHa5Qf5XDt1h80XFsN3x@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
+	    <url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url> 	 
 	</scm>
 	<build>
 		<resources>
