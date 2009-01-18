@@ -331,6 +331,8 @@
 					<tagBase>https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/tags</tagBase>
 					<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
 					<goals>assembly:assembly site-deploy wagon:upload</goals>
+					<username>${sfUsername}</username>
+					<password>${sfPassword}</password>
 				</configuration>
 			</plugin>
 			<plugin>
