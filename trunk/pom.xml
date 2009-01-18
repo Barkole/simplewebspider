@@ -198,8 +198,8 @@
 		</contributor>
 	</contributors>
 	<scm>
-		<connection>scm:svn:https://berendona:o1AkAYHa5Qf5XDt1h80XFsN3x@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
-		<developerConnection>scm:svn:https://berendona:o1AkAYHa5Qf5XDt1h80XFsN3x@simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
+		<connection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</connection>
+		<developerConnection>scm:svn:https://simplewebspider.svn.sourceforge.net/svnroot/simplewebspider/trunk</developerConnection>
 	    <url>http://simplewebspider.svn.sourceforge.net/viewvc/simplewebspider/</url> 	 
 	</scm>
 	<build>
