@@ -218,17 +218,13 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>wagon-maven-plugin</artifactId>
 				<version>1.0-beta-1</version>
-				<executions>
-					<execution>
-						<configuration>
-							<fromDir>target/</fromDir>
-							<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
-							<!-- <excludes>pom.xml</excludes> -->
-							<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
-							<toDir>uploads/</toDir>
-						</configuration>
-					</execution>
-				</executions>
+				<configuration>
+					<fromDir>target/</fromDir>
+					<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
+					<!-- <excludes>pom.xml</excludes> -->
+					<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
+					<toDir>uploads/</toDir>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
