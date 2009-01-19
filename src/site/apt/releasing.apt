@@ -32,8 +32,6 @@ Requirements
 </settings>
 +------------------------------
 
-	Instead of this, you can use file <<<profiles-template.xml>>> saving as <<<profiles.xml>>>
-
 Perform release
 
 	How to create a release.
