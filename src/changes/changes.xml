@@ -26,6 +26,8 @@
 				build timestamp</action>
 			<action dev="berendona" type="add" issue="153376">Load local setting file (use
 				profile.xml)</action>
+			<action dev="berendona" type="add" issue="152917">Check license information saved in file
+				headers</action>
 		</release>
 
 		<release version="0.0.7" date="2009-01-05" description="Features and fixes">

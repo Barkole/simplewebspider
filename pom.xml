@@ -264,7 +264,7 @@
 					</descriptorRefs>
 					-->
 					<descriptors>
-						<descriptor>src/main/assembly/distribution.xml</descriptor>
+						<descriptor>src/assembly/distribution.xml</descriptor>
 					</descriptors>
 					<archive>
 						<manifest>
@@ -357,6 +357,37 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jdepend-maven-plugin</artifactId>
 				<version>2.0-beta-2</version>
+			</plugin>
+			<plugin>
+				<groupId>com.google.code.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.4.0</version>
+				<configuration>
+					<basedir>${basedir}</basedir>
+					<header>${basedir}/src/license/header.template</header>
+					<quiet>false</quiet>
+					<failIfMissing>true</failIfMissing>
+					<aggregate>false</aggregate>
+					<includes>
+						<include>src/main/**</include>
+						<include>src/test/**</include>
+						<include>src/assembly/resources/**</include>
+					</includes>
+					<properties>
+						<year>${project.inceptionYear}</year>
+						<email>berendona@users.sourceforge.net</email>
+						<url>${pom.url}</url>
+					</properties>
+				</configuration>
+				<executions>
+					<execution>
+						<id>check-licenses</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
