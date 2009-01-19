@@ -28,6 +28,7 @@
 				profile.xml)</action>
 			<action dev="berendona" type="add" issue="152917">Check license information saved in file
 				headers</action>
+			<action dev="berendona" type="add" issue="152919">Add timestamp to MANIFEST</action>
 		</release>
 
 		<release version="0.0.7" date="2009-01-05" description="Features and fixes">
