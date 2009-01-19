@@ -525,7 +525,7 @@
 			<!-- http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services -->
 			<id>simplewebspider.sourceforge.net</id>
 			<name>simplewebspider.sourceforge.net</name>
-			<url>scp://${sfUsername},simplewebspider:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
+			<url>scp://${sfUsername}:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
 	</distributionManagement>
 </project>
