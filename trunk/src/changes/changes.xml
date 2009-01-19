@@ -24,8 +24,6 @@
 			<action dev="berendona" type="add">Site report: add external java doc links</action>
 			<action dev="berendona" type="add" issue="153377">Customize manifest file: Add page url and
 				build timestamp</action>
-			<action dev="berendona" type="add" issue="153376">Load local setting file (use
-				profile.xml)</action>
 			<action dev="berendona" type="add" issue="152917">Check license information saved in file
 				headers</action>
 			<action dev="berendona" type="add" issue="152919">Add timestamp to MANIFEST</action>
