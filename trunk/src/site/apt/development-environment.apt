@@ -27,5 +27,7 @@ Requirement
       * SVN
 
       * Maven: {{http://maven.apache.org/eclipse-plugin.html}}
+      
+      * PMD: {{http://pmd.sourceforge.net/}}
 
       * (ExploreFS: {{http://www.junginger.biz/eclipse/}}
