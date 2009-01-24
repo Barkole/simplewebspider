@@ -31,6 +31,7 @@ import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import simplespider.simplespider.bot.extractor.LinkExtractor;
 import simplespider.simplespider.bot.http.HttpClient;
 import simplespider.simplespider.bot.http.HttpClientFactory;
 import simplespider.simplespider.dao.DbHelper;

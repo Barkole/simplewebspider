@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package simplespider.simplespider.bot;
+package simplespider.simplespider.bot.extractor.html;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +32,12 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 import org.htmlcleaner.XPatherException;
 
+import simplespider.simplespider.bot.extractor.LinkExtractor;
 import simplespider.simplespider.util.SimpleUrl;
 import simplespider.simplespider.util.ValidityHelper;
 
-public class LinkExtractorImpl implements LinkExtractor {
-	private static final Log	LOG			= LogFactory.getLog(LinkExtractorImpl.class);
+public class HtmlCleanXpathLinkExtractor implements LinkExtractor {
+	private static final Log	LOG			= LogFactory.getLog(HtmlCleanXpathLinkExtractor.class);
 
 	private HtmlCleaner			htmlCleaner	= new HtmlCleaner();
 
