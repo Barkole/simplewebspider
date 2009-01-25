@@ -1,0 +1,30 @@
+                                    ------
+                                    Versions
+                                    ------
+
+Versions
+
+	It's important to say, this project is currently in <<alpha>> stage. 
+
+* Alpha stage
+
+	There will be some breaking	changes (e.g. database) or unstable functions.
+	
+	In this stage all versions will begin with <<<0.0.>>> and an increasing number.
+	
+* Beta stage
+
+	The program is not stable at all, but there should no big changes at all. All important features are
+	available.
+	
+	In this stage all version will begin with <<<0.1.>>> and an increasing number.
+	
+* Stable stage
+
+	The version number will be separated by the dot in three parts:
+	
+	[[1]] <major> will be increased, if there are incompatible changes
+
+	[[1]] <minor> will be increased, if new feature are added or not used features are removed
+
+	[[1]] <maintenance> will be increased for bug fixes or small improvements
