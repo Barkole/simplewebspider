@@ -22,6 +22,7 @@
 			<item name="Introduction" href="/index.html" />
 			<item name="Change reports" href="/changes-report.html"/>
 			<item name="FAQs" href="/faqs.html" />
+			<item name="Versions" href="/versions.html" />
 		</menu>
 		<menu name="Community">
 			<item name="SourceForge Home" href="https://sourceforge.net/projects/simplewebspider/" />
