@@ -37,7 +37,7 @@
 			<action dev="berendona" type="add" issue="152919">Add timestamp to MANIFEST</action>
 		</release>
 
-		<release version="0.0.7" date="2009-01-05" description="Features and fixes">
+		<release version="0.0.7" date="2009-01-14" description="Features and fixes">
 			<action dev="berendona" type="fix">Improve logging messages on some exception: spare some
 				stacktrace without positive effects</action>
 			<action dev="berendona" type="fix">some other bug fixes</action>
