@@ -30,7 +30,7 @@ import simplespider.simplespider.bot.Crawler;
 import simplespider.simplespider.bot.CrawlerImpl;
 import simplespider.simplespider.bot.CrawlerRunner;
 import simplespider.simplespider.bot.extractor.LinkExtractor;
-import simplespider.simplespider.bot.extractor.html.HtmlCleanXpathLinkExtractor;
+import simplespider.simplespider.bot.extractor.html.stream.StreamExtractor;
 import simplespider.simplespider.bot.http.HttpClientFactory;
 import simplespider.simplespider.bot.http.apache.ApacheHttpClientFactory;
 import simplespider.simplespider.dao.DbHelper;
@@ -121,7 +121,7 @@ public class Main {
 			final String baseUrl = next.getUrl();
 			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
 
-			final LinkExtractor extractor = new HtmlCleanXpathLinkExtractor();
+			final LinkExtractor extractor = new StreamExtractor();
 			final Crawler crawler = new CrawlerImpl(this.dbHelperFactory, extractor, this.httpClientFactory);
 			threadPool.execute(new CrawlerRunner(crawler, baseUrl));
 		}
