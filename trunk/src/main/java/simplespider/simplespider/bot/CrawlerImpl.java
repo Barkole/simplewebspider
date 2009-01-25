@@ -130,12 +130,34 @@ public class CrawlerImpl implements Crawler {
 		}
 	}
 
+	private boolean isProtocolSupported(String url) {
+		url = url.trim();
+		final int p = url.indexOf(':');
+		if (p < 0) {
+			if (url.startsWith("www.")) {
+				return true;
+			}
+
+			LOG.info("Protocol is not given: " + url);
+			return false;
+		}
+
+		final String protocol = url.substring(0, p).trim().toLowerCase();
+		return "http".equals(protocol) // 
+				|| "https".equals(protocol);
+	}
+
 	private void saveLinks(final List<String> urls) throws SQLException {
 		final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
 		try {
 			final LinkDao linkDao = dbHelper.getLinkDao();
 
 			for (final String url : urls) {
+				if (!isProtocolSupported(url)) {
+					LOG.debug("Ignoring not supported protocol; url: " + url);
+					continue;
+				}
+
 				SimpleUrl simpleUrl;
 				try {
 					simpleUrl = new SimpleUrl(url);
