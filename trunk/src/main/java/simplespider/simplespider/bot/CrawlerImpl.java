@@ -216,18 +216,7 @@ public class CrawlerImpl implements Crawler {
 		// Only supporting HTTP and mime type plain and html
 		// If not mime type is defined, so hope it will be plain or html ;-)
 		if (ValidityHelper.isEmpty(mimeType) //
-				|| "text/plain".equalsIgnoreCase(mimeType) //
-				|| "text/html".equalsIgnoreCase(mimeType) //
-				|| "text/xml".equalsIgnoreCase(mimeType) //
-				|| "text/x-opml".equalsIgnoreCase(mimeType) //
-				|| "text/x-opml+xml".equalsIgnoreCase(mimeType) //
-				|| "application/atom+xml".equalsIgnoreCase(mimeType) //
-				|| "application/atomcoll+xml".equalsIgnoreCase(mimeType) //
-				|| "application/atomserv+xml".equalsIgnoreCase(mimeType) //
-				|| "application/html+xml".equalsIgnoreCase(mimeType) //
-				|| "application/rdf+xml".equalsIgnoreCase(mimeType) //
-				|| "application/rss+xml".equalsIgnoreCase(mimeType) //
-				|| "application/xml".equalsIgnoreCase(mimeType) //
+				|| isMimeSupported(mimeType) //
 		) {
 			try {
 				return this.linkExtractor.getUrls(bodyAsStream, cleanedRealBaseUrl);
@@ -236,9 +225,43 @@ public class CrawlerImpl implements Crawler {
 				return null;
 			}
 		} else {
-			LOG.info("Not supporting mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+			if (isMimeExcluded(mimeType)) {
+				LOG.debug("Excluded mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+			} else {
+				LOG.info("Not supporting mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+			}
 			return new ArrayList<String>(0);
 		}
+	}
+
+	private boolean isMimeSupported(String mimeType) {
+		if (ValidityHelper.isEmpty(mimeType)) {
+			return false;
+		}
+
+		mimeType = mimeType.toLowerCase();
+		return "text/plain".equals(mimeType) //
+				|| "text/html".equals(mimeType) //
+				|| "text/xml".equals(mimeType) //
+				|| "text/x-opml".equals(mimeType) //
+				|| "text/x-opml+xml".equals(mimeType) //
+				|| "application/atom+xml".equals(mimeType) //
+				|| "application/atomcoll+xml".equals(mimeType) //
+				|| "application/atomserv+xml".equals(mimeType) //
+				|| "application/html+xml".equals(mimeType) //
+				|| "application/rdf+xml".equals(mimeType) //
+				|| "application/rss+xml".equals(mimeType) //
+				|| "application/xml".equals(mimeType);
+	}
+
+	private boolean isMimeExcluded(String mimeType) {
+		if (ValidityHelper.isEmpty(mimeType)) {
+			return false;
+		}
+
+		mimeType = mimeType.toLowerCase();
+		return mimeType.startsWith("image/") //
+				|| "text/css".equals(mimeType);
 	}
 
 	private boolean isRedirectDouble(final String cleanedBasedUrl, final String cleanedRealBaseUrl) {

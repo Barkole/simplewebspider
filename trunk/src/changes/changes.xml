@@ -14,6 +14,7 @@
 			<action dev="berendona" type="add" issue="152910">Skipping binary content</action>
 			<action dev="berendona" type="add">Add PMD to eclipse, too</action>
 			<action dev="berendona" type="fix" issue="152940">Do not log explicit ignored protocols</action>
+			<action dev="berendona" type="fix" issue="152941">Do not log explicit ignored mime types</action>
 		</release>
 
 		<release version="0.0.8" date="2009-01-19" description="Project management only">
