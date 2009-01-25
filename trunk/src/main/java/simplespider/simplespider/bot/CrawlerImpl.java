@@ -166,12 +166,6 @@ public class CrawlerImpl implements Crawler {
 					continue;
 				}
 
-				final String protocol = simpleUrl.getProtocol();
-				if (!isSupportedProtocol(protocol)) {
-					LOG.info("Ignoring URL without supported protocol: \"" + url + "\"");
-					continue;
-				}
-
 				final String cleanedUrl = simpleUrl.toNormalform(false, true);
 				if (linkDao.isAvailable(cleanedUrl)) {
 					LOG.debug("URL is already available: \"" + url + "\"");
@@ -186,14 +180,6 @@ public class CrawlerImpl implements Crawler {
 		} finally {
 			dbHelper.close();
 		}
-	}
-
-	private boolean isSupportedProtocol(final String protocol) {
-		ValidityHelper.checkNotEmpty("protocol", protocol);
-
-		return "http".equals(protocol) //
-				|| "https".equals(protocol) //
-				|| "ftp".equals(protocol);
 	}
 
 	private List<String> getLinks(final String baseUrl, final HttpClient httpClient) throws SQLException, MalformedURLException {
