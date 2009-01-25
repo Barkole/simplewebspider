@@ -30,4 +30,8 @@ Requirement
       
       * PMD: {{http://pmd.sourceforge.net/}}
 
+      * The Infer Type Refactoring: {{http://www.fernuni-hagen.de/ps/prjs/InferType/}}
+
+      * The Declared Type Generalization Checker: {{http://www.fernuni-hagen.de/ps/prjs/DTGC/}}
+
       * (ExploreFS: {{http://www.junginger.biz/eclipse/}}
