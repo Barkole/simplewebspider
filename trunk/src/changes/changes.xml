@@ -8,7 +8,8 @@
 		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
-		<release version="0.0.10" date="2009-06-19" description="parsing improvements and fixes">
+		<release version="0.0.10" date="2009-06-20" description="parsing improvements and fixes">
+			<action dev="berendona" type="fix" issue="152907">Program quits, if to less links available</action>
 			<action dev="berendona" type="add" issue="152913">Bootstrap phase</action>
 			<action dev="berendona" type="add" issue="158434">Increase reader blocksize</action>
 			<action dev="berendona" type="fix" issue="158433">Extracting links buggy</action>
