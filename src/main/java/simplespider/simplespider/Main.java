@@ -19,8 +19,8 @@ package simplespider.simplespider;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -47,8 +47,8 @@ public class Main {
 	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
 	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
 	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
-	private static final int	MAX_CURRENT_THREADS			= 4;
-	private static final int	MAX_THREADS_PER_MINUTE		= 10;
+	private static final int	MAX_CURRENT_THREADS			= 100;
+	private static final int	MAX_THREADS_PER_MINUTE		= 100;
 	private static final Log	LOG							= LogFactory.getLog(Main.class);
 
 	private static Thread		mainThread;
@@ -100,50 +100,79 @@ public class Main {
 	private void runCrawler() throws SQLException {
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
 
-		final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_CURRENT_THREADS);
 		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
+		{
+			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
+					new LinkedBlockingQueue<Runnable>());
 
-		LOG.info("Bootstrapping (all LINK entries with id lower than or equals " + BOOTSTRAPPING_LINK_MAX_ID + ")");
-		runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
+			LOG.info("Bootstrapping (all LINK entries with id lower than or equals " + BOOTSTRAPPING_LINK_MAX_ID + ")");
+			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
 
-		// Waiting for ending of all bootstrapping jobs
-		LOG.info("Waiting for ending of all bootstrapping jobs");
-		try {
-			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
-		} catch (final InterruptedException e) {
-			LOG.warn("failed to wait for ending of all threads", e);
+			// Waiting for ending of all bootstrapping jobs
+			LOG.info("Invoke shutting down bootstrapping threads...");
+			threadPool.shutdown();
+			LOG.info("Waiting for ending of all bootstrapping jobs");
+			try {
+				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+			} catch (final InterruptedException e) {
+				LOG.warn("failed to wait for ending of all threads", e);
+			}
 		}
 
-		runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false);
+		{
+			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
+					new LinkedBlockingQueue<Runnable>());
 
-		LOG.info("Invoke shutting down threads...");
-		threadPool.shutdown();
-		try {
-			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
-		} catch (final InterruptedException e) {
-			LOG.warn("failed to wait for ending of all threads", e);
+			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false);
+
+			LOG.info("Invoke shutting down threads...");
+			threadPool.shutdown();
+			try {
+				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+			} catch (final InterruptedException e) {
+				LOG.warn("failed to wait for ending of all threads", e);
+			}
+			threadPool.shutdownNow();
 		}
-		threadPool.shutdownNow();
 		db.shutdown();
 		LOG.info("Crawler stops");
 	}
 
-	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ExecutorService threadPool,
+	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ThreadPoolExecutor threadPool,
 			final LimitThroughPut limitThroughPut, final boolean bootstrapping) throws SQLException {
 		final DbHelper db = dbHelperFactory.buildDbHelper();
 		final LinkDao linkDao = db.getLinkDao();
+
+		int retryCountOnNoLinks = 0;
 		while (!this.cancled) {
 			// Block while to much threads were working in last minute
 			limitThroughPut.next();
 
 			final Link next = bootstrapping ? linkDao.getNextUpToId(BOOTSTRAPPING_LINK_MAX_ID) : linkDao.getNext();
 			if (next == null) {
+				// On bootstrapping don't do any retry, if no more links are available
 				if (bootstrapping) {
 					LOG.info("Bootstrapping: No more links available...");
-				} else {
-					LOG.fatal("No more links available...");
+					break;
 				}
-				break;
+				// Seconds try fails
+				if (threadPool.getActiveCount() == 0 //
+						|| retryCountOnNoLinks > 3) {
+					LOG.fatal("No more links available...");
+					break;
+				}
+
+				// Wait for all running treads, perhaps there are any and they create some new LINK entities
+				retryCountOnNoLinks++;
+				LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
+				try {
+					threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+				} catch (final InterruptedException e) {
+					LOG.warn("failed to wait for ending of all threads", e);
+				}
+				continue;
+			} else {
+				retryCountOnNoLinks = 0;
 			}
 
 			next.setDone(true);
