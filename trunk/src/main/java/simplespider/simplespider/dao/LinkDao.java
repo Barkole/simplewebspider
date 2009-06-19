@@ -25,6 +25,8 @@ public interface LinkDao {
 
 	public abstract Link getNext();
 
+	public abstract Link getNextUpToId(long maxId);
+
 	public abstract boolean isAvailable(String url);
 
 	public abstract void save(Link link);
