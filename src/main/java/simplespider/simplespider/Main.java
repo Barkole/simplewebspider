@@ -43,6 +43,7 @@ import simplespider.simplespider.enity.Link;
  * Hello world!
  */
 public class Main {
+	private static final int	BOOTSTRAPPING_LINK_MAX_ID	= 1000;
 	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
 	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
 	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
@@ -97,20 +98,51 @@ public class Main {
 	}
 
 	private void runCrawler() throws SQLException {
-
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
-		final LinkDao linkDao = db.getLinkDao();
 
 		final ExecutorService threadPool = Executors.newFixedThreadPool(MAX_CURRENT_THREADS);
 		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 
+		LOG.info("Bootstrapping (all LINK entries with id lower than or equals " + BOOTSTRAPPING_LINK_MAX_ID + ")");
+		runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
+
+		// Waiting for ending of all bootstrapping jobs
+		LOG.info("Waiting for ending of all bootstrapping jobs");
+		try {
+			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+		} catch (final InterruptedException e) {
+			LOG.warn("failed to wait for ending of all threads", e);
+		}
+
+		runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false);
+
+		LOG.info("Invoke shutting down threads...");
+		threadPool.shutdown();
+		try {
+			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+		} catch (final InterruptedException e) {
+			LOG.warn("failed to wait for ending of all threads", e);
+		}
+		threadPool.shutdownNow();
+		db.shutdown();
+		LOG.info("Crawler stops");
+	}
+
+	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ExecutorService threadPool,
+			final LimitThroughPut limitThroughPut, final boolean bootstrapping) throws SQLException {
+		final DbHelper db = dbHelperFactory.buildDbHelper();
+		final LinkDao linkDao = db.getLinkDao();
 		while (!this.cancled) {
 			// Block while to much threads were working in last minute
 			limitThroughPut.next();
 
-			final Link next = linkDao.getNext();
+			final Link next = bootstrapping ? linkDao.getNextUpToId(BOOTSTRAPPING_LINK_MAX_ID) : linkDao.getNext();
 			if (next == null) {
-				LOG.fatal("No more links available...");
+				if (bootstrapping) {
+					LOG.info("Bootstrapping: No more links available...");
+				} else {
+					LOG.fatal("No more links available...");
+				}
 				break;
 			}
 
@@ -122,20 +154,9 @@ public class Main {
 			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
 
 			final LinkExtractor extractor = new StreamExtractor();
-			final Crawler crawler = new CrawlerImpl(this.dbHelperFactory, extractor, this.httpClientFactory);
+			final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
 			threadPool.execute(new CrawlerRunner(crawler, baseUrl));
 		}
-
-		LOG.warn("Invoke shutting down threads...");
-		threadPool.shutdown();
-		try {
-			threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
-		} catch (final InterruptedException e) {
-			LOG.warn("failed to wait for ending of al threads", e);
-		}
-		threadPool.shutdownNow();
-		db.shutdown();
-		LOG.info("Crawler stops");
 	}
 
 	public static void main(final String[] args) throws Exception {

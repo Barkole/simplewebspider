@@ -27,7 +27,38 @@ import simplespider.simplespider.enity.Link;
 
 public class JdbcLinkDao implements LinkDao {
 
-	private final DbHelper	db;
+	private static final String	UPDATE_LINK	= "UPDATE" //
+							+ " link" // 
+							+ " SET url = ?, done = ?, errors = ?" //
+							+ " WHERE id = ?";
+
+	private static final String	INSERT_LINK	= "INSERT" //
+							+ " INTO link (url, done, errors)" //
+							+ " VALUES (?, ?, ?)";
+
+	private static final String	SELECT_LINK_COUNT_BY_URL	= "SELECT count(ID) AS link_count" //
+																	+ " FROM link" //
+																	+ " WHERE url = ?" //
+																	+ " LIMIT 1";
+
+	private static final String	SELECT_LINK_BY_URL			= "SELECT *" //
+																	+ " FROM link" //
+																	+ " WHERE url = ?";
+
+	private static final String	SELECT_LINK_WITH_MAX_ID		= "SELECT *" //
+																	+ " FROM link" //
+																	+ " WHERE done = false" //
+																	+ "    AND id <= ? " //
+																	+ " ORDER BY rand()" //
+																	+ " LIMIT 1";
+
+	private static final String	SELECT_LINK					= "SELECT *" //
+																	+ " FROM link" //
+																	+ " WHERE done = false" //
+																	+ " ORDER BY rand()" //
+																	+ " LIMIT 1";
+
+	private final DbHelper		db;
 
 	public JdbcLinkDao(final DbHelper db) {
 		this.db = db;
@@ -74,62 +105,59 @@ public class JdbcLinkDao implements LinkDao {
 	@Override
 	public Link getByUrl(final String url) {
 		try {
-			final PreparedStatement select = this.db.prepareStatement("SELECT *" //
-					+ " FROM link" //
-					+ " WHERE url = ?");
+			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_BY_URL);
 			select.setString(1, url);
 
-			final ResultSet selectResult = select.executeQuery();
-			if (!selectResult.next()) {
-				return null;
-			}
-
-			final Link link = createLink(selectResult);
-
-			if (selectResult.next()) {
-				throw new SQLException("Unique constrain voilation: More than one Link available with URL \"" + url + "\"");
-			}
-
-			selectResult.close();
-			select.close();
-
-			return link;
+			return getLink(select, true);
 		} catch (final SQLException e) {
-			throw new RuntimeException("Failed to get next link", e);
+			throw new RuntimeException("Failed to get link for url: " + url, e);
 		}
 	}
 
 	@Override
 	public Link getNext() {
 		try {
-			final PreparedStatement select = this.db.prepareStatement("SELECT *" //
-					+ " FROM link" //
-					+ " WHERE done = false" //
-					+ " ORDER BY rand()" //
-					+ " LIMIT 1");
-			final ResultSet selectResult = select.executeQuery();
-			if (!selectResult.next()) {
-				return null;
-			}
-
-			final Link link = createLink(selectResult);
-
-			selectResult.close();
-			select.close();
-
-			return link;
+			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK);
+			return getLink(select, false);
 		} catch (final SQLException e) {
 			throw new RuntimeException("Failed to get next link", e);
 		}
 	}
 
 	@Override
+	public Link getNextUpToId(final long maxId) {
+		try {
+			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_WITH_MAX_ID);
+			select.setLong(1, maxId);
+			return getLink(select, false);
+		} catch (final SQLException e) {
+			throw new RuntimeException("Failed to get next link", e);
+		}
+	}
+
+	private Link getLink(final PreparedStatement selectLink, final boolean mustUnique) throws SQLException {
+		final ResultSet selectResult = selectLink.executeQuery();
+		if (!selectResult.next()) {
+			return null;
+		}
+
+		final Link link = createLink(selectResult);
+
+		if (mustUnique // 
+				&& selectResult.next()) {
+			throw new SQLException("Unique constrain voilation: More than one Link available");
+		}
+
+		selectResult.close();
+		selectLink.close();
+
+		return link;
+	}
+
+	@Override
 	public boolean isAvailable(final String url) {
 		try {
-			final PreparedStatement select = this.db.prepareStatement("SELECT count(ID) AS link_count" //
-					+ " FROM link" //
-					+ " WHERE url = ?" //
-					+ " LIMIT 1");
+			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_COUNT_BY_URL);
 			select.setString(1, url);
 			final ResultSet selectResult = select.executeQuery();
 			if (!selectResult.next()) {
@@ -143,7 +171,7 @@ public class JdbcLinkDao implements LinkDao {
 
 			return entityCount != 0;
 		} catch (final SQLException e) {
-			throw new RuntimeException("Failed to get next link", e);
+			throw new RuntimeException("Failed to check url: " + url, e);
 		}
 	}
 
@@ -153,9 +181,7 @@ public class JdbcLinkDao implements LinkDao {
 			if (link.getId() == null) {
 				// Save new link
 				final String url = link.getUrl();
-				final PreparedStatement insert = this.db.prepareStatement("INSERT" //
-						+ " INTO link (url, done, errors)" //
-						+ " VALUES (?, ?, ?)");
+				final PreparedStatement insert = this.db.prepareStatement(INSERT_LINK);
 				insert.setString(1, url);
 				insert.setBoolean(2, link.isDone());
 				insert.setInt(3, link.getErrors());
@@ -169,10 +195,7 @@ public class JdbcLinkDao implements LinkDao {
 				}
 				link.setId(insertedLink.getId());
 			} else {
-				final PreparedStatement update = this.db.prepareStatement("UPDATE" //
-						+ " link" // 
-						+ " SET url = ?, done = ?, errors = ?" //
-						+ " WHERE id = ?");
+				final PreparedStatement update = this.db.prepareStatement(UPDATE_LINK);
 				update.setString(1, link.getUrl());
 				update.setBoolean(2, link.isDone());
 				update.setInt(3, link.getErrors());
