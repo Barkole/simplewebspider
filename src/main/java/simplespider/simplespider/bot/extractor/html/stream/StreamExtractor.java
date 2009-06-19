@@ -36,7 +36,7 @@ import simplespider.simplespider.util.ValidityHelper;
 public class StreamExtractor implements LinkExtractor {
 	private static final Log	LOG					= LogFactory.getLog(StreamExtractor.class);
 
-	private static final int	DEFAULT_BUFFER_SIZE	= 1024;
+	private static final int	DEFAULT_BUFFER_SIZE	= 16384;
 
 	public List<String> getUrls(final InputStream body, final String baseUrl) throws IOException {
 		ValidityHelper.checkNotNull("body", body);
