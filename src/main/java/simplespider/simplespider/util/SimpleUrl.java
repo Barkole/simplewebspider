@@ -28,9 +28,7 @@ import simplespider.simplespider.util.Punycode.PunycodeException;
 
 /**
  * this class exist to provide a system-wide normal form representation of urls, and to prevent that java.net.URL usage causes DNS queries which are
- * used in java.net.
- * <p />
- * Based on de.anomic.yacy.yacyURL
+ * used in java.net. <p /> Based on de.anomic.yacy.yacyURL
  */
 public class SimpleUrl {
 	private static final Log		LOG				= LogFactory.getLog(SimpleUrl.class);
@@ -88,10 +86,10 @@ public class SimpleUrl {
 		} else if (relPath.startsWith("/")) {
 			this.path = relPath;
 		} else if (baseURL.path.endsWith("/")) {
-			if (relPath.startsWith("#") //
-					|| relPath.startsWith("?")) {
-				throw new MalformedURLException("relative path malformed: " + relPath);
-			}
+			//			if (relPath.startsWith("#") //
+			//					|| relPath.startsWith("?")) {
+			//				throw new MalformedURLException("relative path malformed: " + relPath);
+			//			}
 			this.path = baseURL.path + relPath;
 		} else {
 			if (relPath.startsWith("#") //
@@ -167,15 +165,11 @@ public class SimpleUrl {
 	}
 
 	/**
-	 * Encode a string to the "x-www-form-urlencoded" form, enhanced with the UTF-8-in-URL proposal. This is what happens:
-	 * <ul>
-	 * <li>The ASCII characters 'a' through 'z', 'A' through 'Z', and '0' through '9' remain the same.
-	 * <li>The unreserved characters - _ . ! ~ * ' ( ) remain the same.
-	 * <li>All other ASCII characters are converted into the 3-character string "%xy", where xy is the two-digit hexadecimal representation of the
-	 * character code
-	 * <li>All non-ASCII characters are encoded in two steps: first to a sequence of 2 or 3 bytes, using the UTF-8 algorithm; secondly each of these
-	 * bytes is encoded as "%xx".
-	 * </ul>
+	 * Encode a string to the "x-www-form-urlencoded" form, enhanced with the UTF-8-in-URL proposal. This is what happens: <ul> <li>The ASCII
+	 * characters 'a' through 'z', 'A' through 'Z', and '0' through '9' remain the same. <li>The unreserved characters - _ . ! ~ * ' ( ) remain the
+	 * same. <li>All other ASCII characters are converted into the 3-character string "%xy", where xy is the two-digit hexadecimal representation of
+	 * the character code <li>All non-ASCII characters are encoded in two steps: first to a sequence of 2 or 3 bytes, using the UTF-8 algorithm;
+	 * secondly each of these bytes is encoded as "%xx". </ul>
 	 * 
 	 * @param s
 	 *            The string to be encoded
@@ -444,12 +438,8 @@ public class SimpleUrl {
 	}
 
 	/**
-	 * Escapes the following parts of the url, this object already contains:
-	 * <ul>
-	 * <li>path: see {@link #escape(String)}</li>
-	 * <li>ref: same as above</li>
-	 * <li>quest: same as above without the ampersand ("&amp;") and the equals symbol</li>
-	 * </ul>
+	 * Escapes the following parts of the url, this object already contains: <ul> <li>path: see {@link #escape(String)}</li> <li>ref: same as
+	 * above</li> <li>quest: same as above without the ampersand ("&amp;") and the equals symbol</li> </ul>
 	 */
 	// private void escape() {
 	// if (this.path != null && this.path.indexOf('%') == -1) {
@@ -695,13 +685,22 @@ public class SimpleUrl {
 				this.port = -1;
 				this.quest = null;
 				this.ref = null;
+			} else if (this.protocol.equals("javascript")) {
+				// parse email url
+				this.userInfo = null;
+				this.host = null;
+				this.path = url.substring(p + 1);
+				this.port = -1;
+				this.quest = null;
+				this.ref = null;
 			} else {
 				throw new MalformedURLException("unknown protocol: " + url);
 			}
 		}
 
 		// handle international domains
-		if (!Punycode.isBasic(this.host)) {
+		if (this.host != null // 
+				&& !Punycode.isBasic(this.host)) {
 			try {
 				final int d1 = this.host.lastIndexOf('.');
 				if (d1 >= 0) {
@@ -745,7 +744,7 @@ public class SimpleUrl {
 
 		return this.protocol + "://" //
 				+ ((this.userInfo != null) ? (this.userInfo + "@") : ("")) //
-				+ getHost().toLowerCase() //
+				+ ((getHost() != null) ? getHost().toLowerCase() : ("")) //
 				+ (hasDefaultPort() ? "" : ":" + this.port) //
 				+ resolvedPath;
 	}
