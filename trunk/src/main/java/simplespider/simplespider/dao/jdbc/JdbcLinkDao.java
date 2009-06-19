@@ -27,14 +27,14 @@ import simplespider.simplespider.enity.Link;
 
 public class JdbcLinkDao implements LinkDao {
 
-	private static final String	UPDATE_LINK	= "UPDATE" //
-							+ " link" // 
-							+ " SET url = ?, done = ?, errors = ?" //
-							+ " WHERE id = ?";
+	private static final String	UPDATE_LINK					= "UPDATE" //
+																	+ " link" // 
+																	+ " SET url = ?, done = ?, errors = ?" //
+																	+ " WHERE id = ?";
 
-	private static final String	INSERT_LINK	= "INSERT" //
-							+ " INTO link (url, done, errors)" //
-							+ " VALUES (?, ?, ?)";
+	private static final String	INSERT_LINK					= "INSERT" //
+																	+ " INTO link (url, done, errors)" //
+																	+ " VALUES (?, ?, ?)";
 
 	private static final String	SELECT_LINK_COUNT_BY_URL	= "SELECT count(ID) AS link_count" //
 																	+ " FROM link" //
@@ -48,7 +48,7 @@ public class JdbcLinkDao implements LinkDao {
 	private static final String	SELECT_LINK_WITH_MAX_ID		= "SELECT *" //
 																	+ " FROM link" //
 																	+ " WHERE done = false" //
-																	+ "    AND id <= ? " //
+																	+ "    AND id < ? " //
 																	+ " ORDER BY rand()" //
 																	+ " LIMIT 1";
 
