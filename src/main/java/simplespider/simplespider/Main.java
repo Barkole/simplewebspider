@@ -105,7 +105,7 @@ public class Main {
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
-			LOG.info("Bootstrapping (all LINK entries with id lower than or equals " + BOOTSTRAPPING_LINK_MAX_ID + ")");
+			LOG.info("Bootstrapping (all LINK entries with id lower than " + BOOTSTRAPPING_LINK_MAX_ID + ")");
 			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
 
 			// Waiting for ending of all bootstrapping jobs
