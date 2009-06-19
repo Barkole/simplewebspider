@@ -38,14 +38,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
 package simplespider.simplespider.bot.extractor.html.stream;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 final class HtmlWriter extends Writer {
+
+	private static final Log	LOG					= LogFactory.getLog(HtmlWriter.class);
 
 	private static final int	DEFAULT_BUFFER_SIZE	= 1024;
 	public static final char	lb					= '<';
@@ -289,22 +293,29 @@ final class HtmlWriter extends Writer {
 					try {
 						charBuffer.close();
 					} catch (final IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.warn("Failed to close tag writer", e);
 					}
 				}
 				if (((this.scraper != null) && (this.scraper.isTagWithContent(tag)))) {
-					// ok, start collecting
-					this.filterTag = tag;
 					final TagWriter scb = new TagWriter(content);
-					this.filterOpts = scb.propParser();
+
+					final Properties properties = scb.propParser();
 					try {
 						scb.close();
 					} catch (final IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOG.warn("Failed to close tag writer", e);
 					}
-					this.filterCont = new TagWriter();
+
+					if (content[content.length - 1] == '/') {
+						// A simple empty tag! This single tag is collected at once here
+						this.scraper.scrapeTagWithContent(tag, properties, null);
+					} else {
+						// ok, start collecting
+						this.filterTag = tag;
+						this.filterOpts = properties;
+						this.filterCont = new TagWriter();
+					}
+
 					return;
 				} else {
 					// we ignore that thing and return it again
@@ -324,11 +335,11 @@ final class HtmlWriter extends Writer {
 		}
 
 		// it's a tag! which one?
-		if ((opening) || (!(tag.equalsIgnoreCase(this.filterTag)))) {
-			// this tag is not our concern. just add it
-			this.filterCont.append(genTag0raw(tag, opening, content));
-			return;
-		}
+		//		if ((opening) || (!(tag.equalsIgnoreCase(this.filterTag)))) {
+		//			// this tag is not our concern. just add it
+		//			this.filterCont.append(genTag0raw(tag, opening, content));
+		//			return;
+		//		}
 
 		// it's our closing tag! return complete result.
 		if (this.scraper != null) {

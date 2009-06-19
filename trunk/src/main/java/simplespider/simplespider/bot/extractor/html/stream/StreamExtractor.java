@@ -30,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.bot.extractor.LinkExtractor;
 import simplespider.simplespider.util.SimpleUrl;
+import simplespider.simplespider.util.StringUtils;
 import simplespider.simplespider.util.ValidityHelper;
 
 public class StreamExtractor implements LinkExtractor {
@@ -54,16 +55,20 @@ public class StreamExtractor implements LinkExtractor {
 		final SimpleUrl url = new SimpleUrl(baseUrl);
 		final List<String> links = new ArrayList<String>(extractedLinks.size());
 		for (final String reference : extractedLinks) {
+			if (reference.contains("<") || reference.contains(">")) {
+				LOG.warn("Ignoring possible invalid reference based on URL \"" + baseUrl + "\":\n" + StringUtils.clipping(reference, 128));
+				continue;
+			}
 			try {
 				final SimpleUrl newUrl = SimpleUrl.newURL(url, reference);
 				if (newUrl == null) {
-					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"");
-				} else {
-					final String normalformedUrl = newUrl.toNormalform(false, true);
-					links.add(normalformedUrl);
+					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\", because it contains nothing");
+					continue;
 				}
+				final String normalformedUrl = newUrl.toNormalform(false, true);
+				links.add(normalformedUrl);
 			} catch (final Exception e) {
-				LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
+				LOG.warn("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
 			}
 		}
 		return links;
