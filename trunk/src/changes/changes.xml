@@ -9,6 +9,7 @@
 	</properties>
 	<body>
 		<release version="0.0.10" date="2009-06-19" description="parsing improvements and fixes">
+			<action dev="berendona" type="fix" issue="158434">Increase reader blocksize</action>
 			<action dev="berendona" type="fix" issue="158433">Extracting links buggy</action>
 		</release>
 		<release version="0.0.9" date="2009-01-25" description="Memory and speed improvements">

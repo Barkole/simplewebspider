@@ -51,7 +51,7 @@ final class HtmlWriter extends Writer {
 
 	private static final Log	LOG					= LogFactory.getLog(HtmlWriter.class);
 
-	private static final int	DEFAULT_BUFFER_SIZE	= 1024;
+	private static final int	DEFAULT_BUFFER_SIZE	= 16384;
 	public static final char	lb					= '<';
 	public static final char	rb					= '>';
 	public static final char	dash				= '-';
