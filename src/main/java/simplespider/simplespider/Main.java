@@ -47,8 +47,8 @@ public class Main {
 	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
 	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
 	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
-	private static final int	MAX_CURRENT_THREADS			= 100;
-	private static final int	MAX_THREADS_PER_MINUTE		= 100;
+	private static final int	MAX_CURRENT_THREADS			= 4;
+	private static final int	MAX_THREADS_PER_MINUTE		= 10;
 	private static final Log	LOG							= LogFactory.getLog(Main.class);
 
 	private static Thread		mainThread;
