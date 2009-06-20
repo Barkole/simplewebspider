@@ -9,6 +9,7 @@
 	</properties>
 	<body>
 		<release version="0.0.11" date="2009-XX-XX" description="???????">
+			<action dev="berendona" type="update" issue="158443">Increase available bootstrap links</action>
 			<action dev="berendona" type="fix" issue="158438">Too much threads and throutput</action>
 		</release>
 		<release version="0.0.10" date="2009-06-20" description="parsing improvements and fixes">
