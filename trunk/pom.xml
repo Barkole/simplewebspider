@@ -76,7 +76,7 @@
 				<dependency>
 					<groupId>hsqldb</groupId>
 					<artifactId>hsqldb</artifactId>
-					<version>1.8.0.7</version>
+					<version>1.8.0.10</version>
 					<!--
 						Assembly plugin forced us to set a fixed version:
 						http://jira.codehaus.org/browse/MASSEMBLY-248 
