@@ -92,20 +92,23 @@ public class Main {
 
 		};
 
+		LOG.info("Add shutdown hook...");
 		listener.setDaemon(true);
-
 		Runtime.getRuntime().addShutdownHook(listener);
 	}
 
 	private void runCrawler() throws SQLException {
+		LOG.info("Start crawler...");
+		LOG.info("Open database connection... This could took time...");
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
 
 		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 		{
+			LOG.info("Bootstrapping (all LINK entries with id lower than " + BOOTSTRAPPING_LINK_MAX_ID + ")");
+
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
-			LOG.info("Bootstrapping (all LINK entries with id lower than " + BOOTSTRAPPING_LINK_MAX_ID + ")");
 			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
 
 			// Waiting for ending of all bootstrapping jobs
@@ -120,6 +123,8 @@ public class Main {
 		}
 
 		{
+			LOG.info("Crawl non bootstrapping LINK entries...");
+
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
@@ -189,6 +194,7 @@ public class Main {
 	}
 
 	public static void main(final String[] args) throws Exception {
+		LOG.info("Starting program...");
 		try {
 			// do sanity checks and startup actions
 			daemonize();
