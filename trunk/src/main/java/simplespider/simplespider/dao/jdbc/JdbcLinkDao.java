@@ -39,12 +39,12 @@ public class JdbcLinkDao implements LinkDao {
 
 	private static final String	SELECT_LINK_COUNT_BY_URL	= "SELECT count(ID) AS link_count" //
 																	+ " FROM link" //
-																	+ " WHERE url = ?" //
+																	+ " WHERE url_hash = ?" //
 																	+ " LIMIT 1";
 
 	private static final String	SELECT_LINK_BY_URL			= "SELECT *" //
 																	+ " FROM link" //
-																	+ " WHERE url = ?";
+																	+ " WHERE url_hash = ?";
 
 	private static final String	SELECT_LINK_WITH_MAX_ID		= "SELECT *" //
 																	+ " FROM link" //
@@ -107,7 +107,7 @@ public class JdbcLinkDao implements LinkDao {
 	public Link getByUrl(final String url) {
 		try {
 			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_BY_URL);
-			select.setString(1, url);
+			select.setString(1, MD5.encodeString(url));
 
 			return getLink(select, true);
 		} catch (final SQLException e) {
@@ -159,7 +159,7 @@ public class JdbcLinkDao implements LinkDao {
 	public boolean isAvailable(final String url) {
 		try {
 			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_COUNT_BY_URL);
-			select.setString(1, url);
+			select.setString(1, MD5.encodeString(url));
 			final ResultSet selectResult = select.executeQuery();
 			if (!selectResult.next()) {
 				throw new SQLException("Failed to count entities for url " + url + ": No count result");
