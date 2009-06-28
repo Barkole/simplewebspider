@@ -9,6 +9,7 @@
 	</properties>
 	<body>
 		<release version="0.0.11" date="2009-XX-XX" description="???????">
+			<action dev="berendona" type="update" issue="158449">Database: Uses indices</action>
 			<action dev="berendona" type="update" issue="158447">Database: Use hashes for detecting unique</action>
 			<action dev="berendona" type="update" issue="158450">Database: Use cached tables as default</action>
 			<action dev="berendona" type="update" issue="158446">Update HSQLDB to 1.8.0.10</action>
