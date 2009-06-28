@@ -24,17 +24,18 @@ import java.sql.SQLException;
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.enity.Link;
+import simplespider.simplespider.util.MD5;
 
 public class JdbcLinkDao implements LinkDao {
 
 	private static final String	UPDATE_LINK					= "UPDATE" //
 																	+ " link" // 
-																	+ " SET url = ?, done = ?, errors = ?" //
+																	+ " SET url = ?, url_hash = ?, done = ?, errors = ?" //
 																	+ " WHERE id = ?";
 
 	private static final String	INSERT_LINK					= "INSERT" //
-																	+ " INTO link (url, done, errors)" //
-																	+ " VALUES (?, ?, ?)";
+																	+ " INTO link (url, url_hash, done, errors)" //
+																	+ " VALUES (?, ?, ?, ?)";
 
 	private static final String	SELECT_LINK_COUNT_BY_URL	= "SELECT count(ID) AS link_count" //
 																	+ " FROM link" //
@@ -183,8 +184,9 @@ public class JdbcLinkDao implements LinkDao {
 				final String url = link.getUrl();
 				final PreparedStatement insert = this.db.prepareStatement(INSERT_LINK);
 				insert.setString(1, url);
-				insert.setBoolean(2, link.isDone());
-				insert.setInt(3, link.getErrors());
+				insert.setString(2, MD5.encodeString(link.getUrl()));
+				insert.setBoolean(3, link.isDone());
+				insert.setInt(4, link.getErrors());
 				insert.executeUpdate();
 				insert.close();
 
@@ -197,9 +199,10 @@ public class JdbcLinkDao implements LinkDao {
 			} else {
 				final PreparedStatement update = this.db.prepareStatement(UPDATE_LINK);
 				update.setString(1, link.getUrl());
-				update.setBoolean(2, link.isDone());
-				update.setInt(3, link.getErrors());
-				update.setLong(4, link.getId().longValue());
+				update.setString(2, MD5.encodeString(link.getUrl()));
+				update.setBoolean(3, link.isDone());
+				update.setInt(4, link.getErrors());
+				update.setLong(5, link.getId().longValue());
 				update.executeUpdate();
 				update.close();
 			}

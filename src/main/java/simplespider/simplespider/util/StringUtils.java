@@ -34,4 +34,67 @@ public final class StringUtils {
 
 		return value.subSequence(0, maxLength - 3) + "...";
 	}
+
+	static public String byteToHex(final byte b) {
+		final StringBuilder sb = new StringBuilder(2);
+		byteToHex(b, sb);
+		return sb.toString();
+	}
+
+	static public void byteToHex(final byte b, final StringBuilder sb) {
+		// Returns hex String representation of byte b
+		final char hexDigit[] = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+		sb.append(hexDigit[(b >> 4) & 0x0f]);
+		sb.append(hexDigit[b & 0x0f]);
+	}
+
+	static public String charToHex(final char c) {
+		final StringBuilder sb = new StringBuilder(4);
+		charToHex(c, sb);
+		return sb.toString();
+	}
+
+	static public void charToHex(final char c, final StringBuilder sb) {
+		// Returns hex String representation of char c
+		final byte hi = (byte) (c >>> 8);
+		final byte lo = (byte) (c & 0xff);
+		byteToHex(hi, sb);
+		byteToHex(lo, sb);
+	}
+
+	static public String stringToHex(final String s, final boolean prefix) {
+		final StringBuilder sb;
+		if (prefix) {
+			sb = new StringBuilder(s.length() + 2);
+			sb.append("0x");
+		} else {
+			sb = new StringBuilder(s.length());
+		}
+		stringToHex(s, sb);
+		return sb.toString();
+	}
+
+	static public void stringToHex(final String s, final StringBuilder sb) {
+		for (int i = 0; i < s.length(); i++) {
+			charToHex(s.charAt(i), sb);
+		}
+	}
+
+	static public String bytesToHex(final byte[] b, final boolean prefix) {
+		final StringBuilder sb;
+		if (prefix) {
+			sb = new StringBuilder(b.length + 2);
+			sb.append("0x");
+		} else {
+			sb = new StringBuilder(b.length);
+		}
+		bytesToHex(b, sb);
+		return sb.toString();
+	}
+
+	static public void bytesToHex(final byte[] b, final StringBuilder sb) {
+		for (int i = 0; i < b.length; i++) {
+			byteToHex(b[i], sb);
+		}
+	}
 }
