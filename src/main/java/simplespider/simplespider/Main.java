@@ -60,6 +60,7 @@ public class Main {
 	private volatile boolean		cancled	= false;
 	private final DbHelperFactory	dbHelperFactory;
 	final HttpClientFactory			httpClientFactory;
+	private Thread					listener;
 
 	private Main(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory) {
 		this.dbHelperFactory = dbHelperFactory;
@@ -76,7 +77,7 @@ public class Main {
 	}
 
 	private void startCancleListener() {
-		final Thread listener = new Thread() {
+		this.listener = new Thread() {
 			@Override
 			public void run() {
 				LOG.warn("Invoke stopping crawler...");
@@ -93,8 +94,14 @@ public class Main {
 		};
 
 		LOG.info("Add shutdown hook...");
-		listener.setDaemon(true);
-		Runtime.getRuntime().addShutdownHook(listener);
+		this.listener.setDaemon(true);
+		Runtime.getRuntime().addShutdownHook(this.listener);
+	}
+
+	private void interruptCancleListener() {
+		LOG.info("Interrupting cancle listner...");
+		Runtime.getRuntime().removeShutdownHook(this.listener);
+		this.listener.interrupt();
 	}
 
 	private void runCrawler() throws SQLException {
@@ -181,7 +188,11 @@ public class Main {
 			}
 
 			next.setDone(true);
-			linkDao.save(next);
+			try {
+				linkDao.save(next);
+			} catch (final RuntimeException e) {
+				LOG.error("Failed to set LINK entity " + next.toString() + " on done", e);
+			}
 			db.commitTransaction();
 
 			final String baseUrl = next.getUrl();
@@ -213,6 +224,13 @@ public class Main {
 
 		final Main main = new Main(dbHelperFactory, httpClientFactory);
 		main.startCancleListener();
-		main.runCrawler();
+		try {
+			main.runCrawler();
+		} catch (final RuntimeException e) {
+			LOG.error("Uncaught and unhandled error occurs. Please report this bug", e);
+			main.interruptCancleListener();
+			System.exit(1);
+		}
+		System.exit(0);
 	}
 }
