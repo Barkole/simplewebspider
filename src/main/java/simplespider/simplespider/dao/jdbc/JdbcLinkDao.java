@@ -20,6 +20,8 @@ package simplespider.simplespider.dao.jdbc;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.LinkDao;
@@ -27,6 +29,8 @@ import simplespider.simplespider.enity.Link;
 import simplespider.simplespider.util.MD5;
 
 public class JdbcLinkDao implements LinkDao {
+
+	private static final String	DELETE_LINK_BY_ID			= "DELETE FROM LINK WHERE ID = ?";
 
 	private static final String	UPDATE_LINK					= "UPDATE" //
 																	+ " link" // 
@@ -52,6 +56,10 @@ public class JdbcLinkDao implements LinkDao {
 																	+ "    AND id < ? " //
 																	+ " ORDER BY rand()" //
 																	+ " LIMIT 1";
+
+	private static final String	SELECT_LINK_WITHOUT_HASH	= "SELECT *" //
+																	+ " FROM link" //
+																	+ " WHERE url_hash is null";
 
 	private static final String	SELECT_LINK					= "SELECT *" //
 																	+ " FROM link" //
@@ -155,6 +163,22 @@ public class JdbcLinkDao implements LinkDao {
 		return link;
 	}
 
+	private List<Link> getLinks(final PreparedStatement selectLink) throws SQLException {
+		final List<Link> results = new ArrayList<Link>();
+
+		final ResultSet selectResult = selectLink.executeQuery();
+
+		while (selectResult.next()) {
+			final Link link = createLink(selectResult);
+			results.add(link);
+		}
+
+		selectResult.close();
+		selectLink.close();
+
+		return results;
+	}
+
 	@Override
 	public boolean isAvailable(final String url) {
 		try {
@@ -209,5 +233,31 @@ public class JdbcLinkDao implements LinkDao {
 		} catch (final SQLException e) {
 			throw new RuntimeException("Failed to save link " + link, e);
 		}
+	}
+
+	List<Link> getLinksWithoutHash() {
+		try {
+			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_WITHOUT_HASH);
+			return getLinks(select);
+		} catch (final SQLException e) {
+			throw new RuntimeException("Failed to get next link", e);
+		}
+	}
+
+	public int delete(final Link link) {
+		try {
+			final PreparedStatement delete = this.db.prepareStatement(DELETE_LINK_BY_ID);
+			delete.setLong(1, link.getId().longValue());
+
+			final int rowCount = delete.executeUpdate();
+			link.setId(null);
+
+			delete.close();
+
+			return rowCount;
+		} catch (final SQLException e) {
+			throw new RuntimeException("Failed to delete link " + link, e);
+		}
+
 	}
 }

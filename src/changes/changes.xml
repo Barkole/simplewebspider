@@ -8,7 +8,8 @@
 		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
-		<release version="0.0.11" date="2009-XX-XX" description="???????">
+		<release version="0.0.11" date="2009-XX-XX" description="Database improvements and small other bug fixes">
+			<action dev="berendona" type="fix" issue="152906">Inserting URL: Unique constrain failures</action>
 			<action dev="berendona" type="fix" issue="158571">Failure on update database entry causes program stop</action>
 			<action dev="berendona" type="add" issue="158449">Database: Use indices</action>
 			<action dev="berendona" type="update" issue="158447">Database: Use hashes for detecting unique</action>

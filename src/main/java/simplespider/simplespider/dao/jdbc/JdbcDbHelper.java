@@ -22,13 +22,19 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.DbHelper;
-import simplespider.simplespider.dao.LinkDao;
+import simplespider.simplespider.enity.Link;
 
 public class JdbcDbHelper implements DbHelper {
 
-	private Connection	connection;
+	private static final Log	LOG	= LogFactory.getLog(JdbcDbHelper.class);
+
+	private Connection			connection;
 
 	/*
 	 * (non-Javadoc)
@@ -64,7 +70,7 @@ public class JdbcDbHelper implements DbHelper {
 	}
 
 	@Override
-	public LinkDao getLinkDao() {
+	public JdbcLinkDao getLinkDao() {
 		return new JdbcLinkDao(this);
 	}
 
@@ -95,4 +101,28 @@ public class JdbcDbHelper implements DbHelper {
 		this.connection = null;
 	}
 
+	@Override
+	public void prepareDatabase() throws SQLException {
+		try {
+			LOG.info("PrepareDatabase: Build hash for each link without hash value...");
+			final JdbcLinkDao linkDao = getLinkDao();
+			final List<Link> links = linkDao.getLinksWithoutHash();
+			for (final Link link : links) {
+				try {
+					linkDao.save(link);
+				} catch (final RuntimeException e) {
+					LOG.warn("Failed to update hash value for link " + link.toString(), e);
+					LOG.warn("Delete link " + link.toString());
+					try {
+						linkDao.delete(link);
+					} catch (final RuntimeException e2) {
+						LOG.error("Failed to delete link " + link.toString(), e2);
+					}
+				}
+			}
+			commitTransaction();
+		} catch (final Exception e) {
+			throw new SQLException("Failed to prepare database", e);
+		}
+	}
 }
