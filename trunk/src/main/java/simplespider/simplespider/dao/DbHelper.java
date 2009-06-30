@@ -24,6 +24,8 @@ public interface DbHelper {
 
 	public abstract void beginTransaction();
 
+	public abstract void prepareDatabase() throws SQLException;
+
 	public abstract void close() throws SQLException;
 
 	public abstract void commitTransaction() throws SQLException;

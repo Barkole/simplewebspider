@@ -109,6 +109,9 @@ public class Main {
 		LOG.info("Open database connection... This could took time...");
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
 
+		LOG.info("Prepare database...");
+		db.prepareDatabase();
+
 		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 		{
 			LOG.info("Bootstrapping (all LINK entries with id lower than " + BOOTSTRAPPING_LINK_MAX_ID + ")");
