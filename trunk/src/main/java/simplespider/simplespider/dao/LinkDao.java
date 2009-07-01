@@ -17,6 +17,8 @@
  */
 package simplespider.simplespider.dao;
 
+import java.util.List;
+
 import simplespider.simplespider.enity.Link;
 
 public interface LinkDao {
@@ -25,7 +27,11 @@ public interface LinkDao {
 
 	public abstract Link getNext();
 
+	public abstract List<Link> getNext(int limit);
+
 	public abstract Link getNextUpToId(long maxId);
+
+	public abstract List<Link> getNextUpToId(long maxId, int limit);
 
 	public abstract boolean isAvailable(String url);
 

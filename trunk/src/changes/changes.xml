@@ -9,6 +9,7 @@
 	</properties>
 	<body>
 		<release version="0.0.11" date="2009-XX-XX" description="Database improvements and small other bug fixes">
+			<action dev="berendona" type="update" issue="158616">Database: Load more than one LINK entity at once</action>
 			<action dev="berendona" type="fix" issue="152906">Inserting URL: Unique constrain failures</action>
 			<action dev="berendona" type="fix" issue="158571">Failure on update database entry causes program stop</action>
 			<action dev="berendona" type="add" issue="158449">Database: Use indices</action>
