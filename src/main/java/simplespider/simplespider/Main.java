@@ -19,6 +19,9 @@ package simplespider.simplespider;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.ArrayDeque;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +53,7 @@ public class Main {
 	private static final int	MAX_CURRENT_THREADS			= 4;
 	private static final int	MAX_THREADS_PER_MINUTE		= 10;
 	private static final Log	LOG							= LogFactory.getLog(Main.class);
+	private static final int	ROW_LIMIT					= MAX_THREADS_PER_MINUTE * MAX_CURRENT_THREADS * 10;
 
 	private static Thread		mainThread;
 
@@ -159,11 +163,22 @@ public class Main {
 		final LinkDao linkDao = db.getLinkDao();
 
 		int retryCountOnNoLinks = 0;
+		final Queue<Link> linkQueue = new ArrayDeque<Link>(ROW_LIMIT);
 		while (!this.cancled) {
 			// Block while to much threads were working in last minute
 			limitThroughPut.next();
 
-			final Link next = bootstrapping ? linkDao.getNextUpToId(BOOTSTRAPPING_LINK_MAX_ID) : linkDao.getNext();
+			// If Queue is empty, so try to get new LINK entities
+			if (linkQueue.isEmpty()) {
+				final List<Link> nextLinks = bootstrapping ? linkDao.getNextUpToId(BOOTSTRAPPING_LINK_MAX_ID, ROW_LIMIT) : linkDao.getNext(ROW_LIMIT);
+				linkQueue.addAll(nextLinks);
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Loaded " + nextLinks.size() + " LINKs");
+				}
+			}
+
+			// Check for next link, if there is none, wait and try again
+			final Link next = linkQueue.poll();
 			if (next == null) {
 				// On bootstrapping don't do any retry, if no more links are available
 				if (bootstrapping) {

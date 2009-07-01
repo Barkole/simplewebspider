@@ -27,6 +27,7 @@ import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.enity.Link;
 import simplespider.simplespider.util.MD5;
+import simplespider.simplespider.util.ValidityHelper;
 
 public class JdbcLinkDao implements LinkDao {
 
@@ -54,8 +55,7 @@ public class JdbcLinkDao implements LinkDao {
 																	+ " FROM link" //
 																	+ " WHERE done = false" //
 																	+ "    AND id < ? " //
-																	+ " ORDER BY rand()" //
-																	+ " LIMIT 1";
+																	+ " ORDER BY rand()";
 
 	private static final String	SELECT_LINK_WITHOUT_HASH	= "SELECT *" //
 																	+ " FROM link" //
@@ -64,8 +64,7 @@ public class JdbcLinkDao implements LinkDao {
 	private static final String	SELECT_LINK					= "SELECT *" //
 																	+ " FROM link" //
 																	+ " WHERE done = false" //
-																	+ " ORDER BY rand()" //
-																	+ " LIMIT 1";
+																	+ " ORDER BY rand()";
 
 	private final DbHelper		db;
 
@@ -125,9 +124,20 @@ public class JdbcLinkDao implements LinkDao {
 
 	@Override
 	public Link getNext() {
+		final List<Link> result = getNext(1);
+
+		if (ValidityHelper.isEmpty(result)) {
+			return null;
+		}
+
+		return result.get(0);
+	}
+
+	public List<Link> getNext(final int limit) {
 		try {
 			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK);
-			return getLink(select, false);
+			select.setMaxRows(limit);
+			return getLinks(select);
 		} catch (final SQLException e) {
 			throw new RuntimeException("Failed to get next link", e);
 		}
@@ -135,12 +145,23 @@ public class JdbcLinkDao implements LinkDao {
 
 	@Override
 	public Link getNextUpToId(final long maxId) {
+		final List<Link> result = getNextUpToId(maxId, 1);
+
+		if (ValidityHelper.isEmpty(result)) {
+			return null;
+		}
+
+		return result.get(0);
+	}
+
+	public List<Link> getNextUpToId(final long maxId, final int limit) {
 		try {
 			final PreparedStatement select = this.db.prepareStatement(SELECT_LINK_WITH_MAX_ID);
 			select.setLong(1, maxId);
-			return getLink(select, false);
+			select.setMaxRows(limit);
+			return getLinks(select);
 		} catch (final SQLException e) {
-			throw new RuntimeException("Failed to get next link", e);
+			throw new RuntimeException("Failed to get next link [maxId: " + maxId + "; limit: " + limit + "]", e);
 		}
 	}
 
@@ -215,6 +236,7 @@ public class JdbcLinkDao implements LinkDao {
 				insert.close();
 
 				// get id of new link
+				// FIXME Use SELECT IDENTITY() FROM LINK
 				final Link insertedLink = getByUrl(url);
 				if (insertedLink == null) {
 					throw new SQLException("Inserted link is not in database: " + link);
