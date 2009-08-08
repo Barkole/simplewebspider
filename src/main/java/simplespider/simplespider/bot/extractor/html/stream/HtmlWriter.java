@@ -49,15 +49,14 @@ import org.apache.commons.logging.LogFactory;
 
 final class HtmlWriter extends Writer {
 
-	private static final Log	LOG					= LogFactory.getLog(HtmlWriter.class);
+	private static final Log	LOG			= LogFactory.getLog(HtmlWriter.class);
 
-	private static final int	DEFAULT_BUFFER_SIZE	= 16384;
-	public static final char	lb					= '<';
-	public static final char	rb					= '>';
-	public static final char	dash				= '-';
-	public static final char	excl				= '!';
-	public static final char	singlequote			= '\'';
-	public static final char	doublequote			= '"';
+	public static final char	lb			= '<';
+	public static final char	rb			= '>';
+	public static final char	dash		= '-';
+	public static final char	excl		= '!';
+	public static final char	singlequote	= '\'';
+	public static final char	doublequote	= '"';
 
 	private TagWriter			filterCont;
 	private Properties			filterOpts;
@@ -72,9 +71,9 @@ final class HtmlWriter extends Writer {
 	private boolean				binaryUnsuspect;
 	private final boolean		passbyIfBinarySuspect;
 
-	public HtmlWriter(final boolean passbyIfBinarySuspect, final TagListener scraper) {
+	public HtmlWriter(final boolean passbyIfBinarySuspect, final TagListener scraper, final int bufferSize) {
 		this.scraper = scraper;
-		this.buffer = new TagWriter(DEFAULT_BUFFER_SIZE);
+		this.buffer = new TagWriter(bufferSize);
 		this.inSingleQuote = false;
 		this.inDoubleQuote = false;
 		this.inComment = false;
@@ -349,26 +348,6 @@ final class HtmlWriter extends Writer {
 		this.filterOpts = null;
 		this.filterCont = null;
 		return;
-	}
-
-	private static char[] genTag0raw(final String tagname, final boolean opening, final char[] tagopts) {
-		final TagWriter bb = new TagWriter(tagname.length() + tagopts.length + 3);
-		bb.append((int) '<');
-		if (!opening) {
-			bb.append((int) '/');
-		}
-		bb.append(tagname);
-		if (tagopts.length > 0) {
-			bb.append(tagopts);
-		}
-		bb.append((int) '>');
-		final char[] result = bb.getChars();
-		try {
-			bb.close();
-		} catch (final IOException e) {
-			e.printStackTrace();
-		}
-		return result;
 	}
 
 	private static int tagEnd(final char[] tag, final int start) {

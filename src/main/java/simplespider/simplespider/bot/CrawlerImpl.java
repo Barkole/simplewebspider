@@ -44,6 +44,7 @@ import simplespider.simplespider.util.ValidityHelper;
 public class CrawlerImpl implements Crawler {
 
 	// TODO Sleeping on error should be solved not here
+	// TODO Configure this
 	private static final int		SLEEP_SECONDS_ON_ERROR	= 10;
 
 	private static final Log		LOG						= LogFactory.getLog(CrawlerImpl.class);
@@ -65,18 +66,26 @@ public class CrawlerImpl implements Crawler {
 			httpClient.createConnection(baseUrl);
 		} catch (final Exception e) {
 			if (e instanceof SocketTimeoutException) {
-				LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+				}
 			} else if (e instanceof CircularRedirectException) {
-				LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
+				}
 			} else {
-				LOG.info("Failed to load URL \"" + baseUrl + "\"", e);
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Failed to load URL \"" + baseUrl + "\"", e);
+				}
 			}
 			return null;
 		}
 
 		final int statusCode = httpClient.getStatusCode();
 		if (statusCode < 200 || statusCode >= 300) {
-			LOG.info("Failed to load URL \"" + baseUrl + "\":" + httpClient.getStatusLine());
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Failed to load URL \"" + baseUrl + "\":" + httpClient.getStatusLine());
+			}
 			httpClient.releaseConnection();
 			return null;
 		}
@@ -126,7 +135,9 @@ public class CrawlerImpl implements Crawler {
 		try {
 			TimeUnit.SECONDS.sleep(SLEEP_SECONDS_ON_ERROR);
 		} catch (final InterruptedException e) {
-			LOG.debug("Sleep was interrupted", e);
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("Sleep was interrupted", e);
+			}
 		}
 	}
 
@@ -137,8 +148,9 @@ public class CrawlerImpl implements Crawler {
 			if (url.startsWith("www.")) {
 				return true;
 			}
-
-			LOG.info("Protocol is not given: " + url);
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Protocol is not given: " + url);
+			}
 			return false;
 		}
 
@@ -154,7 +166,9 @@ public class CrawlerImpl implements Crawler {
 
 			for (final String url : urls) {
 				if (!isProtocolSupported(url)) {
-					LOG.debug("Ignoring not supported protocol; url: " + url);
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Ignoring not supported protocol; url: " + url);
+					}
 					continue;
 				}
 
@@ -162,13 +176,17 @@ public class CrawlerImpl implements Crawler {
 				try {
 					simpleUrl = new SimpleUrl(url);
 				} catch (final Exception e) {
-					LOG.info("Ignoring malformed URL \"" + url + "\"", e);
+					if (LOG.isInfoEnabled()) {
+						LOG.info("Ignoring malformed URL \"" + url + "\"", e);
+					}
 					continue;
 				}
 
 				final String cleanedUrl = simpleUrl.toNormalform(false, true);
 				if (linkDao.isAvailable(cleanedUrl)) {
-					LOG.debug("URL is already available: \"" + url + "\"");
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("URL is already available: \"" + url + "\"");
+					}
 					continue;
 				}
 
@@ -226,9 +244,13 @@ public class CrawlerImpl implements Crawler {
 			}
 		} else {
 			if (isMimeExcluded(mimeType)) {
-				LOG.debug("Excluded mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Excluded mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+				}
 			} else {
-				LOG.info("Not supporting mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Not supporting mime type \"" + mimeType + "\": Ignoring URL \"" + baseUrl + "\"");
+				}
 			}
 			return new ArrayList<String>(0);
 		}

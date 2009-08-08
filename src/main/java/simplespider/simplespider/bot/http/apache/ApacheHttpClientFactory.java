@@ -33,8 +33,11 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class ApacheHttpClientFactory implements HttpClientFactory {
 
+	// TODO Configure this
 	private static final String	USER_AGENT						= "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 6.0)";
+	// TODO Configure this
 	private static final int	CONNECTION_TIMEOUT_MILLISECONDS	= 30000;
+
 	private final ProxyHost		proxyHost;
 
 	public ApacheHttpClientFactory() {

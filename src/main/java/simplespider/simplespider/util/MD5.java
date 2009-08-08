@@ -63,7 +63,7 @@ public final class MD5 {
 		try {
 			data = string.getBytes(encoding);
 		} catch (final UnsupportedEncodingException x) {
-			throw new RuntimeException(x.toString());
+			throw new RuntimeException("Unsupported encoding: " + encoding, x);
 		}
 		return digestBytes(data);
 	}

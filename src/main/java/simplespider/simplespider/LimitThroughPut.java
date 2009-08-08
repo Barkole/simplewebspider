@@ -40,6 +40,9 @@ public class LimitThroughPut {
 
 	public void next() {
 		final long wait = cleanup();
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Wait for milliseconds: " + wait);
+		}
 		try {
 			TimeUnit.MILLISECONDS.sleep(wait);
 		} catch (final InterruptedException e) {
@@ -57,6 +60,8 @@ public class LimitThroughPut {
 
 		Date mostBlocking = null;
 
+		final int beforeCleanup = this.times.size();
+
 		for (final Iterator<Date> iterator = this.times.iterator(); iterator.hasNext();) {
 			final Date item = iterator.next();
 
@@ -71,6 +76,10 @@ public class LimitThroughPut {
 				iterator.remove();
 				mostBlocking = item;
 			}
+		}
+
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Cleanup - before: " + beforeCleanup + ", after: " + this.times.size() + ", max per minute: " + this.maxPerMinute);
 		}
 
 		if (mostBlocking == null) {
