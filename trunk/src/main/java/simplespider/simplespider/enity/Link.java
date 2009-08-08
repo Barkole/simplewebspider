@@ -17,13 +17,14 @@
  */
 package simplespider.simplespider.enity;
 
+
 public class Link {
 	public static final String	GET_NEXT	= "LINK_GET_NEXT";
 
-	private Long				id			= null;
 	private String				url			= null;
 	private boolean				done		= false;
 	private int					errors		= 0;
+	private boolean				bootstrap	= false;
 
 	public Link() {
 		// Default
@@ -31,10 +32,6 @@ public class Link {
 
 	public Link(final String url) {
 		this.url = url;
-	}
-
-	public Long getId() {
-		return this.id;
 	}
 
 	public String getUrl() {
@@ -49,17 +46,13 @@ public class Link {
 		this.done = done;
 	}
 
-	public void setId(final Long id) {
-		this.id = id;
-	}
-
 	public void setUrl(final String url) {
 		this.url = url;
 	}
 
 	@Override
 	public String toString() {
-		return "Link [id:" + this.id + ",url:\"" + this.url + "\",done:" + this.done + "]";
+		return "Link [url:\"" + this.url + "\",done:" + this.done + ",errors:" + this.errors + ",bootstrap:" + this.bootstrap + "]";
 	}
 
 	public int getErrors() {
@@ -68,5 +61,13 @@ public class Link {
 
 	public void setErrors(final int errors) {
 		this.errors = errors;
+	}
+
+	public boolean isBootstrap() {
+		return this.bootstrap;
+	}
+
+	public void setBootstrap(final boolean bootstrap) {
+		this.bootstrap = bootstrap;
 	}
 }

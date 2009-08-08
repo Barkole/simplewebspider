@@ -36,13 +36,20 @@ import simplespider.simplespider.util.ValidityHelper;
 public class StreamExtractor implements LinkExtractor {
 	private static final Log	LOG					= LogFactory.getLog(StreamExtractor.class);
 
-	private static final int	DEFAULT_BUFFER_SIZE	= 16384;
+	// TODO Configure this
+	private static final int	DEFAULT_BUFFER_SIZE	= 4096;
+
+	private final int			maxUrlLength;
+
+	public StreamExtractor(final int maxUrlLength) {
+		this.maxUrlLength = maxUrlLength;
+	}
 
 	public List<String> getUrls(final InputStream body, final String baseUrl) throws IOException {
 		ValidityHelper.checkNotNull("body", body);
 
 		final TagListenerImpl listener = new TagListenerImpl();
-		final HtmlWriter htmlWriter = new HtmlWriter(true, listener);
+		final HtmlWriter htmlWriter = new HtmlWriter(true, listener, DEFAULT_BUFFER_SIZE);
 
 		parse(body, htmlWriter, baseUrl);
 
@@ -62,10 +69,20 @@ public class StreamExtractor implements LinkExtractor {
 			try {
 				final SimpleUrl newUrl = SimpleUrl.newURL(url, reference);
 				if (newUrl == null) {
-					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\", because it contains nothing");
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\", because it contains nothing");
+					}
 					continue;
 				}
 				final String normalformedUrl = newUrl.toNormalform(false, true);
+
+				if (normalformedUrl.length() > this.maxUrlLength) {
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\", because its size is greater than "
+								+ this.maxUrlLength);
+					}
+					continue;
+				}
 				links.add(normalformedUrl);
 			} catch (final Exception e) {
 				LOG.warn("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
@@ -84,7 +101,9 @@ public class StreamExtractor implements LinkExtractor {
 			count += n;
 
 			if (target.binarySuspect()) {
-				LOG.info("Skip binary content: \"" + baseUrl + "\"");
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Skip binary content: \"" + baseUrl + "\"");
+				}
 				break;
 			}
 		}

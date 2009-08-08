@@ -38,17 +38,18 @@
 // You should have received a copy of the GNU General Public License
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-
 package simplespider.simplespider.bot.extractor.html.stream;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 final class TagWriter extends Writer {
+
+	private static final Log	LOG			= LogFactory.getLog(TagWriter.class);
 
 	private static final char	singlequote	= '\'';
 	private static final char	doublequote	= '"';
@@ -76,58 +77,58 @@ final class TagWriter extends Writer {
 		this.offset = 0;
 	}
 
-	public TagWriter(final char[] bb, final int initLength) {
-		this.buffer = new char[initLength];
-		System.arraycopy(bb, 0, this.buffer, 0, bb.length);
-		this.length = bb.length;
-		this.offset = 0;
-	}
+	//	public TagWriter(final char[] bb, final int initLength) {
+	//		this.buffer = new char[initLength];
+	//		System.arraycopy(bb, 0, this.buffer, 0, bb.length);
+	//		this.length = bb.length;
+	//		this.offset = 0;
+	//	}
 
-	public TagWriter(final char[] bb, final int of, final int le) {
-		if (of * 2 > bb.length) {
-			this.buffer = new char[le];
-			System.arraycopy(bb, of, this.buffer, 0, le);
-			this.length = le;
-			this.offset = 0;
-		} else {
-			this.buffer = bb;
-			this.length = le;
-			this.offset = of;
-		}
-	}
+	//	public TagWriter(final char[] bb, final int of, final int le) {
+	//		if (of * 2 > bb.length) {
+	//			this.buffer = new char[le];
+	//			System.arraycopy(bb, of, this.buffer, 0, le);
+	//			this.length = le;
+	//			this.offset = 0;
+	//		} else {
+	//			this.buffer = bb;
+	//			this.length = le;
+	//			this.offset = of;
+	//		}
+	//	}
 
-	public TagWriter(final TagWriter bb) {
-		this.buffer = bb.buffer;
-		this.length = bb.length;
-		this.offset = bb.offset;
-	}
+	//	public TagWriter(final TagWriter bb) {
+	//		this.buffer = bb.buffer;
+	//		this.length = bb.length;
+	//		this.offset = bb.offset;
+	//	}
 
-	public TagWriter(final File f) throws IOException {
-		// initially fill the buffer with the content of a file
-		if (f.length() > Integer.MAX_VALUE) {
-			throw new IOException("file is too large for buffering");
-		}
-
-		this.length = (int) f.length();
-		this.buffer = new char[this.length * 2];
-		this.offset = 0;
-
-		FileReader fr = null;
-		try {
-			fr = new FileReader(f);
-			final char[] temp = new char[256];
-			int c;
-			while ((c = fr.read(temp)) > 0) {
-				this.append(temp, 0, c);
-			}
-		} catch (final FileNotFoundException e) {
-			throw new IOException("File not found: " + f.toString() + "; " + e.getMessage());
-		} finally {
-			if (fr != null) {
-				fr.close();
-			}
-		}
-	}
+	//	public TagWriter(final File f) throws IOException {
+	//		// initially fill the buffer with the content of a file
+	//		if (f.length() > Integer.MAX_VALUE) {
+	//			throw new IOException("file is too large for buffering");
+	//		}
+	//
+	//		this.length = (int) f.length();
+	//		this.buffer = new char[this.length * 2];
+	//		this.offset = 0;
+	//
+	//		FileReader fr = null;
+	//		try {
+	//			fr = new FileReader(f);
+	//			final char[] temp = new char[256];
+	//			int c;
+	//			while ((c = fr.read(temp)) > 0) {
+	//				this.append(temp, 0, c);
+	//			}
+	//		} catch (final FileNotFoundException e) {
+	//			throw new IOException("File not found: " + f.toString() + "; " + e.getMessage());
+	//		} finally {
+	//			if (fr != null) {
+	//				fr.close();
+	//			}
+	//		}
+	//	}
 
 	public void clear() {
 		this.buffer = new char[0];
@@ -143,6 +144,9 @@ final class TagWriter extends Writer {
 		int newsize = this.buffer.length * 2 + 1;
 		if (newsize < 256) {
 			newsize = 256;
+		}
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Increase tag writer buffer: from " + this.buffer.length + " to " + newsize);
 		}
 		final char[] tmp = new char[newsize];
 		System.arraycopy(this.buffer, this.offset, tmp, 0, this.length);
@@ -532,19 +536,22 @@ final class TagWriter extends Writer {
 		this.offset = 0;
 	}
 
-	public void reset(final int newSize) {
-		resize(newSize);
-		this.reset();
-	}
-
-	public void resize(final int newSize) {
-		if (newSize < 0) {
-			throw new IllegalArgumentException("Illegal array size: " + newSize);
-		}
-		final char[] v = new char[newSize];
-		System.arraycopy(this.buffer, 0, v, 0, newSize > this.buffer.length ? this.buffer.length : newSize);
-		this.buffer = v;
-	}
+	//	public void reset(final int newSize) {
+	//		resize(newSize);
+	//		this.reset();
+	//	}
+	//
+	//	public void resize(final int newSize) {
+	//		if (newSize < 0) {
+	//			throw new IllegalArgumentException("Illegal array size: " + newSize);
+	//		}
+	//		if (LOG.isDebugEnabled()) {
+	//			LOG.debug("Resize tag writer before: from " + this.buffer.length + " to " + newSize);
+	//		}
+	//		final char[] v = new char[newSize];
+	//		System.arraycopy(this.buffer, 0, v, 0, newSize > this.buffer.length ? this.buffer.length : newSize);
+	//		this.buffer = v;
+	//	}
 
 	public char toCharArray()[] {
 		final char[] newbuf = new char[this.length];

@@ -29,11 +29,13 @@ public interface LinkDao {
 
 	public abstract List<Link> getNext(int limit);
 
-	public abstract Link getNextUpToId(long maxId);
+	public abstract Link getNextUpBootstrap();
 
-	public abstract List<Link> getNextUpToId(long maxId, int limit);
+	public abstract List<Link> getNextUpBootstrap(int limit);
 
 	public abstract boolean isAvailable(String url);
 
 	public abstract void save(Link link);
+
+	public void logAllEntities();
 }

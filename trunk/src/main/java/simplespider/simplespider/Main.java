@@ -39,21 +39,31 @@ import simplespider.simplespider.bot.http.apache.ApacheHttpClientFactory;
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
-import simplespider.simplespider.dao.jdbc.JdbcDbHelperFactory;
+import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
 import simplespider.simplespider.enity.Link;
+import simplespider.simplespider.importing.EntityImporter;
+import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
 
 /**
  * Hello world!
  */
 public class Main {
-	private static final int	BOOTSTRAPPING_LINK_MAX_ID	= 1000;
+	private static final Log	LOG							= LogFactory.getLog(Main.class);
+
 	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
 	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
-	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 1;
-	private static final int	MAX_CURRENT_THREADS			= 4;
-	private static final int	MAX_THREADS_PER_MINUTE		= 10;
-	private static final Log	LOG							= LogFactory.getLog(Main.class);
-	private static final int	ROW_LIMIT					= MAX_THREADS_PER_MINUTE * MAX_CURRENT_THREADS * 10;
+	// TODO Configure this
+	private static final String	LINK_IMPORT_FILENAME		= "bootstrapping.txt";
+	// TODO Configure this
+	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 5;
+	// TODO Configure this
+	private static final int	MAX_CURRENT_THREADS			= 10;
+	// TODO Configure this
+	private static final int	MAX_THREADS_PER_MINUTE		= 60;
+	// TODO Configure this
+	private static final int	ROW_LIMIT					= MAX_THREADS_PER_MINUTE;
+	// TODO Configure this
+	private static final int	MAX_URL_LENGTH				= 1024;
 
 	private static Thread		mainThread;
 
@@ -97,28 +107,40 @@ public class Main {
 
 		};
 
-		LOG.info("Add shutdown hook...");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Add shutdown hook...");
+		}
 		this.listener.setDaemon(true);
 		Runtime.getRuntime().addShutdownHook(this.listener);
 	}
 
 	private void interruptCancleListener() {
-		LOG.info("Interrupting cancle listner...");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Interrupting cancle listner...");
+		}
 		Runtime.getRuntime().removeShutdownHook(this.listener);
 		this.listener.interrupt();
 	}
 
 	private void runCrawler() throws SQLException {
-		LOG.info("Start crawler...");
-		LOG.info("Open database connection... This could took time...");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Start crawler...");
+			LOG.info("Open database connection... This could took time...");
+		}
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
-
-		LOG.info("Prepare database...");
-		db.prepareDatabase();
+		db.getLinkDao().logAllEntities();
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Importing bootstrap links...");
+		}
+		importLinks(db, LINK_IMPORT_FILENAME);
+		db.commitTransaction();
+		db.getLinkDao().logAllEntities();
 
 		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 		{
-			LOG.info("Bootstrapping (all LINK entries with id lower than " + BOOTSTRAPPING_LINK_MAX_ID + ")");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Bootstrapping...");
+			}
 
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
@@ -126,9 +148,13 @@ public class Main {
 			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
 
 			// Waiting for ending of all bootstrapping jobs
-			LOG.info("Invoke shutting down bootstrapping threads...");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Invoke shutting down bootstrapping threads...");
+			}
 			threadPool.shutdown();
-			LOG.info("Waiting for ending of all bootstrapping jobs");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Waiting for ending of all bootstrapping jobs");
+			}
 			try {
 				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
 			} catch (final InterruptedException e) {
@@ -137,14 +163,18 @@ public class Main {
 		}
 
 		{
-			LOG.info("Crawl non bootstrapping LINK entries...");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Crawl non bootstrapping LINK entries...");
+			}
 
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
 			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false);
 
-			LOG.info("Invoke shutting down threads...");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Invoke shutting down threads...");
+			}
 			threadPool.shutdown();
 			try {
 				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
@@ -154,7 +184,17 @@ public class Main {
 			threadPool.shutdownNow();
 		}
 		db.shutdown();
-		LOG.info("Crawler stops");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Crawler stops");
+		}
+	}
+
+	private void importLinks(final DbHelper db, final String filename) {
+		final EntityImporter importer = new SimpleFileImporter(filename);
+		final long importLink = importer.importLink(db.getLinkDao());
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Imported links from file \"" + filename + "\": " + importLink);
+		}
 	}
 
 	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ThreadPoolExecutor threadPool,
@@ -170,7 +210,7 @@ public class Main {
 
 			// If Queue is empty, so try to get new LINK entities
 			if (linkQueue.isEmpty()) {
-				final List<Link> nextLinks = bootstrapping ? linkDao.getNextUpToId(BOOTSTRAPPING_LINK_MAX_ID, ROW_LIMIT) : linkDao.getNext(ROW_LIMIT);
+				final List<Link> nextLinks = bootstrapping ? linkDao.getNextUpBootstrap(ROW_LIMIT) : linkDao.getNext(ROW_LIMIT);
 				linkQueue.addAll(nextLinks);
 				if (LOG.isDebugEnabled()) {
 					LOG.debug("Loaded " + nextLinks.size() + " LINKs");
@@ -182,7 +222,9 @@ public class Main {
 			if (next == null) {
 				// On bootstrapping don't do any retry, if no more links are available
 				if (bootstrapping) {
-					LOG.info("Bootstrapping: No more links available...");
+					if (LOG.isInfoEnabled()) {
+						LOG.info("Bootstrapping: No more links available...");
+					}
 					break;
 				}
 				// Seconds try fails
@@ -194,7 +236,9 @@ public class Main {
 
 				// Wait for all running treads, perhaps there are any and they create some new LINK entities
 				retryCountOnNoLinks++;
-				LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
+				if (LOG.isInfoEnabled()) {
+					LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
+				}
 				try {
 					threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
 				} catch (final InterruptedException e) {
@@ -211,19 +255,27 @@ public class Main {
 			} catch (final RuntimeException e) {
 				LOG.error("Failed to set LINK entity " + next.toString() + " on done", e);
 			}
-			db.commitTransaction();
+			try {
+				db.commitTransaction();
+			} catch (final RuntimeException e) {
+				LOG.error("Failed to commit LINK entity " + next.toString() + " on done", e);
+			}
 
 			final String baseUrl = next.getUrl();
-			LOG.info("Start crawling URL: \"" + baseUrl + "\"");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Start crawling URL: \"" + baseUrl + "\"");
+			}
 
-			final LinkExtractor extractor = new StreamExtractor();
+			final LinkExtractor extractor = new StreamExtractor(MAX_URL_LENGTH);
 			final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
 			threadPool.execute(new CrawlerRunner(crawler, baseUrl));
 		}
 	}
 
 	public static void main(final String[] args) throws Exception {
-		LOG.info("Starting program...");
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Starting program...");
+		}
 		try {
 			// do sanity checks and startup actions
 			daemonize();
@@ -231,7 +283,7 @@ public class Main {
 			LOG.fatal("Startup failed", e);
 		}
 
-		final DbHelperFactory dbHelperFactory = new JdbcDbHelperFactory();
+		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory("sws.db4o");
 
 		final HttpClientFactory httpClientFactory;
 		if (args.length == 2) {
