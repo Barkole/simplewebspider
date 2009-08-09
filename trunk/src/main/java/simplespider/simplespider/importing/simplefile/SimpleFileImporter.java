@@ -9,7 +9,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.LinkDao;
-import simplespider.simplespider.enity.Link;
 import simplespider.simplespider.importing.EntityImporter;
 import simplespider.simplespider.util.SimpleUrl;
 
@@ -57,27 +56,8 @@ public class SimpleFileImporter implements EntityImporter {
 
 					final String normalizedUrl = simpleUrl.toNormalform(false, true);
 
-					final boolean available;
 					try {
-						available = linkDao.isAvailable(normalizedUrl);
-					} catch (final RuntimeException e) {
-						LOG.warn("Failed to import \"" + strLine + "\" (normalized: \"" + normalizedUrl + "\"): Failed to check if aready available",
-								e);
-						continue;
-					}
-
-					if (available) {
-						if (LOG.isInfoEnabled()) {
-							LOG.info("Skipping link \"" + strLine + "\" (normalized: \"" + normalizedUrl + "\"): Already available");
-						}
-						continue;
-					}
-
-					final Link link = new Link(normalizedUrl);
-					link.setBootstrap(true);
-
-					try {
-						linkDao.save(link);
+						linkDao.save(normalizedUrl);
 						count++;
 						if (LOG.isInfoEnabled()) {
 							LOG.info("Import link \"" + strLine + "\" (normalized: \"" + normalizedUrl + "\")");

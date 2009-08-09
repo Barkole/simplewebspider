@@ -19,9 +19,6 @@ package simplespider.simplespider;
 
 import java.io.File;
 import java.sql.SQLException;
-import java.util.ArrayDeque;
-import java.util.List;
-import java.util.Queue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -40,7 +37,6 @@ import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
-import simplespider.simplespider.enity.Link;
 import simplespider.simplespider.importing.EntityImporter;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
 
@@ -60,8 +56,6 @@ public class Main {
 	private static final int	MAX_CURRENT_THREADS			= 10;
 	// TODO Configure this
 	private static final int	MAX_THREADS_PER_MINUTE		= 60;
-	// TODO Configure this
-	private static final int	ROW_LIMIT					= MAX_THREADS_PER_MINUTE;
 	// TODO Configure this
 	private static final int	MAX_URL_LENGTH				= 1024;
 
@@ -128,43 +122,16 @@ public class Main {
 			LOG.info("Open database connection... This could took time...");
 		}
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
-		db.getLinkDao().logAllEntities();
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Importing bootstrap links...");
-		}
-		importLinks(db, LINK_IMPORT_FILENAME);
-		db.commitTransaction();
-		db.getLinkDao().logAllEntities();
-
-		final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
-		{
+		try {
 			if (LOG.isInfoEnabled()) {
-				LOG.info("Bootstrapping...");
+				LOG.info("Importing bootstrap links...");
 			}
+			importLinks(db, LINK_IMPORT_FILENAME);
+			db.commitTransaction();
 
-			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
-					new LinkedBlockingQueue<Runnable>());
-
-			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, true);
-
-			// Waiting for ending of all bootstrapping jobs
+			final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
 			if (LOG.isInfoEnabled()) {
-				LOG.info("Invoke shutting down bootstrapping threads...");
-			}
-			threadPool.shutdown();
-			if (LOG.isInfoEnabled()) {
-				LOG.info("Waiting for ending of all bootstrapping jobs");
-			}
-			try {
-				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
-			} catch (final InterruptedException e) {
-				LOG.warn("failed to wait for ending of all threads", e);
-			}
-		}
-
-		{
-			if (LOG.isInfoEnabled()) {
-				LOG.info("Crawl non bootstrapping LINK entries...");
+				LOG.info("Crawl LINK entries...");
 			}
 
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
@@ -182,10 +149,15 @@ public class Main {
 				LOG.warn("failed to wait for ending of all threads", e);
 			}
 			threadPool.shutdownNow();
-		}
-		db.shutdown();
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Crawler stops");
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Crawler stops");
+			}
+		} finally {
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Shutting down database");
+			}
+			db.shutdown();
+
 		}
 	}
 
@@ -203,22 +175,18 @@ public class Main {
 		final LinkDao linkDao = db.getLinkDao();
 
 		int retryCountOnNoLinks = 0;
-		final Queue<Link> linkQueue = new ArrayDeque<Link>(ROW_LIMIT);
 		while (!this.cancled) {
 			// Block while to much threads were working in last minute
 			limitThroughPut.next();
 
-			// If Queue is empty, so try to get new LINK entities
-			if (linkQueue.isEmpty()) {
-				final List<Link> nextLinks = bootstrapping ? linkDao.getNextUpBootstrap(ROW_LIMIT) : linkDao.getNext(ROW_LIMIT);
-				linkQueue.addAll(nextLinks);
-				if (LOG.isDebugEnabled()) {
-					LOG.debug("Loaded " + nextLinks.size() + " LINKs");
-				}
+			// Check for next link, if there is none, wait and try again
+			final String next = linkDao.removeNext();
+			try {
+				db.commitTransaction();
+			} catch (final RuntimeException e) {
+				LOG.error("Failed to commit LINK entity " + next.toString() + " on done", e);
 			}
 
-			// Check for next link, if there is none, wait and try again
-			final Link next = linkQueue.poll();
 			if (next == null) {
 				// On bootstrapping don't do any retry, if no more links are available
 				if (bootstrapping) {
@@ -249,26 +217,13 @@ public class Main {
 				retryCountOnNoLinks = 0;
 			}
 
-			next.setDone(true);
-			try {
-				linkDao.save(next);
-			} catch (final RuntimeException e) {
-				LOG.error("Failed to set LINK entity " + next.toString() + " on done", e);
-			}
-			try {
-				db.commitTransaction();
-			} catch (final RuntimeException e) {
-				LOG.error("Failed to commit LINK entity " + next.toString() + " on done", e);
-			}
-
-			final String baseUrl = next.getUrl();
 			if (LOG.isInfoEnabled()) {
-				LOG.info("Start crawling URL: \"" + baseUrl + "\"");
+				LOG.info("Start crawling URL: \"" + next + "\"");
 			}
 
 			final LinkExtractor extractor = new StreamExtractor(MAX_URL_LENGTH);
 			final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
-			threadPool.execute(new CrawlerRunner(crawler, baseUrl));
+			threadPool.execute(new CrawlerRunner(crawler, next));
 		}
 	}
 

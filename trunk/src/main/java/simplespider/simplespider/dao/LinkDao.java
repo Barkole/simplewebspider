@@ -17,25 +17,10 @@
  */
 package simplespider.simplespider.dao;
 
-import java.util.List;
-
-import simplespider.simplespider.enity.Link;
 
 public interface LinkDao {
 
-	public abstract Link getByUrl(String url);
+	public String removeNext();
 
-	public abstract Link getNext();
-
-	public abstract List<Link> getNext(int limit);
-
-	public abstract Link getNextUpBootstrap();
-
-	public abstract List<Link> getNextUpBootstrap(int limit);
-
-	public abstract boolean isAvailable(String url);
-
-	public abstract void save(Link link);
-
-	public void logAllEntities();
+	public void save(String link);
 }
