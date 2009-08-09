@@ -326,22 +326,22 @@ public class CrawlerImpl implements Crawler {
 	}
 
 	private void setLinkUndone(final String baseUrl) throws SQLException {
-		final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
-		try {
-			final LinkDao linkDao = dbHelper.getLinkDao();
-			final Link link = linkDao.getByUrl(baseUrl);
-
-			if (link == null) {
-				throw new SQLException("Link with following url not available: \"" + baseUrl + "\"");
-			}
-
-			link.setDone(false);
-			link.setErrors(link.getErrors() + 1);
-			linkDao.save(link);
-			dbHelper.commitTransaction();
-		} finally {
-			dbHelper.close();
-		}
+		//		final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
+		//		try {
+		//			final LinkDao linkDao = dbHelper.getLinkDao();
+		//			final Link link = linkDao.getByUrl(baseUrl);
+		//
+		//			if (link == null) {
+		//				throw new SQLException("Link with following url not available: \"" + baseUrl + "\"");
+		//			}
+		//
+		//			link.setDone(false);
+		//			link.setErrors(link.getErrors() + 1);
+		//			linkDao.save(link);
+		//			dbHelper.commitTransaction();
+		//		} finally {
+		//			dbHelper.close();
+		//		}
 	}
 
 }
