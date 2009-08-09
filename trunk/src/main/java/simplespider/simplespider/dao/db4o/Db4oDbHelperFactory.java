@@ -13,7 +13,6 @@ import simplespider.simplespider.enity.Link;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
 import com.db4o.config.FileConfiguration;
-import com.db4o.constraints.UniqueFieldValueConstraint;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.cs.config.ServerConfiguration;
 import com.db4o.defragment.Defragment;
@@ -38,14 +37,14 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
 		dbConfig.common().objectClass(Link.class).objectField("done").indexed(true);
 		dbConfig.common().objectClass(Link.class).objectField("errors").indexed(true);
-		dbConfig.common().objectClass(Link.class).objectField("url").indexed(true);
+		//		dbConfig.common().objectClass(Link.class).objectField("url").indexed(true);
 		dbConfig.common().objectClass(Link.class).objectField("bootstrap").indexed(true);
-		dbConfig.common().add(new UniqueFieldValueConstraint(Link.class, "url"));
+		//		dbConfig.common().add(new UniqueFieldValueConstraint(Link.class, "url"));
 
 		dbConfig.common().allowVersionUpdates(true);
 		dbConfig.common().detectSchemaChanges(true);
 		dbConfig.common().exceptionsOnNotStorable(true);
-		dbConfig.common().optimizeNativeQueries(false);
+		dbConfig.common().optimizeNativeQueries(true);
 		dbConfig.common().messageLevel(1);
 		dbConfig.common().activationDepth(1);
 

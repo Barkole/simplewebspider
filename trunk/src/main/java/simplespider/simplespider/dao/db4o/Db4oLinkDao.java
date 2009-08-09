@@ -13,6 +13,7 @@ import simplespider.simplespider.util.ValidityHelper;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
+import com.db4o.query.Query;
 
 public class Db4oLinkDao implements LinkDao {
 
@@ -20,22 +21,22 @@ public class Db4oLinkDao implements LinkDao {
 
 	private final Db4oDbHelper	dbHelper;
 
-	private static class QueryByUrl extends Predicate<Link> {
-
-		private static final long	serialVersionUID	= 2607574799548754285L;
-
-		private final String		url;
-
-		private QueryByUrl(final String url) {
-			super();
-			this.url = url;
-		}
-
-		@Override
-		public boolean match(final Link candidate) {
-			return this.url.equals(candidate.getUrl());
-		}
-	}
+	//	private static class QueryByUrl extends Predicate<Link> {
+	//
+	//		private static final long	serialVersionUID	= 2607574799548754285L;
+	//
+	//		private final String		url;
+	//
+	//		private QueryByUrl(final String url) {
+	//			super();
+	//			this.url = url;
+	//		}
+	//
+	//		@Override
+	//		public boolean match(final Link candidate) {
+	//			return this.url.equals(candidate.getUrl());
+	//		}
+	//	}
 
 	private static class QueryByNotDone extends Predicate<Link> {
 		private static final long	serialVersionUID	= 306198406406817207L;
@@ -66,8 +67,10 @@ public class Db4oLinkDao implements LinkDao {
 		ValidityHelper.checkNotEmpty("url", url);
 
 		final ObjectContainer container = this.dbHelper.getContainer();
-		final ObjectSet<Link> links = container.query(new QueryByUrl(url));
-
+		final Query query = container.query();
+		query.constrain(Link.class);
+		query.descend("url").constrain(url);
+		final ObjectSet<Link> links = query.execute();
 		if (!links.hasNext()) {
 			return null;
 		}
@@ -134,8 +137,9 @@ public class Db4oLinkDao implements LinkDao {
 
 	@Override
 	public boolean isAvailable(final String url) {
-		final Link links = getByUrl(url);
-		return links != null;
+		//		final Link links = getByUrl(url);
+		//		return links != null;
+		return false;
 	}
 
 	@Override
