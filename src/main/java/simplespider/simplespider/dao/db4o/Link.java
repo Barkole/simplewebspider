@@ -15,16 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package simplespider.simplespider.enity;
-
+package simplespider.simplespider.dao.db4o;
 
 public class Link {
-	public static final String	GET_NEXT	= "LINK_GET_NEXT";
-
-	private String				url			= null;
-	private boolean				done		= false;
-	private int					errors		= 0;
-	private boolean				bootstrap	= false;
+	private String	url	= null;
 
 	public Link() {
 		// Default
@@ -38,36 +32,12 @@ public class Link {
 		return this.url;
 	}
 
-	public boolean isDone() {
-		return this.done;
-	}
-
-	public void setDone(final boolean done) {
-		this.done = done;
-	}
-
 	public void setUrl(final String url) {
 		this.url = url;
 	}
 
 	@Override
 	public String toString() {
-		return "Link [url:\"" + this.url + "\",done:" + this.done + ",errors:" + this.errors + ",bootstrap:" + this.bootstrap + "]";
-	}
-
-	public int getErrors() {
-		return this.errors;
-	}
-
-	public void setErrors(final int errors) {
-		this.errors = errors;
-	}
-
-	public boolean isBootstrap() {
-		return this.bootstrap;
-	}
-
-	public void setBootstrap(final boolean bootstrap) {
-		this.bootstrap = bootstrap;
+		return this.url;
 	}
 }

@@ -37,7 +37,6 @@ import simplespider.simplespider.bot.http.HttpClientFactory;
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
-import simplespider.simplespider.enity.Link;
 import simplespider.simplespider.util.SimpleUrl;
 import simplespider.simplespider.util.ValidityHelper;
 
@@ -183,15 +182,7 @@ public class CrawlerImpl implements Crawler {
 				}
 
 				final String cleanedUrl = simpleUrl.toNormalform(false, true);
-				if (linkDao.isAvailable(cleanedUrl)) {
-					if (LOG.isDebugEnabled()) {
-						LOG.debug("URL is already available: \"" + url + "\"");
-					}
-					continue;
-				}
-
-				final Link linkEntity = new Link(cleanedUrl);
-				linkDao.save(linkEntity);
+				linkDao.save(cleanedUrl);
 			}
 
 			dbHelper.commitTransaction();
@@ -209,13 +200,7 @@ public class CrawlerImpl implements Crawler {
 			return null;
 		}
 
-		final String cleanedBasedUrl = new SimpleUrl(baseUrl).toNormalform(false, true);
 		final String cleanedRealBaseUrl = new SimpleUrl(realBaseUrl).toNormalform(false, true);
-
-		if (isRedirectDouble(cleanedBasedUrl, cleanedRealBaseUrl)) {
-			// Was redirected to a URL, thats already available, so nothing is to do
-			return new ArrayList<String>(0);
-		}
 
 		final InputStream bodyAsStream;
 		try {
@@ -284,45 +269,6 @@ public class CrawlerImpl implements Crawler {
 		mimeType = mimeType.toLowerCase();
 		return mimeType.startsWith("image/") //
 				|| "text/css".equals(mimeType);
-	}
-
-	private boolean isRedirectDouble(final String cleanedBasedUrl, final String cleanedRealBaseUrl) {
-
-		final DbHelper dbHelper;
-		try {
-			dbHelper = this.dbHelperFactory.buildDbHelper();
-		} catch (final SQLException e) {
-			throw new RuntimeException("Failed to get database helper", e);
-		}
-
-		try {
-			final LinkDao linkDao = dbHelper.getLinkDao();
-
-			if (!cleanedBasedUrl.equals(cleanedRealBaseUrl)) {
-				if (linkDao.isAvailable(cleanedRealBaseUrl)) {
-					return true;
-				}
-
-				final Link newLink = new Link();
-				newLink.setUrl(cleanedRealBaseUrl);
-				newLink.setDone(true);
-
-				linkDao.save(newLink);
-				try {
-					dbHelper.commitTransaction();
-				} catch (final SQLException e) {
-					throw new RuntimeException("Failed to commit transaction");
-				}
-			}
-		} finally {
-			try {
-				dbHelper.close();
-			} catch (final SQLException e) {
-				LOG.warn("Failed to close database connection", e);
-			}
-		}
-
-		return false;
 	}
 
 	private void setLinkUndone(final String baseUrl) throws SQLException {

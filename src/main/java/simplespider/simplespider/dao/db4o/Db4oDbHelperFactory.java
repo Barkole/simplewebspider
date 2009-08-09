@@ -8,11 +8,9 @@ import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
-import simplespider.simplespider.enity.Link;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
-import com.db4o.config.FileConfiguration;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.cs.config.ServerConfiguration;
 import com.db4o.defragment.Defragment;
@@ -22,8 +20,6 @@ import com.db4o.diagnostic.DiagnosticBase;
 import com.db4o.diagnostic.DiagnosticListener;
 import com.db4o.ext.ExtObjectContainer;
 import com.db4o.ext.SystemInfo;
-import com.db4o.io.FileStorage;
-import com.db4o.io.NonFlushingStorage;
 import com.db4o.reflect.ReflectClass;
 
 public class Db4oDbHelperFactory implements DbHelperFactory {
@@ -35,11 +31,6 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 	public Db4oDbHelperFactory(final String filename) {
 
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
-		dbConfig.common().objectClass(Link.class).objectField("done").indexed(true);
-		dbConfig.common().objectClass(Link.class).objectField("errors").indexed(true);
-		//		dbConfig.common().objectClass(Link.class).objectField("url").indexed(true);
-		dbConfig.common().objectClass(Link.class).objectField("bootstrap").indexed(true);
-		//		dbConfig.common().add(new UniqueFieldValueConstraint(Link.class, "url"));
 
 		dbConfig.common().allowVersionUpdates(true);
 		dbConfig.common().detectSchemaChanges(true);
@@ -70,7 +61,7 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		 * The shutdown hook does auto-commit. We do NOT want auto-commit: if a
 		 * transaction hasn't commit()ed, it's not safe to commit it. 
 		 * Add our own hook to rollback and close... */
-		dbConfig.common().automaticShutDown(false);
+		dbConfig.common().automaticShutDown(true);
 
 		// LAZY appears to cause ClassCastException's relating to db4o objects inside db4o code. :(
 		// Also it causes duplicates if we activate immediately.
@@ -94,9 +85,9 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		//			}
 		//		};
 		//		final FileStorage storage = new FileStorage();
-		final NonFlushingStorage storage = new NonFlushingStorage(new FileStorage());
-		final FileConfiguration fileConfiguration = dbConfig.file();
-		fileConfiguration.storage(storage);
+		//		final NonFlushingStorage storage = new NonFlushingStorage(new FileStorage());
+		//		final FileConfiguration fileConfiguration = dbConfig.file();
+		//		fileConfiguration.storage(storage);
 
 		//		dbConfig.file().storage().
 

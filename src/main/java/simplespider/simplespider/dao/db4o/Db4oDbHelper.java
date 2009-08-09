@@ -2,16 +2,11 @@ package simplespider.simplespider.dao.db4o;
 
 import java.sql.SQLException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import simplespider.simplespider.dao.DbHelper;
 
 import com.db4o.ObjectContainer;
 
 public class Db4oDbHelper implements DbHelper {
-
-	private static final Log	LOG	= LogFactory.getLog(Db4oDbHelper.class);
 
 	private ObjectContainer		container;
 
