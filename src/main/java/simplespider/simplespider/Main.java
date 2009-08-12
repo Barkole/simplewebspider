@@ -51,11 +51,11 @@ public class Main {
 	// TODO Configure this
 	private static final String	LINK_IMPORT_FILENAME		= "bootstrapping.txt";
 	// TODO Configure this
-	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 5;
+	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 3;
 	// TODO Configure this
-	private static final int	MAX_CURRENT_THREADS			= 10;
+	private static final int	MAX_CURRENT_THREADS			= 4;
 	// TODO Configure this
-	private static final int	MAX_THREADS_PER_MINUTE		= 60;
+	private static final int	MAX_THREADS_PER_MINUTE		= 10;
 	// TODO Configure this
 	private static final int	MAX_URL_LENGTH				= 1024;
 

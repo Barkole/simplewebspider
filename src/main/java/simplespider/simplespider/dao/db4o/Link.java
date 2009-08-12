@@ -17,15 +17,19 @@
  */
 package simplespider.simplespider.dao.db4o;
 
-public class Link {
-	private String	url	= null;
+class Link {
+	private String				url			= null;
+
+	public final static String	RANDOMIZER	= "randomizer";
+	private long				randomizer	= 0;
 
 	public Link() {
 		// Default
 	}
 
-	public Link(final String url) {
+	public Link(final String url, final long randomizer) {
 		this.url = url;
+		this.randomizer = randomizer;
 	}
 
 	public String getUrl() {
@@ -38,6 +42,14 @@ public class Link {
 
 	@Override
 	public String toString() {
-		return this.url;
+		return "[" + this.url + ";" + this.randomizer + "]";
+	}
+
+	public void setRandomizer(final long randomizer) {
+		this.randomizer = randomizer;
+	}
+
+	public long getRandomizer() {
+		return this.randomizer;
 	}
 }

@@ -2,11 +2,16 @@ package simplespider.simplespider.dao.db4o;
 
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import simplespider.simplespider.dao.DbHelper;
 
 import com.db4o.ObjectContainer;
 
 public class Db4oDbHelper implements DbHelper {
+
+	private static final Log	LOG	= LogFactory.getLog(Db4oDbHelper.class);
 
 	private ObjectContainer		container;
 
@@ -25,8 +30,18 @@ public class Db4oDbHelper implements DbHelper {
 	}
 
 	@Override
-	public void commitTransaction() throws SQLException {
-		this.container.commit();
+	public void commitTransaction() {
+		try {
+			this.container.commit();
+		} catch (final RuntimeException e) {
+			try {
+				this.container.rollback();
+			} catch (final RuntimeException e2) {
+				LOG.error("Failed to rollback database transaction", e);
+			}
+
+			throw e;
+		}
 	}
 
 	@Override

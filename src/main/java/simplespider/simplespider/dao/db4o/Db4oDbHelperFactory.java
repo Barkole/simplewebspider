@@ -11,6 +11,7 @@ import simplespider.simplespider.dao.DbHelperFactory;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
+import com.db4o.constraints.UniqueFieldValueConstraint;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.cs.config.ServerConfiguration;
 import com.db4o.defragment.Defragment;
@@ -31,6 +32,9 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 	public Db4oDbHelperFactory(final String filename) {
 
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
+		dbConfig.common().objectClass(Link.class).objectField(Link.RANDOMIZER).indexed(true);
+		dbConfig.common().objectClass(Hash.class).objectField(Hash.HASH).indexed(true);
+		dbConfig.common().add(new UniqueFieldValueConstraint(Hash.class, Hash.HASH));
 
 		dbConfig.common().allowVersionUpdates(true);
 		dbConfig.common().detectSchemaChanges(true);
