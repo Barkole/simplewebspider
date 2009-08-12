@@ -73,7 +73,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<db4oVersion>7.10.96.13184</db4oVersion>
+				<db4oVersion>7.11.107.13473</db4oVersion>
 				<db4oJava>java5</db4oJava>
 			</properties>
 			<dependencies>
