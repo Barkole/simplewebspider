@@ -15,3 +15,25 @@
 @REM You should have received a copy of the GNU General Public License
 @REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @REM
+@echo off
+setlocal EnableDelayedExpansion
+
+SET JAVA=java
+SET JAVANMAIN=simplespider.simplespider.Main
+SET JAVA_ARGS=-Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true
+
+// Determine all available jars for classpath
+SET JARS=
+FOR %%j IN (.\lib\*.jar) DO (
+	if "!JARS!"=="" SET JARS=%%j
+	if "!JARS!" NEQ "" SET JARS=!JARS!;%%j
+)
+
+SET PARAMETER=
+
+SET CMDLINE=%JAVA% %JAVA_ARGS% -classpath %JARS% %JAVANMAIN% %PARAMETER%
+
+::echo %CMDLINE%
+call %CMDLINE%
+
+endlocal
