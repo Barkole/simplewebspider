@@ -31,13 +31,11 @@
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0700</fileMode>
 		</file>
-<!--
 		<file>
-			<source>src/assembly/resources/simple-web-spider.bat</source>
+			<source>src/assembly/resources/start-sws.bat</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0600</fileMode>
 		</file>
--->
 	</files>
 	<dependencySets>
 		<dependencySet>

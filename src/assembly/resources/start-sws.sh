@@ -138,8 +138,8 @@ done
 #echo $options;exit 0 #DEBUG for getopts
 
 #get javastart args
-JAVA_ARGS="-server -XX:+UseAdaptiveSizePolicy";
-#JAVA_ARGS="-verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails $JAVA_ARGS";
+JAVA_ARGS="";
+#JAVA_ARGS="-server -XX:+UseAdaptiveSizePolicy -verbose:gc -XX:+PrintGCTimeStamps -XX:+PrintGCDetails $JAVA_ARGS";
 
 #check if Linux system supports large memory pages or if OS is Solaris which 
 #supports large memory pages since version 9 
