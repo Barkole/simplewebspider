@@ -17,10 +17,11 @@
  */
 package simplespider.simplespider.dao;
 
-
 public interface LinkDao {
 
-	public String removeNext();
+	public String removeNextAndCommit();
 
-	public void save(String link);
+	public void saveAndCommit(String link);
+
+	public void saveForced(String link);
 }

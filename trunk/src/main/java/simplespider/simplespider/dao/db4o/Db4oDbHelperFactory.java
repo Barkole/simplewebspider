@@ -32,7 +32,6 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 	public Db4oDbHelperFactory(final String filename) {
 
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
-		dbConfig.common().objectClass(Link.class).objectField(Link.RANDOMIZER).indexed(true);
 		dbConfig.common().objectClass(Hash.class).objectField(Hash.HASH).indexed(true);
 		dbConfig.common().add(new UniqueFieldValueConstraint(Hash.class, Hash.HASH));
 
@@ -72,28 +71,7 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		// And the performance gain for e.g. RegisterMeRunner isn't that great.
 		//		dbConfig.queries().evaluationMode(QueryEvaluationMode.LAZY);
 		//		dbConfig.common().queries().evaluationMode(QueryEvaluationMode.SNAPSHOT);
-
-		//		dbConfig.file().blobPath("blob.db4o");
-		//		dbConfig.file().databaseGrowthSize(1024);
 		//		dbConfig.file().freespace().useBTreeSystem();
-
-		//		dbConfig.cache().slotCacheSize(64);
-		// Try to reduce cachig size
-		//		final int cachePageCount = 4;
-		//		final int cachePageSize = 1024;
-		//		final CachingStorage storage = new CachingStorage(new FileStorage(), cachePageCount, cachePageSize) {
-		//			// By overriding the newCache method you can plug in a different cache
-		//			@Override
-		//			protected Cache4<Object, Object> newCache() {
-		//				return CacheFactory.new2QXCache(cachePageCount);
-		//			}
-		//		};
-		//		final FileStorage storage = new FileStorage();
-		//		final NonFlushingStorage storage = new NonFlushingStorage(new FileStorage());
-		//		final FileConfiguration fileConfiguration = dbConfig.file();
-		//		fileConfiguration.storage(storage);
-
-		//		dbConfig.file().storage().
 
 		/* Block size 8 should have minimal impact since pointers are this
 		 * long, and allows databases of up to 16GB. 

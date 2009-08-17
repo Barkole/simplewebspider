@@ -126,7 +126,7 @@ public class Main {
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Importing bootstrap links...");
 			}
-			importLinks(db, LINK_IMPORT_FILENAME);
+			importLinks(LINK_IMPORT_FILENAME, this.dbHelperFactory);
 			db.commitTransaction();
 
 			final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
@@ -161,9 +161,9 @@ public class Main {
 		}
 	}
 
-	private void importLinks(final DbHelper db, final String filename) {
+	private void importLinks(final String filename, final DbHelperFactory dbHelperFactory) {
 		final EntityImporter importer = new SimpleFileImporter(filename);
-		final long importLink = importer.importLink(db.getLinkDao());
+		final long importLink = importer.importLink(dbHelperFactory);
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Imported links from file \"" + filename + "\": " + importLink);
 		}
@@ -172,58 +172,72 @@ public class Main {
 	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ThreadPoolExecutor threadPool,
 			final LimitThroughPut limitThroughPut, final boolean bootstrapping) throws SQLException {
 		final DbHelper db = dbHelperFactory.buildDbHelper();
-		final LinkDao linkDao = db.getLinkDao();
+		try {
+			final LinkDao linkDao = db.getLinkDao();
 
-		int retryCountOnNoLinks = 0;
-		while (!this.cancled) {
-			// Block while to much threads were working in last minute
-			limitThroughPut.next();
+			int retryCountOnNoLinks = 0;
+			while (!this.cancled) {
+				// Block while to much threads were working in last minute
+				limitThroughPut.next();
 
-			// Check for next link, if there is none, wait and try again
-			final String next = linkDao.removeNext();
-			try {
-				db.commitTransaction();
-			} catch (final RuntimeException e) {
-				LOG.error("Failed to commit LINK entity " + next.toString() + " on done", e);
-			}
-
-			if (next == null) {
-				// On bootstrapping don't do any retry, if no more links are available
-				if (bootstrapping) {
-					if (LOG.isInfoEnabled()) {
-						LOG.info("Bootstrapping: No more links available...");
-					}
-					break;
-				}
-				// Seconds try fails
-				if (threadPool.getActiveCount() == 0 //
-						|| retryCountOnNoLinks > 3) {
-					LOG.fatal("No more links available...");
-					break;
-				}
-
-				// Wait for all running treads, perhaps there are any and they create some new LINK entities
-				retryCountOnNoLinks++;
-				if (LOG.isInfoEnabled()) {
-					LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
-				}
+				// Check for next link, if there is none, wait and try again
+				String next;
 				try {
-					threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
-				} catch (final InterruptedException e) {
-					LOG.warn("failed to wait for ending of all threads", e);
+					next = linkDao.removeNextAndCommit();
+				} catch (final RuntimeException e) {
+					LOG.error("Failed to get next url", e);
+					try {
+						db.rollbackTransaction();
+					} catch (final Exception e2) {
+						LOG.error("Failed to rollback database transaction", e2);
+					}
+					next = null;
 				}
-				continue;
-			} else {
-				retryCountOnNoLinks = 0;
-			}
 
-			if (LOG.isInfoEnabled()) {
-				LOG.info("Start crawling URL: \"" + next + "\"");
-			}
+				if (next == null) {
+					// On bootstrapping don't do any retry, if no more links are available
+					if (bootstrapping) {
+						if (LOG.isInfoEnabled()) {
+							LOG.info("Bootstrapping: No more links available...");
+						}
+						break;
+					}
+					// Seconds try fails
+					if (threadPool.getActiveCount() == 0 //
+							|| retryCountOnNoLinks > 3) {
+						LOG.fatal("No more links available...");
+						break;
+					}
 
-			final LinkExtractor extractor = new StreamExtractor(MAX_URL_LENGTH);
-			final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
-			threadPool.execute(new CrawlerRunner(crawler, next));
+					// Wait for all running treads, perhaps there are any and they create some new LINK entities
+					retryCountOnNoLinks++;
+					if (LOG.isInfoEnabled()) {
+						LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
+					}
+					try {
+						threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+					} catch (final InterruptedException e) {
+						LOG.warn("failed to wait for ending of all threads", e);
+					}
+					continue;
+				} else {
+					retryCountOnNoLinks = 0;
+				}
+
+				if (LOG.isInfoEnabled()) {
+					LOG.info("Start crawling URL: \"" + next + "\"");
+				}
+
+				final LinkExtractor extractor = new StreamExtractor(MAX_URL_LENGTH);
+				final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
+				threadPool.execute(new CrawlerRunner(crawler, next));
+			}
+		} finally {
+			try {
+				db.close();
+			} catch (final Exception e) {
+				LOG.warn("Failed to cloase database connection", e);
+			}
 		}
 	}
 
