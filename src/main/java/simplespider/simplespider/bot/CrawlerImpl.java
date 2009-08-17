@@ -182,12 +182,19 @@ public class CrawlerImpl implements Crawler {
 				}
 
 				final String cleanedUrl = simpleUrl.toNormalform(false, true);
-				linkDao.save(cleanedUrl);
+				try {
+					linkDao.saveAndCommit(cleanedUrl);
+				} catch (final Exception e) {
+					LOG.warn("Failed to save url: " + cleanedUrl, e);
+					dbHelper.rollbackTransaction();
+				}
 			}
-
-			dbHelper.commitTransaction();
 		} finally {
-			dbHelper.close();
+			try {
+				dbHelper.close();
+			} catch (final Exception e) {
+				LOG.warn("Failed to close database connection", e);
+			}
 		}
 	}
 
@@ -271,23 +278,32 @@ public class CrawlerImpl implements Crawler {
 				|| "text/css".equals(mimeType);
 	}
 
-	private void setLinkUndone(final String baseUrl) throws SQLException {
-		//		final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
-		//		try {
-		//			final LinkDao linkDao = dbHelper.getLinkDao();
-		//			final Link link = linkDao.getByUrl(baseUrl);
-		//
-		//			if (link == null) {
-		//				throw new SQLException("Link with following url not available: \"" + baseUrl + "\"");
-		//			}
-		//
-		//			link.setDone(false);
-		//			link.setErrors(link.getErrors() + 1);
-		//			linkDao.save(link);
-		//			dbHelper.commitTransaction();
-		//		} finally {
-		//			dbHelper.close();
-		//		}
+	private void setLinkUndone(final String baseUrl) {
+		try {
+			final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
+			try {
+				dbHelper.beginTransaction();
+				try {
+					final LinkDao linkDao = dbHelper.getLinkDao();
+					linkDao.saveForced(baseUrl);
+				} catch (final Exception e) {
+					try {
+						dbHelper.rollbackTransaction();
+					} catch (final Exception e2) {
+						LOG.warn("Failed to rollback connection", e2);
+					}
+					throw e;
+				}
+			} finally {
+				try {
+					dbHelper.close();
+				} catch (final Exception e) {
+					LOG.warn("Failed to close database connection", e);
+				}
+			}
+		} catch (final Exception e) {
+			LOG.warn("Failed to resave url: " + baseUrl, e);
+		}
 	}
 
 }

@@ -25,19 +25,19 @@ public class Db4oLinkDao implements LinkDao {
 	}
 
 	@Override
-	public String removeNext() {
+	public String removeNextAndCommit() {
 		final ObjectContainer container = this.dbHelper.getContainer();
 		final Query query = container.query();
 		query.constrain(Link.class);
-		query.descend(Link.RANDOMIZER).orderAscending();
 		final ObjectSet<Link> links = query.execute();
-		//		final ObjectSet<Link> links = container.query(Link.class);
 
-		if (!links.hasNext()) {
+		final int size = links.size();
+		if (size == 0) {
 			return null;
 		}
 
-		final Link next = links.next();
+		final int randomElement = this.random.nextInt(size);
+		final Link next = links.get(randomElement);
 		container.activate(next, 1);
 		final String url = next.getUrl();
 		container.delete(next);
@@ -48,15 +48,19 @@ public class Db4oLinkDao implements LinkDao {
 	}
 
 	@Override
-	public void save(final String url) {
-		if (!addHash(url)) {
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Ignoring duplicate: " + url);
-			}
-			return;
+	public void saveAndCommit(final String url) {
+		if (addHash(url)) {
+			saveForced(url);
 		}
+
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("Ignoring duplicate: " + url);
+		}
+	}
+
+	public void saveForced(final String url) {
 		final ObjectContainer container = this.dbHelper.getContainer();
-		final Link link = new Link(url, this.random.nextLong());
+		final Link link = new Link(url);
 		container.store(link);
 		try {
 			this.dbHelper.commitTransaction();

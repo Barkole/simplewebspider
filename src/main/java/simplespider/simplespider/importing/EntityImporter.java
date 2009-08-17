@@ -1,7 +1,7 @@
 package simplespider.simplespider.importing;
 
-import simplespider.simplespider.dao.LinkDao;
+import simplespider.simplespider.dao.DbHelperFactory;
 
 public interface EntityImporter {
-	long importLink(LinkDao linkDao);
+	long importLink(DbHelperFactory dbHelperFactory);
 }
