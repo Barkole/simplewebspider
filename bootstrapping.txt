@@ -55,3 +55,5 @@ http://localhost:8888/freenet:USK@7H66rhYmxIFgMyw5Dl11JazXGHPhp7dSN7WMa1pbtEo,jQ
 http://localhost:8888/freenet:USK@rMEifshVu-XOuYT-vtPeIloVanveZBh4nmLkhVbqWc4,jUEphjsclmMet1EPDmBfKY8vKRcrpKWKizRvxbS2pwE,AQACAAE/F_A_Index/193/
 http://localhost:8888/freenet:USK@bm68umd0wTtUg23~Z5Z53qjXtZuiAeNSiSAKruOcUSI,NIGBj0N3-LCYRB0bX0l9d19EZiu-pgEZtmE23mmODiw,AQACAAE/0toZIndex/18/
 http://www.herdict.org/web/participate
+http://www.herdict.org/web/rss/en/inaccessible
+http://www.herdict.org/web/rss/en
