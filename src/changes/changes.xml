@@ -16,8 +16,16 @@
 			<action dev="berendona" type="update" issue="158447">Database: Use hashes for detecting unique</action>
 			<action dev="berendona" type="update" issue="158450">Database: Use cached tables as default</action>
 			<action dev="berendona" type="update" issue="158446">Update HSQLDB to 1.8.0.10</action>
+			<action dev="berendona" type="remove" issue="152916">Remove HSQLDB</action>
+			<action dev="berendona" type="add" issue="152916">Move to DB4O</action>
 			<action dev="berendona" type="update" issue="158443">Increase available bootstrap links</action>
 			<action dev="berendona" type="fix" issue="158438">Too much threads and throutput</action>
+			<action dev="berendona" type="add" issue="158572">Skip saving urls that are too long</action>
+			<action dev="berendona" type="add" issue="158448">Database: Reduce size</action>
+			<action dev="berendona" type="add" issue="158615">Too huge memory requirement</action>
+			<action dev="berendona" type="add" issue="152920">Script for start under windows</action>
+			<action dev="berendona" type="add" issue="158444">Loading list of URLs from File</action>
+			<action dev="berendona" type="add" issue="158445">Allow always checking bootstrapping urls</action>
 		</release>
 		<release version="0.0.10" date="2009-06-20" description="parsing improvements and fixes">
 			<action dev="berendona" type="fix" issue="152907">Program quits, if to less links available</action>
