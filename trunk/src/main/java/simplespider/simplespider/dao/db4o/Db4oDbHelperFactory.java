@@ -61,17 +61,18 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		}
 
 		/* TURN OFF SHUTDOWN HOOK.
-		 * The shutdown hook does auto-commit. We do NOT want auto-commit: if a
-		 * transaction hasn't commit()ed, it's not safe to commit it. 
-		 * Add our own hook to rollback and close... */
-		dbConfig.common().automaticShutDown(true);
+		 * The shutdown hook does auto-commit. 
+		 * And it close database after getting signal (or pressing CTRL-C) */
+		dbConfig.common().automaticShutDown(false);
 
 		// LAZY appears to cause ClassCastException's relating to db4o objects inside db4o code. :(
 		// Also it causes duplicates if we activate immediately.
 		// And the performance gain for e.g. RegisterMeRunner isn't that great.
 		//		dbConfig.queries().evaluationMode(QueryEvaluationMode.LAZY);
 		//		dbConfig.common().queries().evaluationMode(QueryEvaluationMode.SNAPSHOT);
-		//		dbConfig.file().freespace().useBTreeSystem();
+
+		// Reduce memory usage. After running eight hours with an 350 MB DB (than 400 MB) freeslot requires 14 MB instead of 0.4 MB on application startup
+		dbConfig.file().freespace().useBTreeSystem();
 
 		/* Block size 8 should have minimal impact since pointers are this
 		 * long, and allows databases of up to 16GB. 
