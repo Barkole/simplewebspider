@@ -26,6 +26,9 @@
 			</roles>
 		</developer>
 	</developers>
+	<properties>
+		<sfReleaseFileUploadPath>home/frs/project/s/si/simplewebspider/</sfReleaseFileUploadPath>
+	</properties>
 	<profiles>
 		<profile>
 			<id>java-1.5</id>
@@ -224,8 +227,9 @@
 					<fromDir>target</fromDir>
 					<includes>*.zip,*.jar,*.tar.gz,*.tar.bz2</includes>
 					<!-- <excludes>pom.xml</excludes> -->
+					<!-- https://sourceforge.net/apps/trac/sourceforge/wiki/Release%20files%20for%20download -->
 					<url>sftp://${sfUsername}:${sfPassword}@frs.sourceforge.net/</url>
-					<toDir>${sfFrsPath}</toDir>
+					<toDir>${sfReleaseFileUploadPath}</toDir>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -572,10 +576,10 @@
 	</licenses>
 	<distributionManagement>
 		<site>
-			<!-- http://alexandria.wiki.sourceforge.net/Project+Web,+Shell,+VHOST+and+Database+Services -->
+			<!-- https://sourceforge.net/apps/trac/sourceforge/wiki/Project%20web -->
 			<id>simplewebspider.sourceforge.net</id>
 			<name>simplewebspider.sourceforge.net</name>
-			<url>scp://${sfUsername}:${sfPassword}@shell.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
+			<url>scp://${sfUsername}:${sfPassword}@web.sourceforge.net/home/groups/s/si/simplewebspider/htdocs</url>
 		</site>
 	</distributionManagement>
 </project>
