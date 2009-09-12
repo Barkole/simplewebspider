@@ -51,7 +51,7 @@ public class Main {
 	// TODO Configure this
 	private static final String	LINK_IMPORT_FILENAME		= "bootstrapping.txt";
 	// TODO Configure this
-	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 3;
+	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 3 * 60;
 	// TODO Configure this
 	private static final int	MAX_CURRENT_THREADS			= 4;
 	// TODO Configure this
@@ -144,7 +144,7 @@ public class Main {
 			}
 			threadPool.shutdown();
 			try {
-				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.NANOSECONDS);
 			} catch (final InterruptedException e) {
 				LOG.warn("failed to wait for ending of all threads", e);
 			}
@@ -215,7 +215,7 @@ public class Main {
 						LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
 					}
 					try {
-						threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.MINUTES);
+						threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.SECONDS);
 					} catch (final InterruptedException e) {
 						LOG.warn("failed to wait for ending of all threads", e);
 					}
