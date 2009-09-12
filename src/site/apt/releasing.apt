@@ -25,7 +25,6 @@ Requirements
       <properties>
          <sfUsername>YOUR SOURCEFORGE NAME</sfUsername>
          <sfPassword>YOUR SOURCEFORGE PASSWORD</sfPassword>
-         <sfFrsPath>YOUR SFTP://FRS.SOURCEFORGE.NET PATH LIKE: home/users/b/be/berendona/uploads</sfFrsPath>
       </properties>
     </profile>
   </profiles>
