@@ -1,0 +1,16 @@
+TODOs:
+ 
+1.) Allow configuration:
+http://commons.apache.org/configuration/
+
+2.) Bootstraps into current loader queue:
+Do not save bootstraps URLs everytime into database, use them at first before loading any stuff from database persisted queue
+
+3.) Filtering by domain name:
+try to reduce to many requests to same domain name 
+
+4.) Upgrade to HttpClient 4.0:
+http://www.theserverside.com/news/thread.tss?thread_id=55715
+
+5.) Check InterruptException Handling
+http://www.ibm.com/developerworks/java/library/j-jtp05236.html
