@@ -22,121 +22,127 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import simplespider.simplespider.dao.DbHelper;
-import simplespider.simplespider.dao.DbHelperFactory;
-import simplespider.simplespider.dao.LinkDao;
-import simplespider.simplespider.importing.EntityImporter;
 import simplespider.simplespider.util.SimpleUrl;
 import simplespider.simplespider.util.ValidityHelper;
 
-public class SimpleFileImporter implements EntityImporter {
-
-	private static final String	BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT	= "bootstrapping.txt";
+public class SimpleFileImporter implements Iterator<String>, Iterable<String> {
 
 	private static final String	BOOTSTRAP_SIMPLE_FILE_FILE_NAME			= "bootstrap.simple-file.file-name";
+	private static final String	BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT	= "bootstrapping.txt";
 
 	private static final Log	LOG										= LogFactory.getLog(SimpleFileImporter.class);
 
 	private final Configuration	configuration;
+	private String				filename;
+	private FileReader			fstream;
+	private BufferedReader		br;
+	private String				nextLine;
 
 	public SimpleFileImporter(final Configuration configuration) {
 		this.configuration = configuration;
+
+		init();
 	}
 
-	@Override
-	public long importLink(final DbHelperFactory dbHelperFactory) {
-		String filename = this.configuration.getString(BOOTSTRAP_SIMPLE_FILE_FILE_NAME, BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT);
-		if (ValidityHelper.isEmpty(filename)) {
+	private void init() {
+		this.filename = this.configuration.getString(BOOTSTRAP_SIMPLE_FILE_FILE_NAME, BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT);
+		if (ValidityHelper.isEmpty(this.filename)) {
 			LOG.warn("Configuration " + BOOTSTRAP_SIMPLE_FILE_FILE_NAME + " is invalid. Using default value: " + BOOTSTRAP_SIMPLE_FILE_FILE_NAME);
-			filename = BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT;
+			this.filename = BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT;
 		}
 		// Open the file that is the first 
 		// command line parameter
-		final FileReader fstream;
 		try {
-			fstream = new FileReader(filename);
+			this.fstream = new FileReader(this.filename);
 			if (LOG.isInfoEnabled()) {
-				LOG.info("Bootstraping from file \"" + filename + "\"");
+				LOG.info("Bootstraping from file \"" + this.filename + "\"");
 			}
 		} catch (final FileNotFoundException e) {
-			LOG.warn("Import links fails: Failed to open file \"" + filename + "\"", e);
-			return 0;
+			LOG.warn("Import links fails: Failed to open file \"" + this.filename + "\"", e);
+			this.fstream = null;
 		}
 
-		long count = 0;
+		this.br = new BufferedReader(this.fstream);
 
-		try {
-			final DbHelper dbHelper = dbHelperFactory.buildDbHelper();
+		loadNext();
+	}
+
+	private void loadNext() {
+		boolean readNextLine = true;
+		while (readNextLine) {
+			readNextLine = false;
+
+			String strLine;
 			try {
-				final BufferedReader br = new BufferedReader(fstream);
-				try {
-
-					final LinkDao linkDao = dbHelper.getLinkDao();
-
-					String strLine;
-					//Read File Line By Line
-					while ((strLine = br.readLine()) != null) {
-						if (LOG.isDebugEnabled()) {
-							LOG.debug("Try to import link \"" + strLine + "\"");
-						}
-
-						final SimpleUrl simpleUrl;
-						try {
-							simpleUrl = new SimpleUrl(strLine);
-						} catch (final RuntimeException e) {
-							LOG.warn("Skipping link \"" + strLine + "\": Not valid", e);
-							continue;
-						}
-
-						final String normalizedUrl = simpleUrl.toNormalform(false, true);
-
-						try {
-							linkDao.saveForced(normalizedUrl);
-							count++;
-							if (LOG.isInfoEnabled()) {
-								LOG.info("Import link \"" + strLine + "\" (normalized: \"" + normalizedUrl + "\")");
-							}
-						} catch (final RuntimeException e) {
-							LOG.warn("Failed to import \"" + strLine + "\" (normalized: \"" + normalizedUrl + "\")", e);
-							try {
-								dbHelper.rollbackTransaction();
-							} catch (final Exception e2) {
-								LOG.warn("Failed to rollback database transaction", e2);
-							}
-						}
-					}
-				} catch (final IOException e) {
-					LOG.warn("Failure to read line of file \"" + filename + "\"", e);
-				} finally {
-					try {
-						br.close();
-					} catch (final IOException e) {
-						LOG.warn("Failed to close buffer of file \"" + filename + "\"", e);
-					}
-				}
-			} finally {
-				try {
-					dbHelper.close();
-				} catch (final Exception e) {
-					LOG.warn("Failed to close database connection", e);
-				}
-			}
-		} catch (final SQLException e) {
-			LOG.error("Failed to open conenction to database", e);
-		} finally {
-			try {
-				fstream.close();
+				strLine = this.br.readLine();
 			} catch (final IOException e) {
-				LOG.warn("Failed to close file \"" + filename + "\"", e);
+				LOG.warn("Failed to read line from file " + this.filename, e);
+				strLine = null;
+			}
+
+			if (strLine == null) {
+				this.nextLine = null;
+				if (this.br != null) {
+					try {
+						this.br.close();
+					} catch (final IOException e) {
+						LOG.error("Failed to close buffered reader", e);
+					}
+					this.br = null;
+				}
+				if (this.fstream != null) {
+					try {
+						this.fstream.close();
+					} catch (final IOException e) {
+						LOG.error("Failed to close file " + this.filename, e);
+					}
+					this.fstream = null;
+				}
+			} else {
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("Try to import link \"" + strLine + "\"");
+				}
+				final SimpleUrl simpleUrl;
+				try {
+					simpleUrl = new SimpleUrl(strLine);
+					this.nextLine = simpleUrl.toNormalform(false, true);
+				} catch (final Exception e) {
+					LOG.warn("Skipping link \"" + strLine + "\": Not valid", e);
+					readNextLine = true;
+				}
 			}
 		}
+	}
 
-		return count;
+	@Override
+	public boolean hasNext() {
+		return this.nextLine != null;
+	}
+
+	@Override
+	public String next() {
+		if (!hasNext()) {
+			throw new NoSuchElementException();
+		}
+		final String result = this.nextLine;
+		loadNext();
+		return result;
+	}
+
+	@Override
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Iterator<String> iterator() {
+		return this;
 	}
 }
