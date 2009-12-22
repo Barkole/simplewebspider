@@ -23,6 +23,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.BaseConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,20 +48,18 @@ import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
  * Hello world!
  */
 public class Main {
-	private static final Log	LOG							= LogFactory.getLog(Main.class);
 
-	private static final String	PID_FILENAME_KEY			= "sws.daemon.pidfile";
-	private static final String	PID_FILENAME_DEFAULT		= "simple-web-spider.pid";
-	// TODO Configure this
-	private static final String	LINK_IMPORT_FILENAME		= "bootstrapping.txt";
-	// TODO Configure this
-	private static final int	WAIT_FOR_THREAD_ON_SHUTDOWN	= 3 * 60;
-	// TODO Configure this
-	private static final int	MAX_CURRENT_THREADS			= 4;
-	// TODO Configure this
-	private static final int	MAX_THREADS_PER_MINUTE		= 10;
-	// TODO Configure this
-	private static final int	MAX_URL_LENGTH				= 1024;
+	private static final int	BOT_SHUTDOWN_MAX_WAIT_SECONDS_DEFAULT	= 180;
+
+	private static final String	BOT_SHUTDOWN_MAX_WAIT_SECONDS			= "bot.shutdown-max-wait-seconds";
+
+	private static final Log	LOG										= LogFactory.getLog(Main.class);
+
+	private static final String	BOT_MAX_CONCURRENT						= "bot.max_concurrent";
+	private static final int	BOT_MAX_CONCURRENT_DEFAULT				= 4;
+
+	private static final String	PID_FILENAME_KEY						= "sws.daemon.pidfile";
+	private static final String	PID_FILENAME_DEFAULT					= "simple-web-spider.pid";
 
 	private static Thread		mainThread;
 
@@ -67,12 +69,14 @@ public class Main {
 
 	private volatile boolean		cancled	= false;
 	private final DbHelperFactory	dbHelperFactory;
-	final HttpClientFactory			httpClientFactory;
+	private final HttpClientFactory	httpClientFactory;
+	private final Configuration		configuration;
 	private Thread					listener;
 
-	private Main(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory) {
+	private Main(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final Configuration configuration) {
 		this.dbHelperFactory = dbHelperFactory;
 		this.httpClientFactory = httpClientFactory;
+		this.configuration = configuration;
 	}
 
 	static private void daemonize() {
@@ -117,6 +121,12 @@ public class Main {
 	}
 
 	private void runCrawler() throws SQLException {
+		int maxThreadPoolSize = this.configuration.getInt(BOT_MAX_CONCURRENT, BOT_MAX_CONCURRENT_DEFAULT);
+		if (maxThreadPoolSize <= 0) {
+			LOG.warn("Configuration " + BOT_MAX_CONCURRENT + " is invalid. Using default value: " + BOT_MAX_CONCURRENT_DEFAULT);
+			maxThreadPoolSize = BOT_MAX_CONCURRENT_DEFAULT;
+		}
+
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Start crawler...");
 			LOG.info("Open database connection... This could took time...");
@@ -126,25 +136,27 @@ public class Main {
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Importing bootstrap links...");
 			}
-			importLinks(LINK_IMPORT_FILENAME, this.dbHelperFactory);
+			importLinks(this.dbHelperFactory);
 			db.commitTransaction();
 
-			final LimitThroughPut limitThroughPut = new LimitThroughPut(Main.MAX_THREADS_PER_MINUTE);
+			final LimitThroughPut limitThroughPut = new LimitThroughPut(this.configuration);
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Crawl LINK entries...");
 			}
 
-			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(MAX_CURRENT_THREADS, MAX_CURRENT_THREADS, 0L, TimeUnit.MILLISECONDS,
+			final int waitForThreadOnShutdownSeconds = this.configuration
+					.getInt(BOT_SHUTDOWN_MAX_WAIT_SECONDS, BOT_SHUTDOWN_MAX_WAIT_SECONDS_DEFAULT);
+			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(maxThreadPoolSize, maxThreadPoolSize, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
-			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false);
+			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false, waitForThreadOnShutdownSeconds);
 
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Invoke shutting down threads...");
 			}
 			threadPool.shutdown();
 			try {
-				threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.NANOSECONDS);
+				threadPool.awaitTermination(waitForThreadOnShutdownSeconds, TimeUnit.NANOSECONDS);
 			} catch (final InterruptedException e) {
 				LOG.warn("failed to wait for ending of all threads", e);
 			}
@@ -161,16 +173,16 @@ public class Main {
 		}
 	}
 
-	private void importLinks(final String filename, final DbHelperFactory dbHelperFactory) {
-		final EntityImporter importer = new SimpleFileImporter(filename);
+	private void importLinks(final DbHelperFactory dbHelperFactory) {
+		final EntityImporter importer = new SimpleFileImporter(this.configuration);
 		final long importLink = importer.importLink(dbHelperFactory);
 		if (LOG.isInfoEnabled()) {
-			LOG.info("Imported links from file \"" + filename + "\": " + importLink);
+			LOG.info("Imported links: " + importLink);
 		}
 	}
 
 	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ThreadPoolExecutor threadPool,
-			final LimitThroughPut limitThroughPut, final boolean bootstrapping) throws SQLException {
+			final LimitThroughPut limitThroughPut, final boolean bootstrapping, final int waitForThreadOnShutdownSeconds) throws SQLException {
 		final DbHelper db = dbHelperFactory.buildDbHelper();
 		try {
 			final LinkDao linkDao = db.getLinkDao();
@@ -215,7 +227,7 @@ public class Main {
 						LOG.info("No more links available... Waiting for running thread and retry... Count " + retryCountOnNoLinks);
 					}
 					try {
-						threadPool.awaitTermination(WAIT_FOR_THREAD_ON_SHUTDOWN, TimeUnit.SECONDS);
+						threadPool.awaitTermination(waitForThreadOnShutdownSeconds, TimeUnit.SECONDS);
 					} catch (final InterruptedException e) {
 						LOG.warn("failed to wait for ending of all threads", e);
 					}
@@ -228,8 +240,8 @@ public class Main {
 					LOG.info("Start crawling URL: \"" + next + "\"");
 				}
 
-				final LinkExtractor extractor = new StreamExtractor(MAX_URL_LENGTH);
-				final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory);
+				final LinkExtractor extractor = new StreamExtractor(this.configuration);
+				final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory, this.configuration);
 				threadPool.execute(new CrawlerRunner(crawler, next));
 			}
 		} finally {
@@ -241,10 +253,22 @@ public class Main {
 		}
 	}
 
+	private static Configuration loadConfiguration() {
+		try {
+			return new PropertiesConfiguration("simple-web-spider.properties");
+		} catch (final ConfigurationException e) {
+			LOG.warn("Failed to load configuration: use only defaults", e);
+		}
+		return new BaseConfiguration();
+	}
+
 	public static void main(final String[] args) throws Exception {
 		if (LOG.isInfoEnabled()) {
 			LOG.info("Starting program...");
 		}
+
+		final Configuration configuration = loadConfiguration();
+
 		try {
 			// do sanity checks and startup actions
 			daemonize();
@@ -252,16 +276,16 @@ public class Main {
 			LOG.fatal("Startup failed", e);
 		}
 
-		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory("sws.db4o");
+		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory(configuration);
 
 		final HttpClientFactory httpClientFactory;
 		if (args.length == 2) {
-			httpClientFactory = new ApacheHttpClientFactory(args[0], Integer.parseInt(args[1]));
+			httpClientFactory = new ApacheHttpClientFactory(configuration, args[0], Integer.parseInt(args[1]));
 		} else {
-			httpClientFactory = new ApacheHttpClientFactory();
+			httpClientFactory = new ApacheHttpClientFactory(configuration);
 		}
 
-		final Main main = new Main(dbHelperFactory, httpClientFactory);
+		final Main main = new Main(dbHelperFactory, httpClientFactory, configuration);
 		main.startCancleListener();
 		try {
 			main.runCrawler();

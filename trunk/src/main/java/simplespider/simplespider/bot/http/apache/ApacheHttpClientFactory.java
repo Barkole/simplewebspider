@@ -17,6 +17,7 @@
  */
 package simplespider.simplespider.bot.http.apache;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.HostConfiguration;
 import org.apache.commons.httpclient.HttpConnectionManager;
 import org.apache.commons.httpclient.HttpState;
@@ -25,6 +26,8 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.params.HttpClientParams;
 import org.apache.commons.httpclient.params.HttpConnectionManagerParams;
 import org.apache.commons.httpclient.protocol.Protocol;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.bot.http.HttpClient;
 import simplespider.simplespider.bot.http.HttpClientFactory;
@@ -33,20 +36,31 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class ApacheHttpClientFactory implements HttpClientFactory {
 
-	// TODO Configure this
-	private static final String	USER_AGENT						= "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 6.0)";
-	// TODO Configure this
-	private static final int	CONNECTION_TIMEOUT_MILLISECONDS	= 30000;
+	private static final Log	LOG												= LogFactory.getLog(ApacheHttpClientFactory.class);
+
+	private static final String	HTTP_CLIENT_USER_AGENT_DEFAULT					= "Mozilla/4.0 (compatible; MSIE 7.0b; Windows NT 6.0)";
+	private static final String	HTTP_CLIENT_USER_AGENT							= "http.client.user-agent";
+
+	private static final String	HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS				= "http.client.socket.timeout-seconds";
+	private static final int	HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS_DEFAULT		= 30;
+
+	private static final String	HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS			= "http.client.connection.timeout-seconds";
+	private static final int	HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS_DEFAULT	= 30;
 
 	private final ProxyHost		proxyHost;
+	private final Configuration	configuration;
 
-	public ApacheHttpClientFactory() {
+	public ApacheHttpClientFactory(final Configuration configuration) {
+		this.configuration = configuration;
 		this.proxyHost = null;
 		setupSsl();
 	}
 
-	public ApacheHttpClientFactory(final String proxyServer, final int proxyPort) {
+	public ApacheHttpClientFactory(final Configuration configuration, final String proxyServer, final int proxyPort) {
 		ValidityHelper.checkNotEmpty("proxyServer", proxyServer);
+
+		this.configuration = configuration;
+
 		this.proxyHost = new ProxyHost(proxyServer, proxyPort);
 		setupSsl();
 	}
@@ -60,6 +74,21 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 	 * @see simplespider.simplespider_core.http.HttpClientFactory#buildHttpClient()
 	 */
 	public HttpClient buildHttpClient() {
+		int connectionTimeoutSeconds = this.configuration.getInt(HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS,
+				HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS_DEFAULT);
+		if (connectionTimeoutSeconds <= 0) {
+			LOG.warn("Configuration " + HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS + " is invalid. Using default value: "
+					+ HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS_DEFAULT);
+			connectionTimeoutSeconds = HTTP_CLIENT_CONNECTION_TIMEOUT_SECONDS_DEFAULT;
+		}
+		final int socketTimeoutSeconds = this.configuration.getInt(HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS, HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS_DEFAULT);
+		if (socketTimeoutSeconds <= 0) {
+			LOG.warn("Configuration " + HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS + " is invalid. Using default value: "
+					+ HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS_DEFAULT);
+			connectionTimeoutSeconds = HTTP_CLIENT_SOCKET_TIMEOUT_SECONDS_DEFAULT;
+		}
+		final String userAgent = this.configuration.getString(HTTP_CLIENT_USER_AGENT, HTTP_CLIENT_USER_AGENT_DEFAULT);
+
 		final org.apache.commons.httpclient.HttpClient httpClient = new org.apache.commons.httpclient.HttpClient();
 
 		if (this.proxyHost != null) {
@@ -69,7 +98,7 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 
 		final HttpConnectionManager httpConnectionManager = httpClient.getHttpConnectionManager();
 		final HttpConnectionManagerParams httpConnectionManagerParams = httpConnectionManager.getParams();
-		httpConnectionManagerParams.setConnectionTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		httpConnectionManagerParams.setConnectionTimeout(connectionTimeoutSeconds * 1000);
 
 		// Get initial state object
 		final HttpState initialState = new HttpState();
@@ -81,9 +110,9 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		// More browser like behavior
 		clientParams.makeLenient();
 		// Setting client global socket timeout
-		clientParams.setSoTimeout(CONNECTION_TIMEOUT_MILLISECONDS);
+		clientParams.setSoTimeout(socketTimeoutSeconds * 1000);
 		// Setting user agent
-		clientParams.setParameter("http.useragent", USER_AGENT);
+		clientParams.setParameter("http.useragent", userAgent);
 
 		return new ApacheHttpClient(httpClient);
 	}

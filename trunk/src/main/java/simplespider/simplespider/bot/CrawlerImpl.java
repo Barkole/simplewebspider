@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.httpclient.CircularRedirectException;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
@@ -42,20 +43,23 @@ import simplespider.simplespider.util.ValidityHelper;
 
 public class CrawlerImpl implements Crawler {
 
-	// TODO Sleeping on error should be solved not here
-	// TODO Configure this
-	private static final int		SLEEP_SECONDS_ON_ERROR	= 10;
+	private static final long		CRAWLER_SLEEP_SECONDS_ON_ERROR_DEFAULT	= 10L;
 
-	private static final Log		LOG						= LogFactory.getLog(CrawlerImpl.class);
+	private static final String		CRAWLER_SLEEP_SECONDS_ON_ERROR			= "crawler.sleep-seconds-on-error";
+
+	private static final Log		LOG										= LogFactory.getLog(CrawlerImpl.class);
 
 	private final DbHelperFactory	dbHelperFactory;
 	private final LinkExtractor		linkExtractor;
 	private final HttpClientFactory	httpClientFactory;
+	private final Configuration		configuration;
 
-	public CrawlerImpl(final DbHelperFactory dbHelperFactory, final LinkExtractor linkExtractor, final HttpClientFactory httpClientFactory) {
+	public CrawlerImpl(final DbHelperFactory dbHelperFactory, final LinkExtractor linkExtractor, final HttpClientFactory httpClientFactory,
+			final Configuration configuration) {
 		this.dbHelperFactory = dbHelperFactory;
 		this.linkExtractor = linkExtractor;
 		this.httpClientFactory = httpClientFactory;
+		this.configuration = configuration;
 	}
 
 	private HttpClient getHttpConnection(final String baseUrl) {
@@ -132,7 +136,13 @@ public class CrawlerImpl implements Crawler {
 
 	private void sleepOnError() {
 		try {
-			TimeUnit.SECONDS.sleep(SLEEP_SECONDS_ON_ERROR);
+			long seconds = this.configuration.getLong(CRAWLER_SLEEP_SECONDS_ON_ERROR, CRAWLER_SLEEP_SECONDS_ON_ERROR_DEFAULT);
+			if (seconds < 0) {
+				LOG.warn("Configuration " + CRAWLER_SLEEP_SECONDS_ON_ERROR + " is invalid. Using default value: "
+						+ CRAWLER_SLEEP_SECONDS_ON_ERROR_DEFAULT);
+				seconds = CRAWLER_SLEEP_SECONDS_ON_ERROR_DEFAULT;
+			}
+			TimeUnit.SECONDS.sleep(seconds);
 		} catch (final InterruptedException e) {
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Sleep was interrupted", e);

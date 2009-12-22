@@ -8,6 +8,10 @@
 		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
+		<release version="0.0.12" date="2010-01-01" description="Feature release">
+			<action dev="berendona" type="add">allow to use configure file for most configurations</action>
+		</release>
+
 		<release version="0.0.11" date="2009-09-12" description="Database improvements and small other bug fixes">
 			<action dev="berendona" type="update" issue="158616">Database: Load more than one LINK entity at once</action>
 			<action dev="berendona" type="fix" issue="152906">Inserting URL: Unique constrain failures</action>

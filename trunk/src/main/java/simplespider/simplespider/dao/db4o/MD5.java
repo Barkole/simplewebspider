@@ -52,10 +52,10 @@ public class MD5 {
 			final byte[] md5hash = md.digest();
 			return convertToHex(md5hash);
 		} catch (final NoSuchAlgorithmException e) {
-			// Should ever available
+			// Should never available
 			throw new RuntimeException("MD5 is missing", e);
 		} catch (final UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
+			// Should never available
 			throw new RuntimeException("UTF-8 is missing", e);
 		}
 	}

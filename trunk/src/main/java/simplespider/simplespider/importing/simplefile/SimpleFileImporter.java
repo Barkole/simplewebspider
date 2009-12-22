@@ -24,6 +24,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,26 +33,39 @@ import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.importing.EntityImporter;
 import simplespider.simplespider.util.SimpleUrl;
+import simplespider.simplespider.util.ValidityHelper;
 
 public class SimpleFileImporter implements EntityImporter {
 
-	private static final Log	LOG	= LogFactory.getLog(SimpleFileImporter.class);
+	private static final String	BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT	= "bootstrapping.txt";
 
-	private final String		filename;
+	private static final String	BOOTSTRAP_SIMPLE_FILE_FILE_NAME			= "bootstrap.simple-file.file-name";
 
-	public SimpleFileImporter(final String filename) {
-		this.filename = filename;
+	private static final Log	LOG										= LogFactory.getLog(SimpleFileImporter.class);
+
+	private final Configuration	configuration;
+
+	public SimpleFileImporter(final Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	@Override
 	public long importLink(final DbHelperFactory dbHelperFactory) {
+		String filename = this.configuration.getString(BOOTSTRAP_SIMPLE_FILE_FILE_NAME, BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT);
+		if (ValidityHelper.isEmpty(filename)) {
+			LOG.warn("Configuration " + BOOTSTRAP_SIMPLE_FILE_FILE_NAME + " is invalid. Using default value: " + BOOTSTRAP_SIMPLE_FILE_FILE_NAME);
+			filename = BOOTSTRAP_SIMPLE_FILE_FILE_NAME_DEFAULT;
+		}
 		// Open the file that is the first 
 		// command line parameter
 		final FileReader fstream;
 		try {
-			fstream = new FileReader(this.filename);
+			fstream = new FileReader(filename);
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Bootstraping from file \"" + filename + "\"");
+			}
 		} catch (final FileNotFoundException e) {
-			LOG.warn("Import links fails: Failed to open file \"" + this.filename + "\"", e);
+			LOG.warn("Import links fails: Failed to open file \"" + filename + "\"", e);
 			return 0;
 		}
 
@@ -98,12 +112,12 @@ public class SimpleFileImporter implements EntityImporter {
 						}
 					}
 				} catch (final IOException e) {
-					LOG.warn("Failure to read line of file \"" + this.filename + "\"", e);
+					LOG.warn("Failure to read line of file \"" + filename + "\"", e);
 				} finally {
 					try {
 						br.close();
 					} catch (final IOException e) {
-						LOG.warn("Failed to close buffer of file \"" + this.filename + "\"", e);
+						LOG.warn("Failed to close buffer of file \"" + filename + "\"", e);
 					}
 				}
 			} finally {
@@ -119,7 +133,7 @@ public class SimpleFileImporter implements EntityImporter {
 			try {
 				fstream.close();
 			} catch (final IOException e) {
-				LOG.warn("Failed to close file \"" + this.filename + "\"", e);
+				LOG.warn("Failed to close file \"" + filename + "\"", e);
 			}
 		}
 

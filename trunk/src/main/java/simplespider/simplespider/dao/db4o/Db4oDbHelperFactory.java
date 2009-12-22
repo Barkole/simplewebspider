@@ -21,11 +21,13 @@ package simplespider.simplespider.dao.db4o;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
+import simplespider.simplespider.util.ValidityHelper;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectServer;
@@ -43,11 +45,33 @@ import com.db4o.reflect.ReflectClass;
 
 public class Db4oDbHelperFactory implements DbHelperFactory {
 
-	private static final Log	LOG	= LogFactory.getLog(Db4oDbHelperFactory.class);
+	private static final boolean	DATABASE_DEFRAG_ON_STARTUP_DEFAULT	= false;
 
-	private ObjectServer		server;
+	private static final String		DATABASE_DEFRAG_ON_STARTUP			= "database.db4o.defrag-on-startup";
 
-	public Db4oDbHelperFactory(final String filename) {
+	private static final Log		LOG									= LogFactory.getLog(Db4oDbHelperFactory.class);
+
+	private static final String		DATABASE_FILE_NAME					= "database.db4o.file-name";
+	private static final String		DATABASE_FILE_NAME_DEFAULT			= "sws.db4o";
+
+	private static final String		DATABASE_BLOCKSIZE					= "database.db4o.blocksize";
+	private static final int		DATABASE_BLOCKSIZE_DEFAULT			= 8;
+
+	private ObjectServer			server;
+
+	public Db4oDbHelperFactory(final Configuration configuration) {
+
+		String filename = configuration.getString(DATABASE_FILE_NAME, DATABASE_FILE_NAME_DEFAULT);
+		if (ValidityHelper.isEmpty(filename)) {
+			LOG.warn("Configuration " + DATABASE_FILE_NAME + " is invalid. Using default value: " + DATABASE_FILE_NAME_DEFAULT);
+			filename = DATABASE_FILE_NAME_DEFAULT;
+		}
+		int blockSizeBytes = configuration.getInt(DATABASE_BLOCKSIZE, DATABASE_BLOCKSIZE_DEFAULT);
+		if (blockSizeBytes < 1 || blockSizeBytes > 127) {
+			LOG.warn("Configuration " + DATABASE_BLOCKSIZE + " is invalid. Using default value: " + DATABASE_BLOCKSIZE);
+			blockSizeBytes = DATABASE_BLOCKSIZE_DEFAULT;
+		}
+		final boolean defragDatabase = configuration.getBoolean(DATABASE_DEFRAG_ON_STARTUP, DATABASE_DEFRAG_ON_STARTUP_DEFAULT);
 
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
 		dbConfig.common().objectClass(Hash.class).objectField(Hash.HASH).indexed(true);
@@ -93,17 +117,18 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		dbConfig.file().freespace().useBTreeSystem();
 
 		/* Block size 8 should have minimal impact since pointers are this
-		 * long, and allows databases of up to 16GB. 
-		 * FIXME make configurable by user. */
-		dbConfig.file().blockSize(8);
+		 * long, and allows databases of up to 16GB. */
+		dbConfig.file().blockSize(blockSizeBytes);
 
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Start defragmentation database file... This could took some while...");
-		}
-		try {
-			Defragment.defrag(filename);
-		} catch (final IOException e) {
-			LOG.warn("Failed to defragment database file \"" + filename + "\"", e);
+		if (defragDatabase) {
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Start defragmentation database file... This could took some while...");
+			}
+			try {
+				Defragment.defrag(filename);
+			} catch (final IOException e) {
+				LOG.warn("Failed to defragment database file \"" + filename + "\"", e);
+			}
 		}
 
 		if (LOG.isInfoEnabled()) {
@@ -130,8 +155,8 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 				LOG.info(sb.toString());
 
 				final SystemInfo systemInfo = ext.systemInfo();
-				LOG.info("Total size: " + systemInfo.totalSize());
-				LOG.info("Freespace size: " + systemInfo.freespaceSize());
+				LOG.info("Total size (byte): " + systemInfo.totalSize());
+				LOG.info("Freespace size (byte): " + systemInfo.freespaceSize());
 				LOG.info("Freespace entry count: " + systemInfo.freespaceEntryCount());
 
 			} finally {
