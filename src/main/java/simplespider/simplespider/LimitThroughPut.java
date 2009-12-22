@@ -24,18 +24,23 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class LimitThroughPut {
 
-	private static final Log	LOG		= LogFactory.getLog(LimitThroughPut.class);
+	private static final String	BOT_URLS_PER_MINUTE			= "bot.urls-per-minute";
+	private static final int	BOT_URLS_PER_MINUTE_DEFAULT	= 10;
 
-	final private int			maxPerMinute;
-	final private List<Date>	times	= new LinkedList<Date>();
+	private static final Log	LOG							= LogFactory.getLog(LimitThroughPut.class);
 
-	public LimitThroughPut(final int maxPerMinute) {
-		this.maxPerMinute = maxPerMinute;
+	final private List<Date>	times						= new LinkedList<Date>();
+
+	private final Configuration	configuration;
+
+	public LimitThroughPut(final Configuration configuration) {
+		this.configuration = configuration;
 	}
 
 	public void next() {
@@ -56,6 +61,11 @@ public class LimitThroughPut {
 	}
 
 	private long cleanup() {
+		int maxPerMinute = this.configuration.getInt(BOT_URLS_PER_MINUTE, BOT_URLS_PER_MINUTE_DEFAULT);
+		if (maxPerMinute <= 0) {
+			LOG.warn("Configuration " + BOT_URLS_PER_MINUTE + " is invalid. Using default value: " + BOT_URLS_PER_MINUTE);
+			maxPerMinute = BOT_URLS_PER_MINUTE_DEFAULT;
+		}
 		final Date beforeOneMinute = getDateBeforeOneMinute();
 
 		Date mostBlocking = null;
@@ -68,7 +78,7 @@ public class LimitThroughPut {
 			if (item.before(beforeOneMinute)) {
 				// Removing all timestamps before the last minute
 				iterator.remove();
-			} else if (this.times.size() < this.maxPerMinute) {
+			} else if (this.times.size() < maxPerMinute) {
 				// If less than maximum allowed after removing all old timestamp no job to do
 				break;
 			} else {
@@ -79,7 +89,7 @@ public class LimitThroughPut {
 		}
 
 		if (LOG.isDebugEnabled()) {
-			LOG.debug("Cleanup - before: " + beforeCleanup + ", after: " + this.times.size() + ", max per minute: " + this.maxPerMinute);
+			LOG.debug("Cleanup - before: " + beforeCleanup + ", after: " + this.times.size() + ", max per minute: " + maxPerMinute);
 		}
 
 		if (mostBlocking == null) {
