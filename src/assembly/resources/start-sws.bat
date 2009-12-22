@@ -20,7 +20,7 @@ setlocal EnableDelayedExpansion
 
 SET JAVA=java
 SET JAVANMAIN=simplespider.simplespider.Main
-SET JAVA_ARGS=-Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true
+SET JAVA_ARGS=-Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true -Djava.util.logging.config.file=simple-web-spider.java-logger.properties
 
 // Determine all available jars for classpath
 SET JARS=
