@@ -19,6 +19,7 @@ package simplespider.simplespider;
 
 import java.io.File;
 import java.sql.SQLException;
+import java.util.Iterator;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +42,6 @@ import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
-import simplespider.simplespider.importing.EntityImporter;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
 
 /**
@@ -133,12 +133,6 @@ public class Main {
 		}
 		final DbHelper db = this.dbHelperFactory.buildDbHelper();
 		try {
-			if (LOG.isInfoEnabled()) {
-				LOG.info("Importing bootstrap links...");
-			}
-			importLinks(this.dbHelperFactory);
-			db.commitTransaction();
-
 			final LimitThroughPut limitThroughPut = new LimitThroughPut(this.configuration);
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Crawl LINK entries...");
@@ -149,7 +143,7 @@ public class Main {
 			final ThreadPoolExecutor threadPool = new ThreadPoolExecutor(maxThreadPoolSize, maxThreadPoolSize, 0L, TimeUnit.MILLISECONDS,
 					new LinkedBlockingQueue<Runnable>());
 
-			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, false, waitForThreadOnShutdownSeconds);
+			runCrawler(this.dbHelperFactory, this.httpClientFactory, threadPool, limitThroughPut, waitForThreadOnShutdownSeconds);
 
 			if (LOG.isInfoEnabled()) {
 				LOG.info("Invoke shutting down threads...");
@@ -173,17 +167,10 @@ public class Main {
 		}
 	}
 
-	private void importLinks(final DbHelperFactory dbHelperFactory) {
-		final EntityImporter importer = new SimpleFileImporter(this.configuration);
-		final long importLink = importer.importLink(dbHelperFactory);
-		if (LOG.isInfoEnabled()) {
-			LOG.info("Imported links: " + importLink);
-		}
-	}
-
 	private void runCrawler(final DbHelperFactory dbHelperFactory, final HttpClientFactory httpClientFactory, final ThreadPoolExecutor threadPool,
-			final LimitThroughPut limitThroughPut, final boolean bootstrapping, final int waitForThreadOnShutdownSeconds) throws SQLException {
+			final LimitThroughPut limitThroughPut, final int waitForThreadOnShutdownSeconds) throws SQLException {
 		final DbHelper db = dbHelperFactory.buildDbHelper();
+		final Iterator<String> bootstrap = new SimpleFileImporter(this.configuration);
 		try {
 			final LinkDao linkDao = db.getLinkDao();
 
@@ -195,7 +182,12 @@ public class Main {
 				// Check for next link, if there is none, wait and try again
 				String next;
 				try {
-					next = linkDao.removeNextAndCommit();
+					// At first use bootstrap URLs, if there none, so try database queue
+					if (bootstrap.hasNext()) {
+						next = bootstrap.next();
+					} else {
+						next = linkDao.removeNextAndCommit();
+					}
 				} catch (final RuntimeException e) {
 					LOG.error("Failed to get next url", e);
 					try {
@@ -207,13 +199,6 @@ public class Main {
 				}
 
 				if (next == null) {
-					// On bootstrapping don't do any retry, if no more links are available
-					if (bootstrapping) {
-						if (LOG.isInfoEnabled()) {
-							LOG.info("Bootstrapping: No more links available...");
-						}
-						break;
-					}
 					// Seconds try fails
 					if (threadPool.getActiveCount() == 0 //
 							|| retryCountOnNoLinks > 3) {

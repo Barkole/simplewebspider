@@ -9,6 +9,7 @@
 	</properties>
 	<body>
 		<release version="0.0.12" date="2010-01-01" description="Feature release">
+			<action dev="berendona" type="update">bootstrapping URLs will be used at first on every boot and not imported to database base anymore.</action>
 			<action dev="berendona" type="add">allow to use configure file for most configurations</action>
 		</release>
 
