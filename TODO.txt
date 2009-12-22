@@ -1,8 +1,5 @@
 TODOs:
  
-2.) Bootstraps into current loader queue:
-Do not save bootstraps URLs everytime into database, use them at first before loading any stuff from database persisted queue
-
 3.) Filtering by domain name:
 try to reduce to many requests to same domain name 
 

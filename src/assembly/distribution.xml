@@ -17,6 +17,11 @@
 			<fileMode>0600</fileMode>
 		</file>
 		<file>
+			<source>src/assembly/resources/simple-web-spider.java-logger.properties</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>0600</fileMode>
+		</file>
+		<file>
 			<source>src/assembly/resources/simple-web-spider.properties</source>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0600</fileMode>
