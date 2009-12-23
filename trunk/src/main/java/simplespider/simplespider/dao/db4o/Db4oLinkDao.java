@@ -44,8 +44,8 @@ public class Db4oLinkDao implements LinkDao {
 
 	@Override
 	public String removeNextAndCommit() {
-		final ObjectContainer container = this.dbHelper.getContainer();
-		final Query query = container.query();
+		final ObjectContainer queueContainer = this.dbHelper.getQueueContainer();
+		final Query query = queueContainer.query();
 		query.constrain(Link.class);
 		final ObjectSet<Link> links = query.execute();
 
@@ -56,10 +56,10 @@ public class Db4oLinkDao implements LinkDao {
 
 		final int randomElement = this.random.nextInt(size);
 		final Link next = links.get(randomElement);
-		container.activate(next, 1);
+		queueContainer.activate(next, 1);
 		final String url = next.getUrl();
-		container.delete(next);
-		container.deactivate(next, 1);
+		queueContainer.delete(next);
+		queueContainer.deactivate(next, 1);
 		this.dbHelper.commitTransaction();
 
 		return url;
@@ -77,9 +77,9 @@ public class Db4oLinkDao implements LinkDao {
 	}
 
 	public void saveForced(final String url) {
-		final ObjectContainer container = this.dbHelper.getContainer();
+		final ObjectContainer queueContainer = this.dbHelper.getQueueContainer();
 		final Link link = new Link(url);
-		container.store(link);
+		queueContainer.store(link);
 		try {
 			this.dbHelper.commitTransaction();
 		} catch (final UniqueFieldValueConstraintViolationException e) {
@@ -90,12 +90,12 @@ public class Db4oLinkDao implements LinkDao {
 	}
 
 	private boolean addHash(final String url) {
-		final ObjectContainer container = this.dbHelper.getContainer();
+		final ObjectContainer hashesContainer = this.dbHelper.getHashesContainer();
 
 		final String md5 = MD5.buildMD5(url);
 		final Hash hash = new Hash(md5);
 		try {
-			container.store(hash);
+			hashesContainer.store(hash);
 		} catch (final UniqueFieldValueConstraintViolationException e) {
 			return false;
 		}

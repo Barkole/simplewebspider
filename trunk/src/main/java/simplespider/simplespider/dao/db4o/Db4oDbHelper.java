@@ -31,7 +31,8 @@ public class Db4oDbHelper implements DbHelper {
 
 	private static final Log	LOG	= LogFactory.getLog(Db4oDbHelper.class);
 
-	private ObjectContainer		container;
+	private ObjectContainer		containerHashes;
+	private ObjectContainer		containerQueue;
 
 	private Db4oDbHelperFactory	helperFactory;
 
@@ -43,19 +44,38 @@ public class Db4oDbHelper implements DbHelper {
 
 	@Override
 	public void close() throws SQLException {
-		this.container.close();
-		this.container = null;
+		this.containerHashes.close();
+		this.containerHashes = null;
+		this.containerQueue.close();
+		this.containerQueue = null;
 	}
 
 	@Override
 	public void commitTransaction() {
 		try {
-			this.container.commit();
+			this.containerQueue.commit();
 		} catch (final RuntimeException e) {
 			try {
-				this.container.rollback();
+				this.containerQueue.rollback();
 			} catch (final RuntimeException e2) {
-				LOG.error("Failed to rollback database transaction", e);
+				LOG.error("Failed to rollback queue database transaction", e);
+			}
+			try {
+				this.containerHashes.rollback();
+			} catch (final RuntimeException ee) {
+				LOG.error("Failed to rollback hashes database transaction", e);
+			}
+
+			throw e;
+		}
+
+		try {
+			this.containerHashes.commit();
+		} catch (final RuntimeException e) {
+			try {
+				this.containerHashes.rollback();
+			} catch (final RuntimeException ee) {
+				LOG.error("Failed to rollback hashes database transaction", e);
 			}
 
 			throw e;
@@ -69,7 +89,11 @@ public class Db4oDbHelper implements DbHelper {
 
 	@Override
 	public void rollbackTransaction() throws SQLException {
-		this.container.rollback();
+		try {
+			this.containerHashes.rollback();
+		} finally {
+			this.containerQueue.rollback();
+		}
 	}
 
 	@Override
@@ -79,11 +103,16 @@ public class Db4oDbHelper implements DbHelper {
 
 	void createConnection(final Db4oDbHelperFactory db4oDbHelperFactory) {
 		this.helperFactory = db4oDbHelperFactory;
-		this.container = this.helperFactory.getConnection();
+		this.containerHashes = this.helperFactory.getHashesConnection();
+		this.containerQueue = this.helperFactory.getQueueConnection();
 	}
 
-	ObjectContainer getContainer() {
-		return this.container;
+	ObjectContainer getQueueContainer() {
+		return this.containerQueue;
+	}
+
+	ObjectContainer getHashesContainer() {
+		return this.containerHashes;
 	}
 
 }

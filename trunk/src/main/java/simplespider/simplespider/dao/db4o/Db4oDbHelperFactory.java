@@ -45,33 +45,149 @@ import com.db4o.reflect.ReflectClass;
 
 public class Db4oDbHelperFactory implements DbHelperFactory {
 
-	private static final boolean	DATABASE_DEFRAG_ON_STARTUP_DEFAULT	= false;
+	private static final Log		LOG												= LogFactory.getLog(Db4oDbHelperFactory.class);
 
-	private static final String		DATABASE_DEFRAG_ON_STARTUP			= "database.db4o.defrag-on-startup";
+	private static final String		DATABASE_DEFRAG_ON_STARTUP_URL_QUEUE			= "database.db4o.queue.defrag-on-startup";
+	private static final boolean	DATABASE_DEFRAG_ON_STARTUP_URL_QUEUE_DEFAULT	= false;
 
-	private static final Log		LOG									= LogFactory.getLog(Db4oDbHelperFactory.class);
+	private static final String		DATABASE_DEFRAG_ON_STARTUP_URL_HASHES			= "database.db4o.hashes.defrag-on-startup";
+	private static final boolean	DATABASE_DEFRAG_ON_STARTUP_URL_HASHES_DEFAULT	= false;
 
-	private static final String		DATABASE_FILE_NAME					= "database.db4o.file-name";
-	private static final String		DATABASE_FILE_NAME_DEFAULT			= "sws.db4o";
+	private static final String		DATABASE_FILE_NAME_URL_QUEUE					= "database.db4o.queue.file-name";
+	private static final String		DATABASE_FILE_NAME_URL_QUEUE_DEFAULT			= "sws.queue.db4o";
 
-	private static final String		DATABASE_BLOCKSIZE					= "database.db4o.blocksize";
-	private static final int		DATABASE_BLOCKSIZE_DEFAULT			= 8;
+	private static final String		DATABASE_FILE_NAME_URL_HASHES					= "database.db4o.hashes.file-name";
+	private static final String		DATABASE_FILE_NAME_URL_HASHES_DEFAULT			= "sws.hashes.db4o";
 
-	private ObjectServer			server;
+	private static final String		DATABASE_BLOCKSIZE_URL_QUEUE					= "database.db4o.queue.blocksize";
+	private static final int		DATABASE_BLOCKSIZE_URL_QUEUE_DEFAULT			= 8;
+
+	private static final String		DATABASE_BLOCKSIZE_URL_HASHES					= "database.db4o.hashes.blocksize";
+	private static final int		DATABASE_BLOCKSIZE_URL_HASHES_DEFAULT			= 8;
+
+	private ObjectServer			serverQueue;
+	private ObjectServer			serverHashes;
 
 	public Db4oDbHelperFactory(final Configuration configuration) {
+		buildQueueServer(configuration);
+		buildHashesServer(configuration);
+	}
 
-		String filename = configuration.getString(DATABASE_FILE_NAME, DATABASE_FILE_NAME_DEFAULT);
+	private void buildQueueServer(final Configuration configuration) {
+		String filename = configuration.getString(DATABASE_FILE_NAME_URL_QUEUE, DATABASE_FILE_NAME_URL_QUEUE_DEFAULT);
 		if (ValidityHelper.isEmpty(filename)) {
-			LOG.warn("Configuration " + DATABASE_FILE_NAME + " is invalid. Using default value: " + DATABASE_FILE_NAME_DEFAULT);
-			filename = DATABASE_FILE_NAME_DEFAULT;
+			LOG.warn("Configuration " + DATABASE_FILE_NAME_URL_QUEUE + " is invalid. Using default value: " + DATABASE_FILE_NAME_URL_QUEUE_DEFAULT);
+			filename = DATABASE_FILE_NAME_URL_QUEUE_DEFAULT;
 		}
-		int blockSizeBytes = configuration.getInt(DATABASE_BLOCKSIZE, DATABASE_BLOCKSIZE_DEFAULT);
+		int blockSizeBytes = configuration.getInt(DATABASE_BLOCKSIZE_URL_QUEUE, DATABASE_BLOCKSIZE_URL_QUEUE_DEFAULT);
 		if (blockSizeBytes < 1 || blockSizeBytes > 127) {
-			LOG.warn("Configuration " + DATABASE_BLOCKSIZE + " is invalid. Using default value: " + DATABASE_BLOCKSIZE);
-			blockSizeBytes = DATABASE_BLOCKSIZE_DEFAULT;
+			LOG.warn("Configuration " + DATABASE_BLOCKSIZE_URL_QUEUE + " is invalid. Using default value: " + DATABASE_BLOCKSIZE_URL_QUEUE_DEFAULT);
+			blockSizeBytes = DATABASE_BLOCKSIZE_URL_QUEUE_DEFAULT;
 		}
-		final boolean defragDatabase = configuration.getBoolean(DATABASE_DEFRAG_ON_STARTUP, DATABASE_DEFRAG_ON_STARTUP_DEFAULT);
+		final boolean defragDatabase = configuration.getBoolean(DATABASE_DEFRAG_ON_STARTUP_URL_QUEUE, DATABASE_DEFRAG_ON_STARTUP_URL_QUEUE_DEFAULT);
+
+		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
+
+		dbConfig.common().allowVersionUpdates(true);
+		dbConfig.common().detectSchemaChanges(true);
+		dbConfig.common().exceptionsOnNotStorable(true);
+		dbConfig.common().optimizeNativeQueries(true);
+		dbConfig.common().messageLevel(1);
+		dbConfig.common().activationDepth(1);
+
+		if (LOG.isDebugEnabled()) {
+			dbConfig.common().diagnostic().addListener(new DiagnosticListener() {
+				public void onDiagnostic(final Diagnostic arg0) {
+
+					if (arg0 instanceof ClassHasNoFields) {
+						return; // Ignore
+					}
+					if (arg0 instanceof DiagnosticBase) {
+						final DiagnosticBase d = (DiagnosticBase) arg0;
+						LOG.debug("Diagnostic: " + d.getClass() + " : " + d.problem() + " : " + d.solution() + " : " + d.reason(), new Exception(
+								"debug"));
+					} else {
+						LOG.debug("Diagnostic: " + arg0 + " : " + arg0.getClass(), new Exception("debug"));
+					}
+				}
+			});
+		}
+
+		/* TURN OFF SHUTDOWN HOOK.
+		 * The shutdown hook does auto-commit. 
+		 * And it close database after getting signal (or pressing CTRL-C) */
+		dbConfig.common().automaticShutDown(false);
+
+		// LAZY appears to cause ClassCastException's relating to db4o objects inside db4o code. :(
+		// Also it causes duplicates if we activate immediately.
+		// And the performance gain for e.g. RegisterMeRunner isn't that great.
+		//		dbConfig.queries().evaluationMode(QueryEvaluationMode.LAZY);
+		//		dbConfig.common().queries().evaluationMode(QueryEvaluationMode.SNAPSHOT);
+
+		// Reduce memory usage. After running eight hours with an 350 MB DB (than 400 MB) freeslot requires 14 MB instead of 0.4 MB on application startup
+		dbConfig.file().freespace().useBTreeSystem();
+
+		/* Block size 8 should have minimal impact since pointers are this
+		 * long, and allows databases of up to 16GB. */
+		dbConfig.file().blockSize(blockSizeBytes);
+
+		if (defragDatabase) {
+			if (LOG.isInfoEnabled()) {
+				LOG.info("Start defragmentation database file... This could took some while...");
+			}
+			try {
+				Defragment.defrag(filename);
+			} catch (final IOException e) {
+				LOG.warn("Failed to defragment database file \"" + filename + "\"", e);
+			}
+		}
+
+		if (LOG.isInfoEnabled()) {
+			LOG.info("Opening database file... This could took some while...");
+		}
+		try {
+			this.serverQueue = Db4oClientServer.openServer(dbConfig, filename, 0);
+		} catch (final RuntimeException e) {
+			throw new RuntimeException("Failed to open database file \"" + filename + "\"", e);
+		}
+
+		if (LOG.isInfoEnabled()) {
+			final ObjectContainer container = getQueueConnection();
+			try {
+				final ExtObjectContainer ext = container.ext();
+
+				final ReflectClass[] knownClasses = ext.knownClasses();
+				final StringBuffer sb = new StringBuffer();
+				sb.append("Known classes: ");
+				for (final ReflectClass knownClass : knownClasses) {
+					sb.append(knownClass.getName());
+					sb.append(";");
+				}
+				LOG.info(sb.toString());
+
+				final SystemInfo systemInfo = ext.systemInfo();
+				LOG.info("Total size (byte): " + systemInfo.totalSize());
+				LOG.info("Freespace size (byte): " + systemInfo.freespaceSize());
+				LOG.info("Freespace entry count: " + systemInfo.freespaceEntryCount());
+
+			} finally {
+				container.close();
+			}
+		}
+	}
+
+	private void buildHashesServer(final Configuration configuration) {
+		String filename = configuration.getString(DATABASE_FILE_NAME_URL_HASHES, DATABASE_FILE_NAME_URL_HASHES_DEFAULT);
+		if (ValidityHelper.isEmpty(filename)) {
+			LOG.warn("Configuration " + DATABASE_FILE_NAME_URL_HASHES + " is invalid. Using default value: " + DATABASE_FILE_NAME_URL_HASHES_DEFAULT);
+			filename = DATABASE_FILE_NAME_URL_HASHES_DEFAULT;
+		}
+		int blockSizeBytes = configuration.getInt(DATABASE_BLOCKSIZE_URL_HASHES, DATABASE_BLOCKSIZE_URL_HASHES_DEFAULT);
+		if (blockSizeBytes < 1 || blockSizeBytes > 127) {
+			LOG.warn("Configuration " + DATABASE_BLOCKSIZE_URL_HASHES + " is invalid. Using default value: " + DATABASE_BLOCKSIZE_URL_HASHES_DEFAULT);
+			blockSizeBytes = DATABASE_BLOCKSIZE_URL_HASHES_DEFAULT;
+		}
+		final boolean defragDatabase = configuration.getBoolean(DATABASE_DEFRAG_ON_STARTUP_URL_HASHES, DATABASE_DEFRAG_ON_STARTUP_URL_HASHES_DEFAULT);
 
 		final ServerConfiguration dbConfig = Db4oClientServer.newServerConfiguration();
 		dbConfig.common().objectClass(Hash.class).objectField(Hash.HASH).indexed(true);
@@ -135,13 +251,13 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 			LOG.info("Opening database file... This could took some while...");
 		}
 		try {
-			this.server = Db4oClientServer.openServer(dbConfig, filename, 0);
+			this.serverHashes = Db4oClientServer.openServer(dbConfig, filename, 0);
 		} catch (final RuntimeException e) {
 			throw new RuntimeException("Failed to open database file \"" + filename + "\"", e);
 		}
 
 		if (LOG.isInfoEnabled()) {
-			final ObjectContainer container = getConnection();
+			final ObjectContainer container = getHashesConnection();
 			try {
 				final ExtObjectContainer ext = container.ext();
 
@@ -173,13 +289,20 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 		return dbHelper;
 	}
 
-	ObjectContainer getConnection() {
-		return this.server.openClient();
+	ObjectContainer getQueueConnection() {
+		return this.serverQueue.openClient();
+	}
+
+	ObjectContainer getHashesConnection() {
+		return this.serverHashes.openClient();
 	}
 
 	void shutdown() {
-		this.server.close();
-		this.server = null;
+		this.serverHashes.close();
+		this.serverHashes = null;
+
+		this.serverQueue.close();
+		this.serverQueue = null;
 	}
 
 }
