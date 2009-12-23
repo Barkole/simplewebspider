@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.Configuration;
-import org.apache.commons.httpclient.CircularRedirectException;
-import org.apache.commons.httpclient.URIException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,10 +67,6 @@ public class CrawlerImpl implements Crawler {
 			httpClient.createConnection(baseUrl);
 		} catch (final Exception e) {
 			if (e instanceof SocketTimeoutException) {
-				if (LOG.isInfoEnabled()) {
-					LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
-				}
-			} else if (e instanceof CircularRedirectException) {
 				if (LOG.isInfoEnabled()) {
 					LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
 				}
@@ -210,12 +204,12 @@ public class CrawlerImpl implements Crawler {
 
 	private List<String> getLinks(final String baseUrl, final HttpClient httpClient) throws SQLException, MalformedURLException {
 		final String realBaseUrl;
-		try {
-			realBaseUrl = httpClient.getRedirectedUrl();
-		} catch (final URIException e) {
-			LOG.warn("Failed to get URI after redirection for URL \"" + baseUrl + "\"", e);
-			return null;
-		}
+		//		try {
+		realBaseUrl = httpClient.getRedirectedUrl();
+		//		} catch (final URIException e) {
+		//			LOG.warn("Failed to get URI after redirection for URL \"" + baseUrl + "\"", e);
+		//			return null;
+		//		}
 
 		final String cleanedRealBaseUrl = new SimpleUrl(realBaseUrl).toNormalform(false, true);
 

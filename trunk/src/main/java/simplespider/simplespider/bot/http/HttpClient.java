@@ -20,13 +20,12 @@ package simplespider.simplespider.bot.http;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.StatusLine;
-import org.apache.commons.httpclient.URIException;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
 
 public interface HttpClient {
 
-	public abstract void createConnection(final String url) throws HttpException, IOException;
+	public abstract void createConnection(final String url) throws ClientProtocolException, IOException;
 
 	public abstract int getStatusCode();
 
@@ -34,7 +33,7 @@ public interface HttpClient {
 
 	public abstract String getStatusText();
 
-	public abstract String getRedirectedUrl() throws URIException;
+	public abstract String getRedirectedUrl();
 
 	public abstract InputStream getResponseBodyAsStream() throws IOException;
 
