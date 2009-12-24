@@ -103,7 +103,13 @@ public class StreamExtractor implements LinkExtractor {
 				}
 				links.add(normalformedUrl);
 			} catch (final Exception e) {
-				LOG.warn("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\"", e);
+				if (e instanceof RuntimeException) {
+					LOG.error("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\":" + e, e);
+				} else if (LOG.isDebugEnabled()) {
+					LOG.debug("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\":" + e, e);
+				} else {
+					LOG.warn("Ignoring reference \"" + reference + "\" based on URL \"" + baseUrl + "\":" + e);
+				}
 			}
 		}
 		return links;
