@@ -20,7 +20,6 @@ package simplespider.simplespider.bot;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.SocketTimeoutException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -66,14 +65,12 @@ public class CrawlerImpl implements Crawler {
 		try {
 			httpClient.createConnection(baseUrl);
 		} catch (final Exception e) {
-			if (e instanceof SocketTimeoutException) {
-				if (LOG.isInfoEnabled()) {
-					LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
-				}
-			} else {
-				if (LOG.isInfoEnabled()) {
-					LOG.info("Failed to load URL \"" + baseUrl + "\"", e);
-				}
+			if (e instanceof RuntimeException) {
+				LOG.error("Failed to load URL \"" + baseUrl + "\"", e);
+			} else if (LOG.isDebugEnabled()) {
+				LOG.debug("Failed to load URL \"" + baseUrl + "\"", e);
+			} else if (LOG.isInfoEnabled()) {
+				LOG.info("Failed to load URL \"" + baseUrl + "\": " + e);
 			}
 			return null;
 		}
