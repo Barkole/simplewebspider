@@ -277,10 +277,11 @@ final class HtmlWriter extends Writer {
 	}
 
 	private void filterTag(final String tag, final boolean opening, final char[] content, final char quotechar) {
-		if (content == null || content.length == 0) {
-			// No content avaible, that could contain any tag
-			return;
-		}
+		// TODO Check, if empty content
+		//		if (content == null || content.length == 0) {
+		//			// No content avaible, that could contain any tag
+		//			return;
+		//		}
 		if (this.filterTag == null) {
 			// we are not collection tag text
 			if (tag == null) {
