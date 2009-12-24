@@ -7,3 +7,5 @@ try to reduce to many requests to same domain name
 
 7.) Check InterruptException Handling
 http://www.ibm.com/developerworks/java/library/j-jtp05236.html
+
+8.) Allow throttling bandwidth
