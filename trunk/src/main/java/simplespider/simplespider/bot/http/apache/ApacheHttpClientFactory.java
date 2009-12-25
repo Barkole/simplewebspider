@@ -36,6 +36,7 @@ import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
+import org.apache.http.conn.params.ConnPerRouteBean;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -69,6 +70,9 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 
 	private static final String		HTTP_CLIENT_MAX_TOTAL_CONNECTIONS				= "http.client.connection.max-total";
 	private static final int		HTTP_CLIENT_MAX_TOTAL_CONNECTIONS_DEFAULT		= 4;
+
+	private static final String		HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE			= "http.client.connection.per-route";
+	private static final int		HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_DEFAULT	= 2;
 
 	private final HttpHost			proxyHost;
 	private final Configuration		configuration;
@@ -177,6 +181,13 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 			maxTotalConnections = HTTP_CLIENT_MAX_TOTAL_CONNECTIONS_DEFAULT;
 		}
 
+		int maxConnectionsPerRoute = this.configuration.getInt(HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE, HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_DEFAULT);
+		if (maxConnectionsPerRoute <= 0) {
+			LOG.warn("Configuration " + HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE + " is invalid. Using default value: "
+					+ HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_DEFAULT);
+			maxConnectionsPerRoute = HTTP_CLIENT_MAX_CONNECTIONS_PER_ROUTE_DEFAULT;
+		}
+
 		// prepare parameters
 		final HttpParams params = new BasicHttpParams();
 		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
@@ -184,6 +195,8 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		HttpProtocolParams.setUseExpectContinue(params, true);
 
 		ConnManagerParams.setMaxTotalConnections(params, maxTotalConnections);
+		final ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxConnectionsPerRoute);
+		ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
 
 		params.setParameter(CoreProtocolPNames.WAIT_FOR_CONTINUE, Integer.valueOf(connectionTimeoutSeconds));
 		params.setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
@@ -196,5 +209,4 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		params.setParameter(ClientPNames.REJECT_RELATIVE_REDIRECT, Boolean.FALSE);
 		return params;
 	}
-
 }
