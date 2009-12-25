@@ -63,7 +63,8 @@ public class CrawlerImpl implements Crawler {
 		final HttpClient httpClient = this.httpClientFactory.buildHttpClient();
 
 		try {
-			httpClient.createConnection(baseUrl);
+			final String normalform = new SimpleUrl(baseUrl).toNormalform(false, true);
+			httpClient.createConnection(normalform);
 		} catch (final Exception e) {
 			if (e instanceof RuntimeException) {
 				LOG.error("Failed to load URL \"" + baseUrl + "\"", e);
