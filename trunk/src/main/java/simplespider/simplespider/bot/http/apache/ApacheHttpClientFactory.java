@@ -32,12 +32,14 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.HttpVersion;
+import org.apache.http.ProtocolVersion;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
+import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.params.ConnManagerParams;
 import org.apache.http.conn.params.ConnPerRouteBean;
-import org.apache.http.conn.params.ConnRoutePNames;
+import org.apache.http.conn.params.ConnRouteParams;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -45,8 +47,8 @@ import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.CoreConnectionPNames;
 import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HttpContext;
@@ -115,10 +117,6 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		final HttpParams params = buildParameters();
 
 		final DefaultHttpClient httpClient = new DefaultHttpClient(this.connectionManager, params);
-
-		if (this.proxyHost != null) {
-			httpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, this.proxyHost);
-		}
 
 		addGzipSupport(httpClient);
 
@@ -198,14 +196,26 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		final ConnPerRouteBean connPerRoute = new ConnPerRouteBean(maxConnectionsPerRoute);
 		ConnManagerParams.setMaxConnectionsPerRoute(params, connPerRoute);
 
+		if (this.proxyHost != null) {
+			ConnRouteParams.setDefaultProxy(params, this.proxyHost);
+		}
+
+		HttpClientParams.setCookiePolicy(params, CookiePolicy.BROWSER_COMPATIBILITY);
+		HttpClientParams.setRedirecting(params, true);
+
+		HttpConnectionParams.setConnectionTimeout(params, connectionTimeoutSeconds * 1000);
+		HttpConnectionParams.setSoTimeout(params, socketTimeoutSeconds * 1000);
+
+		HttpProtocolParams.setContentCharset(params, "UTF-8");
+		HttpProtocolParams.setHttpElementCharset(params, "UTF-8");
+		HttpProtocolParams.setUserAgent(params, userAgent);
+		HttpProtocolParams.setVersion(params, new ProtocolVersion("HTTP", 1, 1));
+
+		//AuthParams.
+
 		params.setParameter(CoreProtocolPNames.WAIT_FOR_CONTINUE, Integer.valueOf(connectionTimeoutSeconds));
-		params.setParameter(CoreProtocolPNames.USER_AGENT, userAgent);
-		params.setParameter(CoreConnectionPNames.SO_TIMEOUT, Integer.valueOf(socketTimeoutSeconds * 1000));
-		params.setParameter(CoreConnectionPNames.CONNECTION_TIMEOUT, Integer.valueOf(connectionTimeoutSeconds * 1000));
 
 		params.setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, Boolean.TRUE);
-		params.setParameter(ClientPNames.COOKIE_POLICY, CookiePolicy.BROWSER_COMPATIBILITY);
-		params.setParameter(ClientPNames.HANDLE_REDIRECTS, Boolean.TRUE);
 		params.setParameter(ClientPNames.REJECT_RELATIVE_REDIRECT, Boolean.FALSE);
 		return params;
 	}
