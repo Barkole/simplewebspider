@@ -1,9 +1,6 @@
 TODOs:
  
-3.) Filtering by domain name:
-try to reduce to many requests to same domain name 
-
-7.) Check InterruptException Handling
+1.) Check InterruptException Handling
 http://www.ibm.com/developerworks/java/library/j-jtp05236.html
 
-8.) Allow throttling bandwidth
+2.) Allow throttling bandwidth

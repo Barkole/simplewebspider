@@ -24,10 +24,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.DbHelper;
+import simplespider.simplespider.throttle.host.HostThrottler;
 
 import com.db4o.ObjectContainer;
 
-public class Db4oDbHelper implements DbHelper {
+class Db4oDbHelper implements DbHelper {
 
 	private static final Log	LOG	= LogFactory.getLog(Db4oDbHelper.class);
 
@@ -35,6 +36,12 @@ public class Db4oDbHelper implements DbHelper {
 	private ObjectContainer		containerQueue;
 
 	private Db4oDbHelperFactory	helperFactory;
+
+	private final HostThrottler	hostThrottler;
+
+	public Db4oDbHelper(final HostThrottler hostThrottler) {
+		this.hostThrottler = hostThrottler;
+	}
 
 	@Override
 	public void beginTransaction() {
@@ -84,7 +91,7 @@ public class Db4oDbHelper implements DbHelper {
 
 	@Override
 	public Db4oLinkDao getLinkDao() {
-		return new Db4oLinkDao(this);
+		return new Db4oLinkDao(this, this.hostThrottler);
 	}
 
 	@Override

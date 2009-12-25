@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
+import simplespider.simplespider.throttle.host.HostThrottler;
 import simplespider.simplespider.util.ValidityHelper;
 
 import com.db4o.ObjectContainer;
@@ -68,7 +69,10 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 	private ObjectServer			serverQueue;
 	private ObjectServer			serverHashes;
 
-	public Db4oDbHelperFactory(final Configuration configuration) {
+	private final HostThrottler		hostThrottler;
+
+	public Db4oDbHelperFactory(final Configuration configuration, final HostThrottler hostThrottler) {
+		this.hostThrottler = hostThrottler;
 		buildQueueServer(configuration);
 		buildHashesServer(configuration);
 	}
@@ -283,7 +287,7 @@ public class Db4oDbHelperFactory implements DbHelperFactory {
 
 	@Override
 	public DbHelper buildDbHelper() throws SQLException {
-		final Db4oDbHelper dbHelper = new Db4oDbHelper();
+		final Db4oDbHelper dbHelper = new Db4oDbHelper(this.hostThrottler);
 
 		dbHelper.createConnection(this);
 		return dbHelper;

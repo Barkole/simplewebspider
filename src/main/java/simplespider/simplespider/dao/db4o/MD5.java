@@ -22,7 +22,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
-public class MD5 {
+class MD5 {
 	private static String convertToHex(final byte[] data) {
 		final StringBuffer buf = new StringBuffer();
 		for (int i = 0; i < data.length; i++) {
@@ -40,7 +40,7 @@ public class MD5 {
 		return buf.toString();
 	}
 
-	public static String buildMD5(String text) {
+	static String buildMD5(String text) {
 		try {
 			final MessageDigest md = MessageDigest.getInstance("MD5");
 			// Reduce life time of big string and bytes of string 
