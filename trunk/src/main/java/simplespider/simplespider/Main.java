@@ -43,6 +43,7 @@ import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
+import simplespider.simplespider.util.SimpleUrl;
 
 /**
  * Hello world!
@@ -224,6 +225,9 @@ public class Main {
 				if (LOG.isInfoEnabled()) {
 					LOG.info("Start crawling URL: \"" + next + "\"");
 				}
+
+				// Escaping url
+				next = SimpleUrl.escape(next);
 
 				final LinkExtractor extractor = new StreamExtractor(this.configuration);
 				final Crawler crawler = new CrawlerImpl(dbHelperFactory, extractor, httpClientFactory, this.configuration);
