@@ -58,6 +58,12 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<repositories>
+				<repository>
+					<id>db4o-maven-repository</id>
+					<url>https://source.db4o.com/maven</url>
+				</repository>
+			</repositories>
 			<properties>
 				<db4oVersion>7.11.107.13473</db4oVersion>
 				<db4oJava>java5</db4oJava>
