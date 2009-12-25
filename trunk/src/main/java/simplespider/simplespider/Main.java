@@ -43,23 +43,24 @@ import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
 import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
+import simplespider.simplespider.throttle.host.HostThrottler;
+import simplespider.simplespider.throttle.host.simple.SimpleHostThrottler;
 
 /**
  * Hello world!
  */
 public class Main {
 
-	private static final int	BOT_SHUTDOWN_MAX_WAIT_SECONDS_DEFAULT	= 180;
-
-	private static final String	BOT_SHUTDOWN_MAX_WAIT_SECONDS			= "bot.shutdown-max-wait-seconds";
-
 	private static final Log	LOG										= LogFactory.getLog(Main.class);
+
+	private static final String	PID_FILENAME_KEY						= "sws.daemon.pidfile";
+	private static final String	PID_FILENAME_DEFAULT					= "simple-web-spider.pid";
 
 	private static final String	BOT_MAX_CONCURRENT						= "bot.max_concurrent";
 	private static final int	BOT_MAX_CONCURRENT_DEFAULT				= 4;
 
-	private static final String	PID_FILENAME_KEY						= "sws.daemon.pidfile";
-	private static final String	PID_FILENAME_DEFAULT					= "simple-web-spider.pid";
+	private static final String	BOT_SHUTDOWN_MAX_WAIT_SECONDS			= "bot.shutdown-max-wait-seconds";
+	private static final int	BOT_SHUTDOWN_MAX_WAIT_SECONDS_DEFAULT	= 180;
 
 	private static Thread		mainThread;
 
@@ -261,7 +262,8 @@ public class Main {
 			LOG.fatal("Startup failed", e);
 		}
 
-		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory(configuration);
+		final HostThrottler hostThrottler = new SimpleHostThrottler(configuration);
+		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory(configuration, hostThrottler);
 
 		final HttpClientFactory httpClientFactory;
 		if (args.length == 2) {

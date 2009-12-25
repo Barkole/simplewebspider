@@ -15,41 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package simplespider.simplespider;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+package simplespider.simplespider.throttle.host;
 
-/**
- * Unit test for simple App.
- */
-public class AppTest 
-    extends TestCase
-{
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
+import java.util.List;
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
+import simplespider.simplespider.util.SimpleUrl;
 
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
+public interface HostThrottler {
+
+	public abstract int getUrlsAtOnce();
+
+	public abstract String getBestFitting(final List<String> urls);
+
+	public abstract SimpleUrl getBestFitting(final List<SimpleUrl> urls);
+
 }
