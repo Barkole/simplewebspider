@@ -1,7 +1,7 @@
 #!/bin/sh
-VERSION=7.11.107
-BUILD=13473
-LIB=dev/db4o-7.11/lib
+VERSION=7.12.121
+BUILD=14025
+LIB=dev/db4o-7.12/lib
 mvn install:install-file -Dfile=$LIB/bloat-1.0.jar -DgroupId=com.db4o -DartifactId=db4o-bloat -Dversion=$VERSION.$BUILD -Dpackaging=jar -DgeneratePom=true
 mvn install:install-file -Dfile=$LIB/db4o-$VERSION.$BUILD-all-java1.1.jar -DgroupId=com.db4o -DartifactId=db4o-all-java1.1 -Dversion=$VERSION.$BUILD -Dpackaging=jar -DgeneratePom=true
 mvn install:install-file -Dfile=$LIB/db4o-$VERSION.$BUILD-all-java1.2.jar -DgroupId=com.db4o -DartifactId=db4o-all-java1.2 -Dversion=$VERSION.$BUILD -Dpackaging=jar -DgeneratePom=true
