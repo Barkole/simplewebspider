@@ -38,7 +38,7 @@ Caused by: java.net.URISyntaxException: Illegal character in query at index 33: 
 	at java.net.URI.create(URI.java:840)
 	... 8 more
 
-5.) "http://www.linkedin.com/shareArticle?mini=true&url=http:/www.hollywoodreporter.com/hr/content_display/news/e3idbd92851d6a66e355e36cdcc5675a277&title=Why Apple can't kill cable&summary=Article%20about%20Why Apple can't kill cable&source=The Hollwood Reporter" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+ "http://www.linkedin.com/shareArticle?mini=true&url=http:/www.hollywoodreporter.com/hr/content_display/news/e3idbd92851d6a66e355e36cdcc5675a277&title=Why Apple can't kill cable&summary=Article%20about%20Why Apple can't kill cable&source=The Hollwood Reporter" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
 	at java.net.URI.create(URI.java:842)
 	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
 	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
