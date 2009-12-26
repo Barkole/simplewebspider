@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.URI;
 
 import org.apache.http.Header;
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
@@ -44,13 +45,6 @@ public class ApacheHttpClient implements HttpClient {
 		this.httpClient = httpClient;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#createConnection(java.lang.String)
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#createConnection(java.lang.String)
-	 */
 	public void createConnection(final String url) throws ClientProtocolException, IOException {
 		ValidityHelper.checkNotEmpty("url", url);
 
@@ -72,47 +66,19 @@ public class ApacheHttpClient implements HttpClient {
 		this.httpResponse = this.httpClient.execute(this.httpGet, localContext);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#getStatusCode()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getStatusCode()
-	 */
 	public int getStatusCode() {
 		return getStatusLine().getStatusCode();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#getStatusLine()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getStatusLine()
-	 */
 	public StatusLine getStatusLine() {
 		checkForOpenConnection();
 		return this.httpResponse.getStatusLine();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#getStatusText()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getStatusText()
-	 */
 	public String getStatusText() {
 		return getStatusLine().getReasonPhrase();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#getRedirectedUrl()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getRedirectedUrl()
-	 */
 	public String getRedirectedUrl() {
 		checkForOpenConnection();
 		final URI uri = this.httpGet.getURI();
@@ -120,25 +86,17 @@ public class ApacheHttpClient implements HttpClient {
 		return realBaseUrl;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#getResponseBodyAsStream()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getResponseBodyAsStream()
-	 */
 	public InputStream getResponseBodyAsStream() throws IOException {
 		checkForOpenConnection();
-		return this.httpResponse.getEntity().getContent();
+
+		final HttpEntity entity = this.httpResponse.getEntity();
+		if (entity == null) {
+			return null;
+		}
+
+		return entity.getContent();
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClient#releaseConnection()
-	 */
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#releaseConnection()
-	 */
 	public void releaseConnection() {
 		checkForOpenConnection();
 		this.httpGet.abort();
@@ -152,13 +110,15 @@ public class ApacheHttpClient implements HttpClient {
 		}
 	}
 
-	/* (non-Javadoc)
-	 * @see simplespider.simplespider.bot.http.apache.T#getMimeType()
-	 */
 	public String getMimeType() {
 		checkForOpenConnection();
 
-		final Header contentType = this.httpResponse.getEntity().getContentType();
+		final HttpEntity entity = this.httpResponse.getEntity();
+		if (entity == null) {
+			return null;
+		}
+
+		final Header contentType = entity.getContentType();
 		if (contentType == null) {
 			return null;
 		}

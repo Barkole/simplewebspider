@@ -139,14 +139,20 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 
 			public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
 				final HttpEntity entity = response.getEntity();
+				if (entity == null) {
+					return;
+				}
+
 				final Header ceheader = entity.getContentEncoding();
-				if (ceheader != null) {
-					final HeaderElement[] codecs = ceheader.getElements();
-					for (int i = 0; i < codecs.length; i++) {
-						if (codecs[i].getName().equalsIgnoreCase("gzip")) {
-							response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-							return;
-						}
+				if (ceheader == null) {
+					return;
+				}
+
+				for (final HeaderElement codec : ceheader.getElements()) {
+					final String name = codec.getName();
+					if (name != null && name.equalsIgnoreCase("gzip")) {
+						response.setEntity(new GzipDecompressingEntity(entity));
+						return;
 					}
 				}
 			}
@@ -210,8 +216,6 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		HttpProtocolParams.setHttpElementCharset(params, "UTF-8");
 		HttpProtocolParams.setUserAgent(params, userAgent);
 		HttpProtocolParams.setVersion(params, new ProtocolVersion("HTTP", 1, 1));
-
-		//AuthParams.
 
 		params.setParameter(CoreProtocolPNames.WAIT_FOR_CONTINUE, Integer.valueOf(connectionTimeoutSeconds));
 

@@ -4,3 +4,112 @@ TODOs:
 http://www.ibm.com/developerworks/java/library/j-jtp05236.html
 
 2.) Allow throttling bandwidth
+
+3.) <java.lang.ArrayIndexOutOfBoundsException: -1>java.lang.ArrayIndexOutOfBoundsException: -1
+	at simplespider.simplespider.bot.extractor.html.stream.HtmlWriter.filterTag(HtmlWriter.java:313)
+	at simplespider.simplespider.bot.extractor.html.stream.HtmlWriter.filterSentence(HtmlWriter.java:270)
+	at simplespider.simplespider.bot.extractor.html.stream.HtmlWriter.write(HtmlWriter.java:211)
+	at simplespider.simplespider.bot.extractor.html.stream.HtmlWriter.write(HtmlWriter.java:405)
+	at simplespider.simplespider.bot.extractor.html.stream.StreamExtractor.parse(StreamExtractor.java:124)
+	at simplespider.simplespider.bot.extractor.html.stream.StreamExtractor.getUrls(StreamExtractor.java:66)
+	at simplespider.simplespider.bot.CrawlerImpl.getLinks(CrawlerImpl.java:234)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:110)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+
+4.) 2009/12/26 00:39:04:164 CET [ERROR] CrawlerImpl - Failed to load URL "http://www.zeit.de/suche/index?q="Presseschau"" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+	at java.net.URI.create(URI.java:842)
+	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
+	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
+	at simplespider.simplespider.bot.CrawlerImpl.getHttpConnection(CrawlerImpl.java:67)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:99)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: java.net.URISyntaxException: Illegal character in query at index 33: http://www.zeit.de/suche/index?q="Presseschau"
+	at java.net.URI$Parser.fail(URI.java:2809)
+	at java.net.URI$Parser.checkChars(URI.java:2982)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3072)
+	at java.net.URI$Parser.parse(URI.java:3014)
+	at java.net.URI.<init>(URI.java:578)
+	at java.net.URI.create(URI.java:840)
+	... 8 more
+
+5.) "http://www.linkedin.com/shareArticle?mini=true&url=http:/www.hollywoodreporter.com/hr/content_display/news/e3idbd92851d6a66e355e36cdcc5675a277&title=Why Apple can't kill cable&summary=Article%20about%20Why Apple can't kill cable&source=The Hollwood Reporter" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+	at java.net.URI.create(URI.java:842)
+	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
+	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
+	at simplespider.simplespider.bot.CrawlerImpl.getHttpConnection(CrawlerImpl.java:67)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:99)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: java.net.URISyntaxException: Illegal character in query at index 152: http://www.linkedin.com/shareArticle?mini=true&url=http:/www.hollywoodreporter.com/hr/content_display/news/e3idbd92851d6a66e355e36cdcc5675a277&title=Why Apple can't kill cable&summary=Article%20about%20Why Apple can't kill cable&source=The Hollwood Reporter
+	at java.net.URI$Parser.fail(URI.java:2809)
+	at java.net.URI$Parser.checkChars(URI.java:2982)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3072)
+	at java.net.URI$Parser.parse(URI.java:3014)
+	at java.net.URI.<init>(URI.java:578)
+	at java.net.URI.create(URI.java:840)
+	... 8 more
+
+"http://www.facebook.com/sharer.php?u=http:/npd-blog.info/2009/11/30/die-religionskritikverhinderer-4666/&t=Die Religionskritikverhinderer" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+	at java.net.URI.create(URI.java:842)
+	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
+	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
+	at simplespider.simplespider.bot.CrawlerImpl.getHttpConnection(CrawlerImpl.java:67)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:99)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: java.net.URISyntaxException: Illegal character in query at index 110: http://www.facebook.com/sharer.php?u=http:/npd-blog.info/2009/11/30/die-religionskritikverhinderer-4666/&t=Die Religionskritikverhinderer
+	at java.net.URI$Parser.fail(URI.java:2809)
+	at java.net.URI$Parser.checkChars(URI.java:2982)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3072)
+	at java.net.URI$Parser.parse(URI.java:3014)
+	at java.net.URI.<init>(URI.java:578)
+	at java.net.URI.create(URI.java:840)
+	... 8 more
+
+2009/12/26 04:10:48:537 CET [ERROR] CrawlerImpl - Failed to load URL "http://del.icio.us/post?url=http:/news.bbc.co.uk/sport2/hi/boxing/8429621.stm&title=Bruno's ex-manager Lawless dies" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+	at java.net.URI.create(URI.java:842)
+	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
+	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
+	at simplespider.simplespider.bot.CrawlerImpl.getHttpConnection(CrawlerImpl.java:67)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:99)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: java.net.URISyntaxException: Illegal character in query at index 91: http://del.icio.us/post?url=http:/news.bbc.co.uk/sport2/hi/boxing/8429621.stm&title=Bruno's ex-manager Lawless dies
+	at java.net.URI$Parser.fail(URI.java:2809)
+	at java.net.URI$Parser.checkChars(URI.java:2982)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3072)
+	at java.net.URI$Parser.parse(URI.java:3014)
+	at java.net.URI.<init>(URI.java:578)
+	at java.net.URI.create(URI.java:840)
+	... 8 more
+
+2009/12/26 06:32:25:886 CET [ERROR] CrawlerImpl - Failed to load URL "http://dejure.org/dienste/vernetzung/rechtsprechung?Text=MMR 2005, 711" <java.lang.IllegalArgumentException>java.lang.IllegalArgumentException
+	at java.net.URI.create(URI.java:842)
+	at org.apache.http.client.methods.HttpGet.<init>(HttpGet.java:69)
+	at simplespider.simplespider.bot.http.apache.ApacheHttpClient.createConnection(ApacheHttpClient.java:61)
+	at simplespider.simplespider.bot.CrawlerImpl.getHttpConnection(CrawlerImpl.java:67)
+	at simplespider.simplespider.bot.CrawlerImpl.crawl(CrawlerImpl.java:99)
+	at simplespider.simplespider.bot.CrawlerRunner.run(CrawlerRunner.java:37)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.runTask(ThreadPoolExecutor.java:886)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:908)
+	at java.lang.Thread.run(Thread.java:619)
+Caused by: java.net.URISyntaxException: Illegal character in query at index 60: http://dejure.org/dienste/vernetzung/rechtsprechung?Text=MMR 2005, 711
+	at java.net.URI$Parser.fail(URI.java:2809)
+	at java.net.URI$Parser.checkChars(URI.java:2982)
+	at java.net.URI$Parser.parseHierarchical(URI.java:3072)
+	at java.net.URI$Parser.parse(URI.java:3014)
+	at java.net.URI.<init>(URI.java:578)
+	at java.net.URI.create(URI.java:840)
+	... 8 more
