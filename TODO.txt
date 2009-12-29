@@ -113,3 +113,8 @@ Caused by: java.net.URISyntaxException: Illegal character in query at index 60: 
 	at java.net.URI.<init>(URI.java:578)
 	at java.net.URI.create(URI.java:840)
 	... 8 more
+
+5.) Allow configuration of thread priority
+http://java.sun.com/javase/6/docs/api/java/util/concurrent/ThreadPoolExecutor.html#ThreadPoolExecutor(int,%20int,%20long,%20java.util.concurrent.TimeUnit,%20java.util.concurrent.BlockingQueue,%20java.util.concurrent.ThreadFactory)
+http://java.sun.com/javase/6/docs/api/java/util/concurrent/ThreadFactory.html
+http://java.sun.com/javase/6/docs/api/java/lang/Thread.html#setPriority(int)
