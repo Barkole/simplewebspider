@@ -156,12 +156,12 @@ public class SimpleHostThrottler implements HostThrottler {
 	}
 
 	private void updateHosts(final SimpleUrl simpleUrl) {
-		final String host = simpleUrl.getHost();
-		HostCounter hostCounter = this.hosts.get(host);
+		final String hostMain = simpleUrl.getHostMain();
+		HostCounter hostCounter = this.hosts.get(hostMain);
 
 		if (hostCounter == null) {
-			hostCounter = new HostCounter(host);
-			this.hosts.put(host, hostCounter);
+			hostCounter = new HostCounter(hostMain);
+			this.hosts.put(hostMain, hostCounter);
 		}
 
 		hostCounter.increaseUsageCounter();

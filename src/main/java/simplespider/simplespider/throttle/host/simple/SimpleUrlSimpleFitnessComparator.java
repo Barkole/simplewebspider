@@ -69,11 +69,11 @@ class SimpleUrlSimpleFitnessComparator implements Comparator<SimpleUrl> {
 	}
 
 	private HostCounter getDomainCounter(final SimpleUrl simpleUrl) {
-		final String host = simpleUrl.getHost();
-		if (host == null) {
+		final String hostMain = simpleUrl.getHostMain();
+		if (hostMain == null) {
 			new IllegalArgumentException("SimpleUrl " + simpleUrl + " does not contain any host");
 		}
-		return this.domains.get(host);
+		return this.domains.get(hostMain);
 	}
 
 }

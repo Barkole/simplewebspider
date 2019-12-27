@@ -8,6 +8,10 @@
 		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
+		<release version="0.0.14" date="2019-12-27" description="Feature release">
+			<action dev="berendona" type="update">host throttler consieders only the top and second level domain name parts</action>
+		</release>
+
 		<release version="0.0.13" date="2017-01-01" description="Feature release">
 			<action dev="berendona" type="add">only in memory url table</action>
 			<action dev="berendona" type="fix">Throttler spreads requests better</action>

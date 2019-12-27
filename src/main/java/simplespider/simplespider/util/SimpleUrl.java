@@ -40,6 +40,7 @@ public class SimpleUrl {
 	// class variables
 	private String					protocol;
 	private String					host;
+	private String					hostMain;
 	private String					userInfo;
 	private String					path;
 	private String					quest;
@@ -73,6 +74,7 @@ public class SimpleUrl {
 
 		this.protocol = baseURL.protocol;
 		this.host = baseURL.host;
+		this.host = baseURL.hostMain;
 		this.port = baseURL.port;
 		this.userInfo = baseURL.userInfo;
 
@@ -119,6 +121,7 @@ public class SimpleUrl {
 		checkNotEmpty("url", url);
 
 		parseURLString(url);
+		this.hostMain = hostMain(this.host);
 	}
 
 	public SimpleUrl(final String protocol, final String host, final int port, final String path) throws MalformedURLException {
@@ -127,6 +130,7 @@ public class SimpleUrl {
 
 		this.protocol = protocol;
 		this.host = host;
+		this.hostMain = hostMain(host);
 		this.port = port;
 		this.path = path;
 		identRef();
@@ -149,9 +153,9 @@ public class SimpleUrl {
 	 * Copy constructor
 	 * 
 	 * @param baseURL
-	 *            must not be <code>null</code>
+	 *                    must not be <code>null</code>
 	 * @throws NullPointerException
-	 *             if <code>baseUrl</code> is <code>null</code>
+	 *                                  if <code>baseUrl</code> is <code>null</code>
 	 */
 	public SimpleUrl(final SimpleUrl baseURL) {
 		ValidityHelper.checkNotNull("baseURL", baseURL);
@@ -173,7 +177,7 @@ public class SimpleUrl {
 	 * secondly each of these bytes is encoded as "%xx". </ul>
 	 * 
 	 * @param s
-	 *            The string to be encoded
+	 *              The string to be encoded
 	 * @return The encoded string
 	 */
 	// from: http://www.w3.org/International/URLUTF8Encoder.java
@@ -190,8 +194,7 @@ public class SimpleUrl {
 				sbuf.append((char) ch);
 			} else if (ch == ' ') { // space
 				sbuf.append("%20");
-			} else if (ch == '&'
-					|| ch == ':' // unreserved
+			} else if (ch == '&' || ch == ':' // unreserved
 					|| ch == '-' || ch == '_' || ch == '.' || ch == '!' || ch == '~' || ch == '*' || ch == '\'' || ch == '(' || ch == ')'
 					|| ch == ';') {
 				sbuf.append((char) ch);
@@ -220,9 +223,8 @@ public class SimpleUrl {
 				new String[] { "http://www.anomic.de/home/index.html", "ftp://ftp.yacy.net/test" },
 				new String[] { "http://www.anomic.de/home/index.html", "../test" },
 				new String[] { "http://www.anomic.de/home/index.html", "mailto:abcdefg@nomailnomail.com" }, new String[] { null, "news:de.test" },
-				new String[] { "http://www.anomic.de/home", "news:de.test" },
-				new String[] { "http://www.anomic.de/home", "ftp://ftp.anomic.de/src" }, new String[] { null, "ftp://ftp.delegate.org/" },
-				new String[] { "http://www.anomic.de/home", "ftp://ftp.delegate.org/" },
+				new String[] { "http://www.anomic.de/home", "news:de.test" }, new String[] { "http://www.anomic.de/home", "ftp://ftp.anomic.de/src" },
+				new String[] { null, "ftp://ftp.delegate.org/" }, new String[] { "http://www.anomic.de/home", "ftp://ftp.delegate.org/" },
 				new String[] { "http://www.anomic.de", "mailto:yacy@weltherrschaft.org" }, new String[] { "http://www.anomic.de", "javascipt:temp" },
 				new String[] { null, "http://yacy-websuche.de/wiki/index.php?title=De:IntroInformationFreedom&action=history" },
 				new String[] { null, "http://diskusjion.no/index.php?s=5bad5f431a106d9a8355429b81bb0ca5&showuser=23585" },
@@ -316,6 +318,24 @@ public class SimpleUrl {
 		return protocolMatcher.find() && protocolMatcher.start() == 0;
 	}
 
+	private String hostMain(final String host) {
+		if (host == null || host.isEmpty()) {
+			return host;
+		}
+
+		int lastDot = host.lastIndexOf('.');
+		if (lastDot < 0) {
+			return host;
+		}
+
+		int dotBeforeLastDot = host.lastIndexOf('.', lastDot - 1);
+		if (lastDot < 0) {
+			return host;
+		}
+
+		return host.substring(dotBeforeLastDot + 1);
+	}
+
 	// from: http://www.w3.org/International/unescape.java
 	public static String unescape(final String s) {
 		final StringBuilder sbuf = new StringBuilder();
@@ -358,7 +378,7 @@ public class SimpleUrl {
 			} else if ((b & 0xfc) == 0xf8) { // 111110xx (yields 2 bits)
 				sumb = b & 0x03;
 				more = 4; // Expect 4 more bytes
-			} else /* if ((b & 0xfe) == 0xfc) */{ // 1111110x (yields 1 bit)
+			} else /* if ((b & 0xfe) == 0xfc) */ { // 1111110x (yields 1 bit)
 				sumb = b & 0x01;
 				more = 5; // Expect 5 more bytes
 			}
@@ -518,6 +538,10 @@ public class SimpleUrl {
 
 	public String getHost() {
 		return this.host;
+	}
+
+	public String getHostMain() {
+		return this.hostMain;
 	}
 
 	public String getPath() {
