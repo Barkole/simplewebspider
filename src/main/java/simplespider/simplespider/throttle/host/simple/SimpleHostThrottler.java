@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.logging.Log;
@@ -40,10 +41,10 @@ public class SimpleHostThrottler implements HostThrottler {
 	private static final Log				LOG												= LogFactory.getLog(SimpleHostThrottler.class);
 
 	private static String					HOST_THROTTLER_HOSTS_AT_ONCE					= "throttler.host.hosts-at-once";
-	private static int						HOST_THROTTLER_HOSTS_AT_ONCE_DEFAULT			= 20;
+	private static int						HOST_THROTTLER_HOSTS_AT_ONCE_DEFAULT			= 100;
 
 	private static String					HOST_THROTTLER_HOSTS_MAX_SIZE					= "throttler.host.hosts-max-size";
-	private static int						HOST_THROTTLER_HOSTS_MAX_SIZE_DEFAULT			= 1024;
+	private static int						HOST_THROTTLER_HOSTS_MAX_SIZE_DEFAULT			= 10*1024;
 
 	private static String					HOST_THROTTLER_HOSTS_MAX_AGE_SECONDS			= "throttler.host.hosts-max-age-seconds";
 	private static int						HOST_THROTTLER_HOSTS_MAX_AGE_SECONDS_DEFAULT	= 60 * 60;
@@ -56,6 +57,10 @@ public class SimpleHostThrottler implements HostThrottler {
 	private final SortedSet<HostCounter>	hostsByTimestampUpdated;
 	private final Comparator<SimpleUrl>		simpleUrlFitnessComparator;
 
+	// use ReentrantLock instead of synchronized for scalability
+	private ReentrantLock lock;
+
+
 	public SimpleHostThrottler(final Configuration configuration) {
 		ValidityHelper.checkNotNull("configuration", configuration);
 
@@ -63,8 +68,10 @@ public class SimpleHostThrottler implements HostThrottler {
 		this.hosts = new HashMap<String, HostCounter>();
 		this.hostsByTimestampUpdated = new TreeSet<HostCounter>(new HostComparatorByTimestampUpdated());
 		this.simpleUrlFitnessComparator = new SimpleUrlSimpleFitnessComparator(this.hosts);
+		this.lock = new ReentrantLock(false);
 	}
 
+	@Override
 	public int getUrlsAtOnce() {
 		int hostsAtOnce = this.configuration.getInt(HOST_THROTTLER_HOSTS_AT_ONCE, HOST_THROTTLER_HOSTS_AT_ONCE_DEFAULT);
 		if (hostsAtOnce < 1) {
@@ -87,7 +94,13 @@ public class SimpleHostThrottler implements HostThrottler {
 		return this.configuration.getLong(HOST_THROTTLER_HOSTS_MAX_AGE_SECONDS, HOST_THROTTLER_HOSTS_MAX_AGE_SECONDS_DEFAULT);
 	}
 
-	public synchronized String getBestFitting(final List<String> urls) {
+	@Override
+	public String getBestFittingString(final List<String> urls) {
+		lock.lock();
+		try {
+			if (urls == null || urls.isEmpty()) {
+				return null;
+			}
 		// Required for internal algorithm
 		final List<SimpleUrl> simpleUrls = new ArrayList<SimpleUrl>(urls.size());
 		// Used to ensure return the exactly same String object
@@ -101,18 +114,29 @@ public class SimpleHostThrottler implements HostThrottler {
 			} catch (final MalformedURLException e) {
 				LOG.warn("Ignore not valid url " + url + ": " + e);
 			}
+
+			if (simpleUrls.isEmpty()) {
+				// So we remove the malformed URLs from queue
+				return urls.get(0);
+			}
 		}
 
-		final SimpleUrl bestFitting = getBestFitting(simpleUrls);
+		final SimpleUrl bestFitting = getBestFittingSimpleUrl(simpleUrls);
 
 		final String result = simpleUrlsToUrlString.get(bestFitting);
 		if (result == null) {
 			throw new IllegalStateException("Could not find " + simpleUrls + " in internal map");
 		}
 		return result;
+		} finally {
+			lock.unlock();
+		}
 	}
 
-	public synchronized SimpleUrl getBestFitting(final List<SimpleUrl> urls) {
+	@Override
+	public synchronized SimpleUrl getBestFittingSimpleUrl(final List<SimpleUrl> urls) {
+		lock.lock();
+		try {
 		/* Cleanup before using */
 		removeOutOfDateEntries();
 
@@ -126,6 +150,9 @@ public class SimpleHostThrottler implements HostThrottler {
 		enforceMaxSize();
 
 		return bestFittingUrl;
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	private void updateHosts(final SimpleUrl simpleUrl) {
@@ -135,15 +162,11 @@ public class SimpleHostThrottler implements HostThrottler {
 		if (hostCounter == null) {
 			hostCounter = new HostCounter(host);
 			this.hosts.put(host, hostCounter);
-		} else {
-			this.hostsByTimestampUpdated.remove(hostCounter);
 		}
 
 		hostCounter.increaseUsageCounter();
-		final boolean added = this.hostsByTimestampUpdated.add(hostCounter);
-		if (!added) {
-			throw new IllegalStateException("Failed to add hostCounter " + hostCounter);
-		}
+		this.hostsByTimestampUpdated.remove(hostCounter);
+		this.hostsByTimestampUpdated.add(hostCounter);
 	}
 
 	private SimpleUrl getBestFittingInternal(final List<SimpleUrl> urls) {
@@ -166,10 +189,6 @@ public class SimpleHostThrottler implements HostThrottler {
 
 	private void enforceMaxSize() {
 		final int hostsMaxSize = getHostsMaxSize();
-		if (this.hosts.size() != this.hostsByTimestampUpdated.size()) {
-			throw new IllegalStateException("Size of hosts and hostsByTimestampUpdated is not equal: " + this.hosts.size() + " vs. "
-					+ this.hostsByTimestampUpdated.size());
-		}
 
 		while (this.hostsByTimestampUpdated.size() > hostsMaxSize) {
 			final HostCounter oldest = this.hostsByTimestampUpdated.first();
@@ -177,10 +196,6 @@ public class SimpleHostThrottler implements HostThrottler {
 			this.hosts.remove(oldest.getHost());
 		}
 
-		if (this.hosts.size() != this.hostsByTimestampUpdated.size()) {
-			throw new IllegalStateException("After trimming: Size of hosts and hostsByTimestampUpdated is not equal: " + this.hosts.size() + " vs. "
-					+ this.hostsByTimestampUpdated.size());
-		}
 	}
 
 	private void removeOutOfDateEntries() {
@@ -190,11 +205,6 @@ public class SimpleHostThrottler implements HostThrottler {
 			return;
 		}
 
-		if (this.hosts.size() != this.hostsByTimestampUpdated.size()) {
-			throw new IllegalStateException("Size of hosts and hostsByTimestampUpdated is not equal: " + this.hosts.size() + " vs. "
-					+ this.hostsByTimestampUpdated.size());
-		}
-
 		final Date timestampMaxAge = new Date(System.currentTimeMillis() - hostsMaxAgeSeconds * 1000);
 		final HostCounter referenceObject = new HostCounter(null, timestampMaxAge);
 		final SortedSet<HostCounter> outOfDates = this.hostsByTimestampUpdated.headSet(referenceObject);
@@ -202,11 +212,6 @@ public class SimpleHostThrottler implements HostThrottler {
 		for (final HostCounter outOfDate : new ArrayList<HostCounter>(outOfDates)) {
 			this.hosts.remove(outOfDate.getHost());
 			this.hostsByTimestampUpdated.remove(outOfDate);
-		}
-
-		if (this.hosts.size() != this.hostsByTimestampUpdated.size()) {
-			throw new IllegalStateException("After trimming: Size of hosts and hostsByTimestampUpdated is not equal: " + this.hosts.size() + " vs. "
-					+ this.hostsByTimestampUpdated.size());
 		}
 	}
 

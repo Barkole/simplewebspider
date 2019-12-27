@@ -45,6 +45,7 @@ public class ApacheHttpClient implements HttpClient {
 		this.httpClient = httpClient;
 	}
 
+	@Override
 	public void createConnection(final String url) throws ClientProtocolException, IOException {
 		ValidityHelper.checkNotEmpty("url", url);
 
@@ -66,19 +67,23 @@ public class ApacheHttpClient implements HttpClient {
 		this.httpResponse = this.httpClient.execute(this.httpGet, localContext);
 	}
 
+	@Override
 	public int getStatusCode() {
 		return getStatusLine().getStatusCode();
 	}
 
+	@Override
 	public StatusLine getStatusLine() {
 		checkForOpenConnection();
 		return this.httpResponse.getStatusLine();
 	}
 
+	@Override
 	public String getStatusText() {
 		return getStatusLine().getReasonPhrase();
 	}
 
+	@Override
 	public String getRedirectedUrl() {
 		checkForOpenConnection();
 		final URI uri = this.httpGet.getURI();
@@ -86,6 +91,7 @@ public class ApacheHttpClient implements HttpClient {
 		return realBaseUrl;
 	}
 
+	@Override
 	public InputStream getResponseBodyAsStream() throws IOException {
 		checkForOpenConnection();
 
@@ -97,6 +103,7 @@ public class ApacheHttpClient implements HttpClient {
 		return entity.getContent();
 	}
 
+	@Override
 	public void releaseConnection() {
 		checkForOpenConnection();
 		this.httpGet.abort();
@@ -110,6 +117,7 @@ public class ApacheHttpClient implements HttpClient {
 		}
 	}
 
+	@Override
 	public String getMimeType() {
 		checkForOpenConnection();
 

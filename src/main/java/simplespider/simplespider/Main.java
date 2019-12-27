@@ -41,7 +41,7 @@ import simplespider.simplespider.bot.http.apache.ApacheHttpClientFactory;
 import simplespider.simplespider.dao.DbHelper;
 import simplespider.simplespider.dao.DbHelperFactory;
 import simplespider.simplespider.dao.LinkDao;
-import simplespider.simplespider.dao.db4o.Db4oDbHelperFactory;
+import simplespider.simplespider.dao.mem.MemDbHelperFactory;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
 import simplespider.simplespider.throttle.host.HostThrottler;
 import simplespider.simplespider.throttle.host.simple.SimpleHostThrottler;
@@ -263,7 +263,7 @@ public class Main {
 		}
 
 		final HostThrottler hostThrottler = new SimpleHostThrottler(configuration);
-		final DbHelperFactory dbHelperFactory = new Db4oDbHelperFactory(configuration, hostThrottler);
+		final DbHelperFactory dbHelperFactory = new MemDbHelperFactory(configuration, hostThrottler);
 
 		final HttpClientFactory httpClientFactory;
 		if (args.length == 2) {

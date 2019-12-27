@@ -26,8 +26,8 @@ public interface HostThrottler {
 
 	public abstract int getUrlsAtOnce();
 
-	public abstract String getBestFitting(final List<String> urls);
+	public abstract String getBestFittingString(final List<String> urls);
 
-	public abstract SimpleUrl getBestFitting(final List<SimpleUrl> urls);
+	public abstract SimpleUrl getBestFittingSimpleUrl(final List<SimpleUrl> urls);
 
 }
