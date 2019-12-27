@@ -16,13 +16,23 @@
 @REM along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @REM
 @echo off
+
+echo cd %~dp0
+%~d0
+cd %~dp0
+
 setlocal EnableDelayedExpansion
 
+::SET CALL_PREFIX=start /LOW /B
+::SET JAVA=javaw
+
+SET CALL_PREFIX=
 SET JAVA=java
+
 SET JAVANMAIN=simplespider.simplespider.Main
 SET JAVA_ARGS=-Xmx512m -XX:+HeapDumpOnOutOfMemoryError -Djava.awt.headless=true -Djava.util.logging.config.file=simple-web-spider.java-logger.properties
 
-// Determine all available jars for classpath
+:: Determine all available jars for classpath
 SET JARS=
 FOR %%j IN (.\lib\*.jar) DO (
 	if "!JARS!"=="" SET JARS=%%j
@@ -31,9 +41,9 @@ FOR %%j IN (.\lib\*.jar) DO (
 
 SET PARAMETER=
 
-SET CMDLINE=%JAVA% %JAVA_ARGS% -classpath %JARS% %JAVANMAIN% %PARAMETER%
+SET CMDLINE==%CALL_PREFIX%  %JAVA% %JAVA_ARGS% -classpath %JARS% %JAVANMAIN% %PARAMETER%
 
-::echo %CMDLINE%
+echo %CMDLINE%
 call %CMDLINE%
 
 endlocal
