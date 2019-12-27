@@ -8,6 +8,11 @@
 		<author email="berendona@users.sourceforge.net">berendona</author>
 	</properties>
 	<body>
+		<release version="0.0.13" date="2017-01-01" description="Feature release">
+			<action dev="berendona" type="add">only in memory url table</action>
+			<action dev="berendona" type="fix">Throttler spreads requests better</action>
+		</release>
+
 		<release version="0.0.12" date="2010-01-01" description="Feature release">
 			<action dev="berendona" type="add">Host throttler to try to reduce requesting same domain</action>
 			<action dev="berendona" type="update">Upgrade db4o 7.11 to 7.12</action>
