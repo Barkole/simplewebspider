@@ -45,6 +45,7 @@ import simplespider.simplespider.dao.mem.MemDbHelperFactory;
 import simplespider.simplespider.importing.simplefile.SimpleFileImporter;
 import simplespider.simplespider.throttle.host.HostThrottler;
 import simplespider.simplespider.throttle.host.simple.SimpleHostThrottler;
+import simplespider.simplespider.throttle.throughput.LimitThroughPut;
 
 /**
  * Hello world!
