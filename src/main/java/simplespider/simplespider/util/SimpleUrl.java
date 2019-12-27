@@ -64,6 +64,9 @@ public class SimpleUrl {
 		if (baseURL == null) {
 			throw new MalformedURLException("base URL is null");
 		}
+		if (baseURL.path == null) {
+			throw new MalformedURLException("base URL path is null");
+		}
 		if (relPath == null) {
 			throw new MalformedURLException("relPath is null");
 		}
@@ -78,8 +81,6 @@ public class SimpleUrl {
 			// a relative path that uses the protocol from the base url
 			relPath = baseURL.protocol + ":" + relPath;
 		}
-
-		// FIXME baseURL.path could be null
 
 		if (isAbsolute(relPath)) {
 			this.path = baseURL.path;
@@ -277,7 +278,6 @@ public class SimpleUrl {
 		}
 	}
 
-	// TODO Replace this logic by public constructor
 	public static SimpleUrl newURL(final SimpleUrl baseURL, final String relPath) throws MalformedURLException {
 		if (baseURL == null //
 				|| isAbsolute(relPath)) {
@@ -291,7 +291,6 @@ public class SimpleUrl {
 		return new SimpleUrl(baseURL, relPath);
 	}
 
-	// TODO Replace this logic by public constructor
 	public static SimpleUrl newURL(final String baseURL, final String relPath) throws MalformedURLException {
 		if (baseURL == null //
 				|| isAbsolute(relPath)) {

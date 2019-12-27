@@ -50,6 +50,7 @@ public class StreamExtractor implements LinkExtractor {
 		this.configuration = configuration;
 	}
 
+	@Override
 	public List<String> getUrls(final InputStream body, final String baseUrl) throws IOException {
 		ValidityHelper.checkNotNull("body", body);
 

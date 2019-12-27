@@ -88,10 +88,7 @@ public class CrawlerImpl implements Crawler {
 		return httpClient;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.bot.Crawler#crawl(java.lang.String)
-	 */
+	@Override
 	public void crawl(final String baseUrl) {
 		ValidityHelper.checkNotEmpty("baseUrl", baseUrl);
 
@@ -99,7 +96,7 @@ public class CrawlerImpl implements Crawler {
 			final HttpClient httpClient = getHttpConnection(baseUrl);
 			if (httpClient == null) {
 				// Error occurs, try it later
-				setLinkUndone(baseUrl);
+				// setLinkUndone(baseUrl);
 				// Slow down thread
 				sleepOnError();
 				return;
@@ -115,7 +112,7 @@ public class CrawlerImpl implements Crawler {
 
 			if (urls == null) {
 				// Error occurs, try it later
-				setLinkUndone(baseUrl);
+				// setLinkUndone(baseUrl);
 				// Slow down thread
 				sleepOnError();
 			} else {
@@ -278,34 +275,6 @@ public class CrawlerImpl implements Crawler {
 		mimeType = mimeType.toLowerCase();
 		return mimeType.startsWith("image/") //
 				|| "text/css".equals(mimeType);
-	}
-
-	private void setLinkUndone(final String baseUrl) {
-		try {
-			final DbHelper dbHelper = this.dbHelperFactory.buildDbHelper();
-			try {
-				dbHelper.beginTransaction();
-				try {
-					final LinkDao linkDao = dbHelper.getLinkDao();
-					linkDao.saveForced(baseUrl);
-				} catch (final Exception e) {
-					try {
-						dbHelper.rollbackTransaction();
-					} catch (final Exception e2) {
-						LOG.warn("Failed to rollback connection", e2);
-					}
-					throw e;
-				}
-			} finally {
-				try {
-					dbHelper.close();
-				} catch (final Exception e) {
-					LOG.warn("Failed to close database connection", e);
-				}
-			}
-		} catch (final Exception e) {
-			LOG.warn("Failed to resave url: " + baseUrl, e);
-		}
 	}
 
 }

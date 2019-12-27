@@ -108,10 +108,7 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 		this.connectionManager = new ThreadSafeClientConnManager(params, supportedSchemes);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see simplespider.simplespider_core.http.HttpClientFactory#buildHttpClient()
-	 */
+	@Override
 	public HttpClient buildHttpClient() {
 
 		final HttpParams params = buildParameters();
@@ -137,6 +134,7 @@ public class ApacheHttpClientFactory implements HttpClientFactory {
 
 		httpClient.addResponseInterceptor(new HttpResponseInterceptor() {
 
+			@Override
 			public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
 				final HttpEntity entity = response.getEntity();
 				if (entity == null) {

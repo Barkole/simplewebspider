@@ -50,6 +50,8 @@ import org.apache.commons.logging.LogFactory;
 final class TagWriter extends Writer {
 
 	private static final Log	LOG			= LogFactory.getLog(TagWriter.class);
+	private static final int    MIN_BUFFER_SIZE = 256;
+	private static final int    MAX_BUFFER_SIZE = 10 * 1024 * 1024;
 
 	private static final char	singlequote	= '\'';
 	private static final char	doublequote	= '"';
@@ -60,12 +62,13 @@ final class TagWriter extends Writer {
 	private int					length;
 
 	public TagWriter() {
-		this.buffer = new char[10];
+		this.buffer = new char[MIN_BUFFER_SIZE];
 		this.length = 0;
 		this.offset = 0;
 	}
 
 	public TagWriter(final int initLength) {
+		checkBufferSize(initLength);
 		this.buffer = new char[initLength];
 		this.length = 0;
 		this.offset = 0;
@@ -142,8 +145,8 @@ final class TagWriter extends Writer {
 
 	private void grow() {
 		int newsize = this.buffer.length * 2 + 1;
-		if (newsize < 256) {
-			newsize = 256;
+		if (newsize < MIN_BUFFER_SIZE) {
+			newsize = MIN_BUFFER_SIZE;
 		}
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Increase tag writer buffer: from " + this.buffer.length + " to " + newsize);
@@ -561,12 +564,18 @@ final class TagWriter extends Writer {
 
 	@Override
 	public void close() throws IOException {
-		// TODO Auto-generated method stub        
+		clear();
 	}
 
 	@Override
 	public void flush() throws IOException {
-		// TODO Auto-generated method stub        
+		// Nothing to do
+	}
+
+	private static void checkBufferSize(int newSize) {
+		if (newSize > MAX_BUFFER_SIZE) {
+			throw new IllegalStateException(String.format("New buffer size exceeds max buffer size [newSize=%s, maxSize=%s]", Integer.valueOf(newSize), Integer.valueOf(MAX_BUFFER_SIZE)));
+		}
 	}
 
 }
