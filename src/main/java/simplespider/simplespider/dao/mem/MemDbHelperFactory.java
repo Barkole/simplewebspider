@@ -11,7 +11,7 @@ import org.apache.commons.configuration.Configuration;
 public class MemDbHelperFactory implements DbHelperFactory {
 
     private static final String KEY_QUEUE_SIZE  = "database.mem.queue.size";
-    private static final int   DFLT_QUEUE_SIZE = 1_000_000;
+    private static final int   DFLT_QUEUE_SIZE = 10_000;
 
     volatile HostThrottler     hostThrottler;
     volatile SimpleSet<String> queue;
